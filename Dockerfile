@@ -71,6 +71,7 @@ RUN ln -s /usr/bin/clang++-${LLVM_VERSION} /usr/bin/clang++
 RUN apt-get remove -y python3-distro
 RUN pip3 install conan --break-system-packages
 
+ARG WORKDIR
 WORKDIR $WORKDIR
 COPY scripts scripts
 COPY conanfile.py .
@@ -92,6 +93,7 @@ FROM builder AS build
 ARG BUILD_OUTPUT_DIR
 ARG BUILD_TYPE
 
+ARG WORKDIR
 WORKDIR $WORKDIR
 COPY . .
 
@@ -133,6 +135,7 @@ RUN apt-get update \
 RUN pip3 install click eth-account eth-utils typing-extensions --break-system-packages
 
 ARG BUILD_OUTPUT_DIR
+ARG WORKDIR
 WORKDIR /root/.taraxa
 
 # Copy required binaries
