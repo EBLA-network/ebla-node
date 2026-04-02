@@ -4,13 +4,13 @@
 	ignore = dirty
 [submodule "submodules/taraxa-evm"]
 	path = submodules/taraxa-evm
-	url = ../taraxa-evm.git
+	url = ../ebla-evm.git
 	ignore = dirty
 [submodule "submodules/taraxa-vdf"]
 	path = submodules/taraxa-vdf
-	url = ../taraxa-vdf.git
+	url = ../ebla-vdf.git
 	ignore = dirty
 [submodule "submodules/taraxa-vrf"]
 	path = submodules/taraxa-vrf
-	url = ../taraxa-vrf.git
+	url = ../ebla-vrf.git
 	ignore = dirty
