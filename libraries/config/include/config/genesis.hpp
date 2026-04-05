@@ -12,7 +12,7 @@ namespace taraxa {
 struct GasPriceConfig {
   uint64_t percentile = 60;
   uint64_t blocks = 200;
-  uint64_t minimum_price = 1;
+  uint64_t minimum_price = 1000000000;
   void validate() const;
   bytes rlp() const;
 };

@@ -64,7 +64,7 @@
   "gas_price": {
     "blocks": 200,
     "percentile": 60,
-    "minimum_price": 1
+    "minimum_price": 1000000000
   },
   "pbft": {
     "committee_size": "0x3e8",
@@ -128,7 +128,7 @@
     },
     "soleirolia_hf": {
       "block_num": 0,
-      "trx_min_gas_price": "0x1",
+      "trx_min_gas_price": "0x3B9ACA00",
       "trx_max_gas_limit": "0x1E0A6E0"
     }
   }
