@@ -1111,33 +1111,33 @@ void DbStorage::clearOwnVerifiedVotes(Batch& write_batch,
   }
 }
 
-void DbStorage::replaceTwoTPlusOneVotes(TwoTPlusOneVotedBlockType type,
+void DbStorage::replaceFiveOfEightVotes(FiveOfEightVotedBlockType type,
                                         const std::vector<std::shared_ptr<PbftVote>>& votes) {
-  remove(Columns::latest_round_two_t_plus_one_votes, static_cast<uint8_t>(type));
+  remove(Columns::latest_round_five_of_eight_votes, static_cast<uint8_t>(type));
 
   dev::RLPStream s(votes.size());
   for (const auto& vote : votes) {
     s.appendRaw(vote->rlp(true, true));
   }
-  insert(Columns::latest_round_two_t_plus_one_votes, static_cast<uint8_t>(type), s.out());
+  insert(Columns::latest_round_five_of_eight_votes, static_cast<uint8_t>(type), s.out());
 }
 
-void DbStorage::replaceTwoTPlusOneVotesToBatch(TwoTPlusOneVotedBlockType type,
+void DbStorage::replaceFiveOfEightVotesToBatch(FiveOfEightVotedBlockType type,
                                                const std::vector<std::shared_ptr<PbftVote>>& votes,
                                                Batch& write_batch) {
-  remove(write_batch, Columns::latest_round_two_t_plus_one_votes, static_cast<uint8_t>(type));
+  remove(write_batch, Columns::latest_round_five_of_eight_votes, static_cast<uint8_t>(type));
 
   dev::RLPStream s(votes.size());
   for (const auto& vote : votes) {
     s.appendRaw(vote->rlp(true, true));
   }
-  insert(write_batch, Columns::latest_round_two_t_plus_one_votes, static_cast<uint8_t>(type), s.out());
+  insert(write_batch, Columns::latest_round_five_of_eight_votes, static_cast<uint8_t>(type), s.out());
 }
 
-std::vector<std::shared_ptr<PbftVote>> DbStorage::getAllTwoTPlusOneVotes() {
+std::vector<std::shared_ptr<PbftVote>> DbStorage::getAllFiveOfEightVotes() {
   std::vector<std::shared_ptr<PbftVote>> votes;
-  auto load_db_votes = [this, &votes](TwoTPlusOneVotedBlockType type) {
-    auto votes_raw = asBytes(lookup(static_cast<uint8_t>(type), Columns::latest_round_two_t_plus_one_votes));
+  auto load_db_votes = [this, &votes](FiveOfEightVotedBlockType type) {
+    auto votes_raw = asBytes(lookup(static_cast<uint8_t>(type), Columns::latest_round_five_of_eight_votes));
     auto votes_rlp = dev::RLP(votes_raw);
     votes.reserve(votes.size() + votes_rlp.size());
 
@@ -1146,10 +1146,10 @@ std::vector<std::shared_ptr<PbftVote>> DbStorage::getAllTwoTPlusOneVotes() {
     }
   };
 
-  load_db_votes(TwoTPlusOneVotedBlockType::SoftVotedBlock);
-  load_db_votes(TwoTPlusOneVotedBlockType::CertVotedBlock);
-  load_db_votes(TwoTPlusOneVotedBlockType::NextVotedBlock);
-  load_db_votes(TwoTPlusOneVotedBlockType::NextVotedNullBlock);
+  load_db_votes(FiveOfEightVotedBlockType::SoftVotedBlock);
+  load_db_votes(FiveOfEightVotedBlockType::CertVotedBlock);
+  load_db_votes(FiveOfEightVotedBlockType::NextVotedBlock);
+  load_db_votes(FiveOfEightVotedBlockType::NextVotedNullBlock);
 
   return votes;
 }

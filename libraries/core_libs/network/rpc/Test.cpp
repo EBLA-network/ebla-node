@@ -111,7 +111,7 @@ Json::Value Test::get_node_status() {
     const auto chain_size = node->getPbftChain()->getPbftChainSize();
     const auto dpos_total_votes_opt = node->getPbftManager()->getCurrentDposTotalVotesCount();
     const auto dpos_node_votes_opt = node->getPbftManager()->getCurrentNodeVotesCount();
-    const auto two_t_plus_one_opt = node->getVoteManager()->getPbftTwoTPlusOne(chain_size, PbftVoteTypes::cert_vote);
+    const auto five_of_eight_opt = node->getVoteManager()->getPbftFiveOfEight(chain_size, PbftVoteTypes::cert_vote);
 
     res["synced"] = !node->getNetwork()->pbft_syncing();
     res["syncing_seconds"] = Json::UInt64(node->getNetwork()->syncTimeSeconds());
@@ -127,7 +127,7 @@ Json::Value Test::get_node_status() {
     res["pbft_round"] = Json::UInt64(node->getPbftManager()->getPbftRound());
     res["dpos_total_votes"] = Json::UInt64(dpos_total_votes_opt.has_value() ? *dpos_total_votes_opt : 0);
     res["dpos_node_votes"] = Json::UInt64(dpos_node_votes_opt ? *dpos_node_votes_opt : 0);
-    res["dpos_quorum"] = Json::UInt64(two_t_plus_one_opt ? *two_t_plus_one_opt : 0);
+    res["dpos_quorum"] = Json::UInt64(five_of_eight_opt ? *five_of_eight_opt : 0);
     res["pbft_sync_queue_size"] = Json::UInt64(node->getPbftManager()->periodDataQueueSize());
     res["trx_pool_size"] = Json::UInt64(node->getTransactionManager()->getTransactionPoolSize());
     res["trx_nonfinalized_size"] = Json::UInt64(node->getTransactionManager()->getNonfinalizedTrxSize());

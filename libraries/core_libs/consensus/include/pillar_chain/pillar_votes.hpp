@@ -48,7 +48,7 @@ class PillarVotes {
   bool periodDataInitialized(PbftPeriod period) const;
 
   /**
-   * @brief Initialize period data with period_two_t_plus_one
+   * @brief Initialize period data with period quorum threshold
    *
    * @param period
    * @param threshold

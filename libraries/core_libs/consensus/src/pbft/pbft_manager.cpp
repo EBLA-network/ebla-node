@@ -316,8 +316,8 @@ void PbftManager::resetStep() {
 bool PbftManager::tryPushCertVotesBlock() {
   const auto [current_pbft_round, current_pbft_period] = getPbftRoundAndPeriod();
 
-  auto cert_votes = vote_mgr_->getTwoTPlusOneVotedBlockVotes(current_pbft_period, current_pbft_round,
-                                                             TwoTPlusOneVotedBlockType::CertVotedBlock);
+  auto cert_votes = vote_mgr_->getFiveOfEightVotedBlockVotes(current_pbft_period, current_pbft_round,
+                                                             FiveOfEightVotedBlockType::CertVotedBlock);
   if (cert_votes.empty()) {
     return false;
   }
@@ -532,10 +532,10 @@ void PbftManager::initialState() {
 
   waitForPeriodFinalization();
 
-  const auto previous_round_next_voted_block = vote_mgr_->getTwoTPlusOneVotedBlock(
-      current_pbft_period, current_pbft_round - 1, TwoTPlusOneVotedBlockType::NextVotedBlock);
-  const auto previous_round_next_voted_null_block = vote_mgr_->getTwoTPlusOneVotedBlock(
-      current_pbft_period, current_pbft_round - 1, TwoTPlusOneVotedBlockType::NextVotedNullBlock);
+  const auto previous_round_next_voted_block = vote_mgr_->getFiveOfEightVotedBlock(
+      current_pbft_period, current_pbft_round - 1, FiveOfEightVotedBlockType::NextVotedBlock);
+  const auto previous_round_next_voted_null_block = vote_mgr_->getFiveOfEightVotedBlock(
+      current_pbft_period, current_pbft_round - 1, FiveOfEightVotedBlockType::NextVotedNullBlock);
 
   LOG(log_nf_) << "Node initialize at period " << current_pbft_period << ", round " << current_pbft_round << ", step "
                << current_pbft_step << ". Previous round 2t+1 next voted null block: " << std::boolalpha
@@ -636,16 +636,16 @@ void PbftManager::broadcastVotes() {
     stuckPeriodBroadcastVotes(rebroadcast);
 
     // Broadcast 2t+1 soft votes
-    gossipVotes(vote_mgr_->getTwoTPlusOneVotedBlockVotes(period, round, TwoTPlusOneVotedBlockType::SoftVotedBlock),
+    gossipVotes(vote_mgr_->getFiveOfEightVotedBlockVotes(period, round, FiveOfEightVotedBlockType::SoftVotedBlock),
                 "2t+1 soft votes", rebroadcast);
 
     // Broadcast previous round 2t+1 next votes
     if (round > 1) {
       gossipVotes(
-          vote_mgr_->getTwoTPlusOneVotedBlockVotes(period, round - 1, TwoTPlusOneVotedBlockType::NextVotedBlock),
+          vote_mgr_->getFiveOfEightVotedBlockVotes(period, round - 1, FiveOfEightVotedBlockType::NextVotedBlock),
           "2t+1 next votes", rebroadcast);
       gossipVotes(
-          vote_mgr_->getTwoTPlusOneVotedBlockVotes(period, round - 1, TwoTPlusOneVotedBlockType::NextVotedNullBlock),
+          vote_mgr_->getFiveOfEightVotedBlockVotes(period, round - 1, FiveOfEightVotedBlockType::NextVotedNullBlock),
           "2t+1 next null votes", rebroadcast);
     }
   };
@@ -944,7 +944,7 @@ void PbftManager::proposeBlock_() {
   LOG(log_dg_) << "PBFT value proposal state in period " << period << ", round " << round;
 
   if (round == 1 ||
-      vote_mgr_->getTwoTPlusOneVotedBlock(period, round - 1, TwoTPlusOneVotedBlockType::NextVotedNullBlock)
+      vote_mgr_->getFiveOfEightVotedBlock(period, round - 1, FiveOfEightVotedBlockType::NextVotedNullBlock)
           .has_value()) {
     LOG(log_nf_) << " 2t+1 next voted kNullBlockHash in previous round " << round - 1;
 
@@ -970,7 +970,7 @@ void PbftManager::proposeBlock_() {
 
     return;
   } else if (const auto previous_round_next_voted_value =
-                 vote_mgr_->getTwoTPlusOneVotedBlock(period, round - 1, TwoTPlusOneVotedBlockType::NextVotedBlock);
+                 vote_mgr_->getFiveOfEightVotedBlock(period, round - 1, FiveOfEightVotedBlockType::NextVotedBlock);
              previous_round_next_voted_value.has_value()) {
     // previous_round_next_voted_value_ should never have value for round == 1
     assert(round > 1);
@@ -1007,7 +1007,7 @@ void PbftManager::identifyBlock_() {
   LOG(log_dg_) << "PBFT filtering state in period: " << period << ", round: " << round;
 
   if (round == 1 ||
-      vote_mgr_->getTwoTPlusOneVotedBlock(period, round - 1, TwoTPlusOneVotedBlockType::NextVotedNullBlock)
+      vote_mgr_->getFiveOfEightVotedBlock(period, round - 1, FiveOfEightVotedBlockType::NextVotedNullBlock)
           .has_value()) {
     // Identity leader
     const auto leader_block_data = identifyLeaderBlock(proposed_blocks_, vote_mgr_->getProposalVotes(period, round));
@@ -1023,7 +1023,7 @@ void PbftManager::identifyBlock_() {
     genAndPlaceVote(PbftVoteTypes::soft_vote, leader_block_data->first->getPeriod(), round, step_,
                     leader_block_data->first->getBlockHash(), leader_block_data->first);
   } else if (const auto previous_round_next_voted_value =
-                 vote_mgr_->getTwoTPlusOneVotedBlock(period, round - 1, TwoTPlusOneVotedBlockType::NextVotedBlock);
+                 vote_mgr_->getFiveOfEightVotedBlock(period, round - 1, FiveOfEightVotedBlockType::NextVotedBlock);
              previous_round_next_voted_value.has_value()) {
     const auto &next_voted_block_hash = *previous_round_next_voted_value;
     const auto next_voted_block = getValidPbftProposedBlock(period, next_voted_block_hash);
@@ -1067,7 +1067,7 @@ void PbftManager::certifyBlock_() {
       debug_msg += "]\n";
     }
     debug_msg += "all votes weight " + std::to_string(votes_weight) + ", 2t+1 threshold " +
-                 std::to_string(vote_mgr_->getPbftTwoTPlusOne(period - 1, PbftVoteTypes::soft_vote).value());
+                 std::to_string(vote_mgr_->getPbftFiveOfEight(period - 1, PbftVoteTypes::soft_vote).value());
     LOG(log_dg_) << debug_msg;
 
     return;
@@ -1088,7 +1088,7 @@ void PbftManager::certifyBlock_() {
 
   // Get 2t+1 soft voted bock hash
   const auto soft_voted_block_hash =
-      vote_mgr_->getTwoTPlusOneVotedBlock(period, round, TwoTPlusOneVotedBlockType::SoftVotedBlock);
+      vote_mgr_->getFiveOfEightVotedBlock(period, round, FiveOfEightVotedBlockType::SoftVotedBlock);
   if (!soft_voted_block_hash.has_value()) {
     LOG(log_dg_) << "Certify: Not enough soft votes for current round yet. Period " << period << ",  round " << round;
     return;
@@ -1127,7 +1127,7 @@ void PbftManager::firstFinish_() {
     genAndPlaceVote(PbftVoteTypes::next_vote, cert_voted_block->getPeriod(), round, step_,
                     cert_voted_block->getBlockHash(), cert_voted_block);
   } else if (round >= 2 &&
-             vote_mgr_->getTwoTPlusOneVotedBlock(period, round - 1, TwoTPlusOneVotedBlockType::NextVotedNullBlock)
+             vote_mgr_->getFiveOfEightVotedBlock(period, round - 1, FiveOfEightVotedBlockType::NextVotedNullBlock)
                  .has_value()) {
     // Starting value in round 1 is always null block hash... So combined with other condition for next
     // voting null block hash...
@@ -1138,7 +1138,7 @@ void PbftManager::firstFinish_() {
     std::pair<blk_hash_t, std::shared_ptr<PbftBlock>> starting_value;
 
     const auto previous_round_next_voted_value =
-        vote_mgr_->getTwoTPlusOneVotedBlock(period, round - 1, TwoTPlusOneVotedBlockType::NextVotedBlock);
+        vote_mgr_->getFiveOfEightVotedBlock(period, round - 1, FiveOfEightVotedBlockType::NextVotedBlock);
     if (previous_round_next_voted_value.has_value()) {
       auto block = getValidPbftProposedBlock(period, *previous_round_next_voted_value);
       if (!block) {
@@ -1153,7 +1153,7 @@ void PbftManager::firstFinish_() {
               // should be == false
       // This should never happen as round >= 2 && previous_round_next_voted_block == kNullBlockHash is covered in
       // previous "else if" condition
-      assert(!vote_mgr_->getTwoTPlusOneVotedBlock(period, round - 1, TwoTPlusOneVotedBlockType::NextVotedNullBlock)
+      assert(!vote_mgr_->getFiveOfEightVotedBlock(period, round - 1, FiveOfEightVotedBlockType::NextVotedNullBlock)
                   .has_value());
       starting_value = {kNullBlockHash, nullptr};
     }
@@ -1179,7 +1179,7 @@ void PbftManager::secondFinish_() {
 
     // Get 2t+1 soft voted bock hash
     const auto soft_voted_block_hash =
-        vote_mgr_->getTwoTPlusOneVotedBlock(period, round, TwoTPlusOneVotedBlockType::SoftVotedBlock);
+        vote_mgr_->getFiveOfEightVotedBlock(period, round, FiveOfEightVotedBlockType::SoftVotedBlock);
     if (!soft_voted_block_hash.has_value()) {
       LOG(log_tr_) << "Second finish: Not enough soft votes for current round yet. Period " << period << ",  round "
                    << round;
@@ -1211,7 +1211,7 @@ void PbftManager::secondFinish_() {
 
     // Get 2t+1 next voted null bock from previous round
     const auto next_voted_null_block_hash =
-        vote_mgr_->getTwoTPlusOneVotedBlock(period, round - 1, TwoTPlusOneVotedBlockType::NextVotedNullBlock);
+        vote_mgr_->getFiveOfEightVotedBlock(period, round - 1, FiveOfEightVotedBlockType::NextVotedNullBlock);
     if (!next_voted_null_block_hash.has_value()) {
       LOG(log_tr_) << "Second finish: Not enough null next votes from previous round. Period " << period << ",  round "
                    << round;
@@ -2226,13 +2226,13 @@ bool PbftManager::validatePbftBlockCertVotes(const std::shared_ptr<PbftBlock> pb
     vote_mgr_->addVerifiedVote(v);
   }
 
-  const auto two_t_plus_one = vote_mgr_->getPbftTwoTPlusOne(first_vote_period - 1, PbftVoteTypes::cert_vote);
+  const auto two_t_plus_one = vote_mgr_->getPbftFiveOfEight(first_vote_period - 1, PbftVoteTypes::cert_vote);
   if (!two_t_plus_one.has_value()) {
     return false;
   }
 
   if (votes_weight < *two_t_plus_one) {
-    LOG(log_wr_) << "Invalid votes weight " << votes_weight << " < two_t_plus_one " << *two_t_plus_one
+    LOG(log_wr_) << "Invalid votes weight " << votes_weight << " < five_of_eight " << *two_t_plus_one
                  << ", pbft block " << pbft_block->getBlockHash();
     return false;
   }

@@ -116,9 +116,9 @@ class DbStorage : public std::enable_shared_from_this<DbStorage> {
     COLUMN(proposed_pbft_blocks);       // Proposed pbft blocks
     COLUMN(pbft_head);
     COLUMN(latest_round_own_votes);             // own votes of any type for the latest round
-    COLUMN(latest_round_two_t_plus_one_votes);  // 2t+1 votes bundles of any type for the latest round
-    COLUMN(extra_reward_votes);                 // extra reward votes on top of 2t+1 cert votes bundle from
-                                                // latest_round_two_t_plus_one_votes
+    COLUMN(latest_round_five_of_eight_votes);  // 5/8 votes bundles of any type for the latest round
+    COLUMN(extra_reward_votes);                 // extra reward votes on top of 5/8 cert votes bundle from
+                                                // latest_round_five_of_eight_votes
     COLUMN(pbft_block_period);
     COLUMN(dag_block_period);
     COLUMN_W_COMP(proposal_period_levels_map, getIntComparator<uint64_t>());
@@ -337,10 +337,10 @@ class DbStorage : public std::enable_shared_from_this<DbStorage> {
   void clearOwnVerifiedVotes(Batch& write_batch, const std::vector<std::shared_ptr<PbftVote>>& own_verified_votes);
 
   // 2t+1 votes bundles for the latest round
-  void replaceTwoTPlusOneVotes(TwoTPlusOneVotedBlockType type, const std::vector<std::shared_ptr<PbftVote>>& votes);
-  void replaceTwoTPlusOneVotesToBatch(TwoTPlusOneVotedBlockType type,
+  void replaceFiveOfEightVotes(FiveOfEightVotedBlockType type, const std::vector<std::shared_ptr<PbftVote>>& votes);
+  void replaceFiveOfEightVotesToBatch(FiveOfEightVotedBlockType type,
                                       const std::vector<std::shared_ptr<PbftVote>>& votes, Batch& write_batch);
-  std::vector<std::shared_ptr<PbftVote>> getAllTwoTPlusOneVotes();
+  std::vector<std::shared_ptr<PbftVote>> getAllFiveOfEightVotes();
 
   // Reward votes - cert votes for the latest finalized block
   void removeExtraRewardVotes(const std::vector<vote_hash_t>& votes, Batch& write_batch);

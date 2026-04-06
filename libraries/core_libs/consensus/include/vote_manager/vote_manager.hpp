@@ -190,12 +190,12 @@ class VoteManager {
   std::pair<bool, std::string> validateVote(const std::shared_ptr<PbftVote>& vote, bool strict = true) const;
 
   /**
-   * @brief Get 2t+1. 2t+1 is 2/3 of PBFT sortition threshold and plus 1 for a specific period
+   * @brief Get 5/8 threshold. Quorum is 5/8 of PBFT sortition threshold (ceiling) for a specific period
    * @param pbft_period pbft period
    * @param vote_type vote type, for which we get 2t+1
    * @return PBFT 2T + 1 if successful, otherwise (due to non-existent data for pbft_period) empty optional
    */
-  std::optional<uint64_t> getPbftTwoTPlusOne(PbftPeriod pbft_period, PbftVoteTypes vote_type) const;
+  std::optional<uint64_t> getPbftFiveOfEight(PbftPeriod pbft_period, PbftVoteTypes vote_type) const;
 
   /**
    * @param vote_hash
@@ -218,8 +218,8 @@ class VoteManager {
    * @param votes_type
    * @return empty optional if no 2t+1 voted block was found, otherwise initialized optional with block hash
    */
-  std::optional<blk_hash_t> getTwoTPlusOneVotedBlock(PbftPeriod period, PbftRound round,
-                                                     TwoTPlusOneVotedBlockType type) const;
+  std::optional<blk_hash_t> getFiveOfEightVotedBlock(PbftPeriod period, PbftRound round,
+                                                     FiveOfEightVotedBlockType type) const;
 
   /**
    * Get 2t+1 voted block votes for specific period, round and type, e.g. soft/cert/next voted block
@@ -229,8 +229,8 @@ class VoteManager {
    * @param type
    * @return vector of votes if 2t+1 voted block votes found, otherwise empty vector
    */
-  std::vector<std::shared_ptr<PbftVote>> getTwoTPlusOneVotedBlockVotes(PbftPeriod period, PbftRound round,
-                                                                       TwoTPlusOneVotedBlockType type) const;
+  std::vector<std::shared_ptr<PbftVote>> getFiveOfEightVotedBlockVotes(PbftPeriod period, PbftRound round,
+                                                                       FiveOfEightVotedBlockType type) const;
 
   /**
    * Get all step votes for specific period, round and step
@@ -313,11 +313,11 @@ class VoteManager {
   // Own votes generated during current period & round
   std::vector<std::shared_ptr<PbftVote>> own_verified_votes_;
 
-  // Cache for current 2T+1 - <Vote type, <period, two_t_plus_one for period>>
-  // !!! Important: do not access it directly as it is not updated automatically, always call getPbftTwoTPlusOne instead
+  // Cache for current 5/8 quorum threshold - <Vote type, <period, five_of_eight for period>>
+  // !!! Important: do not access it directly as it is not updated automatically, always call getPbftFiveOfEight instead
   // !!!
-  mutable std::unordered_map<PbftVoteTypes, std::pair<PbftPeriod, uint64_t>> current_two_t_plus_one_;
-  mutable std::shared_mutex current_two_t_plus_one_mutex_;
+  mutable std::unordered_map<PbftVoteTypes, std::pair<PbftPeriod, uint64_t>> current_five_of_eight_;
+  mutable std::shared_mutex current_five_of_eight_mutex_;
 
   // Votes that have been already validated in terms of signature, stake, etc...
   // It is used as protection against ddos attack so we do no validate/process vote more than once

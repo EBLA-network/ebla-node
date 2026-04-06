@@ -326,7 +326,7 @@ void App::rebuildDb() {
     if (data.size() == 0) {
       next_period_data = nullptr;
       // Latest finalized block cert votes are saved in db as 2t+1 cert votes
-      auto votes = old_db_->getAllTwoTPlusOneVotes();
+      auto votes = old_db_->getAllFiveOfEightVotes();
       for (auto v : votes) {
         if (v->getType() == PbftVoteTypes::cert_vote) cert_votes.push_back(v);
       }

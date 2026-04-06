@@ -174,7 +174,7 @@ TEST_F(VoteTest, vote_broadcast) {
   });
 }
 
-TEST_F(VoteTest, two_t_plus_one_votes) {
+TEST_F(VoteTest, five_of_eight_votes) {
   auto node_cfgs = make_node_cfgs(1);
   auto nodes = launch_nodes(node_cfgs);
   auto &node = nodes[0];
@@ -188,8 +188,8 @@ TEST_F(VoteTest, two_t_plus_one_votes) {
   clearAllVotes({node});
 
   const auto chain_size = node->getPbftChain()->getPbftChainSize();
-  auto pbft_2t_plus_1 = vote_mgr->getPbftTwoTPlusOne(chain_size, PbftVoteTypes::cert_vote).value();
-  EXPECT_EQ(pbft_2t_plus_1, 1);
+  auto pbft_five_of_eight = vote_mgr->getPbftFiveOfEight(chain_size, PbftVoteTypes::cert_vote).value();
+  EXPECT_EQ(pbft_five_of_eight, 1);
 
   // Generate a vote voted at kNullBlockHash
   PbftPeriod period = 1;
@@ -197,38 +197,38 @@ TEST_F(VoteTest, two_t_plus_one_votes) {
 
   vote_mgr->addVerifiedVote(genDummyVote(PbftVoteTypes::soft_vote, period, round, 2, blk_hash_t(1), vote_mgr,
                                          node->getConfig().getFirstWallet()));
-  EXPECT_TRUE(vote_mgr->getTwoTPlusOneVotedBlock(period, round, TwoTPlusOneVotedBlockType::SoftVotedBlock).has_value());
+  EXPECT_TRUE(vote_mgr->getFiveOfEightVotedBlock(period, round, FiveOfEightVotedBlockType::SoftVotedBlock).has_value());
   EXPECT_FALSE(
-      vote_mgr->getTwoTPlusOneVotedBlock(period, round, TwoTPlusOneVotedBlockType::CertVotedBlock).has_value());
+      vote_mgr->getFiveOfEightVotedBlock(period, round, FiveOfEightVotedBlockType::CertVotedBlock).has_value());
   EXPECT_FALSE(
-      vote_mgr->getTwoTPlusOneVotedBlock(period, round, TwoTPlusOneVotedBlockType::NextVotedBlock).has_value());
+      vote_mgr->getFiveOfEightVotedBlock(period, round, FiveOfEightVotedBlockType::NextVotedBlock).has_value());
   EXPECT_FALSE(
-      vote_mgr->getTwoTPlusOneVotedBlock(period, round, TwoTPlusOneVotedBlockType::NextVotedNullBlock).has_value());
+      vote_mgr->getFiveOfEightVotedBlock(period, round, FiveOfEightVotedBlockType::NextVotedNullBlock).has_value());
 
   vote_mgr->addVerifiedVote(genDummyVote(PbftVoteTypes::cert_vote, period, round, 3, blk_hash_t(1), vote_mgr,
                                          node->getConfig().getFirstWallet()));
-  EXPECT_TRUE(vote_mgr->getTwoTPlusOneVotedBlock(period, round, TwoTPlusOneVotedBlockType::SoftVotedBlock).has_value());
-  EXPECT_TRUE(vote_mgr->getTwoTPlusOneVotedBlock(period, round, TwoTPlusOneVotedBlockType::CertVotedBlock).has_value());
+  EXPECT_TRUE(vote_mgr->getFiveOfEightVotedBlock(period, round, FiveOfEightVotedBlockType::SoftVotedBlock).has_value());
+  EXPECT_TRUE(vote_mgr->getFiveOfEightVotedBlock(period, round, FiveOfEightVotedBlockType::CertVotedBlock).has_value());
   EXPECT_FALSE(
-      vote_mgr->getTwoTPlusOneVotedBlock(period, round, TwoTPlusOneVotedBlockType::NextVotedBlock).has_value());
+      vote_mgr->getFiveOfEightVotedBlock(period, round, FiveOfEightVotedBlockType::NextVotedBlock).has_value());
   EXPECT_FALSE(
-      vote_mgr->getTwoTPlusOneVotedBlock(period, round, TwoTPlusOneVotedBlockType::NextVotedNullBlock).has_value());
+      vote_mgr->getFiveOfEightVotedBlock(period, round, FiveOfEightVotedBlockType::NextVotedNullBlock).has_value());
 
   vote_mgr->addVerifiedVote(genDummyVote(PbftVoteTypes::next_vote, period, round, 4, blk_hash_t(1), vote_mgr,
                                          node->getConfig().getFirstWallet()));
-  EXPECT_TRUE(vote_mgr->getTwoTPlusOneVotedBlock(period, round, TwoTPlusOneVotedBlockType::SoftVotedBlock).has_value());
-  EXPECT_TRUE(vote_mgr->getTwoTPlusOneVotedBlock(period, round, TwoTPlusOneVotedBlockType::CertVotedBlock).has_value());
-  EXPECT_TRUE(vote_mgr->getTwoTPlusOneVotedBlock(period, round, TwoTPlusOneVotedBlockType::NextVotedBlock).has_value());
+  EXPECT_TRUE(vote_mgr->getFiveOfEightVotedBlock(period, round, FiveOfEightVotedBlockType::SoftVotedBlock).has_value());
+  EXPECT_TRUE(vote_mgr->getFiveOfEightVotedBlock(period, round, FiveOfEightVotedBlockType::CertVotedBlock).has_value());
+  EXPECT_TRUE(vote_mgr->getFiveOfEightVotedBlock(period, round, FiveOfEightVotedBlockType::NextVotedBlock).has_value());
   EXPECT_FALSE(
-      vote_mgr->getTwoTPlusOneVotedBlock(period, round, TwoTPlusOneVotedBlockType::NextVotedNullBlock).has_value());
+      vote_mgr->getFiveOfEightVotedBlock(period, round, FiveOfEightVotedBlockType::NextVotedNullBlock).has_value());
 
   vote_mgr->addVerifiedVote(genDummyVote(PbftVoteTypes::next_vote, period, round, 5, kNullBlockHash, vote_mgr,
                                          node->getConfig().getFirstWallet()));
-  EXPECT_TRUE(vote_mgr->getTwoTPlusOneVotedBlock(period, round, TwoTPlusOneVotedBlockType::SoftVotedBlock).has_value());
-  EXPECT_TRUE(vote_mgr->getTwoTPlusOneVotedBlock(period, round, TwoTPlusOneVotedBlockType::CertVotedBlock).has_value());
-  EXPECT_TRUE(vote_mgr->getTwoTPlusOneVotedBlock(period, round, TwoTPlusOneVotedBlockType::NextVotedBlock).has_value());
+  EXPECT_TRUE(vote_mgr->getFiveOfEightVotedBlock(period, round, FiveOfEightVotedBlockType::SoftVotedBlock).has_value());
+  EXPECT_TRUE(vote_mgr->getFiveOfEightVotedBlock(period, round, FiveOfEightVotedBlockType::CertVotedBlock).has_value());
+  EXPECT_TRUE(vote_mgr->getFiveOfEightVotedBlock(period, round, FiveOfEightVotedBlockType::NextVotedBlock).has_value());
   EXPECT_TRUE(
-      vote_mgr->getTwoTPlusOneVotedBlock(period, round, TwoTPlusOneVotedBlockType::NextVotedNullBlock).has_value());
+      vote_mgr->getFiveOfEightVotedBlock(period, round, FiveOfEightVotedBlockType::NextVotedNullBlock).has_value());
 }
 
 TEST_F(VoteTest, vote_count_compare) {

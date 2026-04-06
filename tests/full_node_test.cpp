@@ -228,35 +228,35 @@ TEST_F(FullNodeTest, db_test) {
   EXPECT_TRUE(db.getOwnVerifiedVotes().empty());
 
   // 2t+1 votes bundles for the latest round
-  EXPECT_TRUE(db.getAllTwoTPlusOneVotes().empty());
-  db.replaceTwoTPlusOneVotes(TwoTPlusOneVotedBlockType::SoftVotedBlock, verified_votes);
-  const auto db_two_t_plus_one_votes = db.getAllTwoTPlusOneVotes();
-  EXPECT_EQ(db_two_t_plus_one_votes.size(), verified_votes.size());
-  for (size_t i = 0; i < db_two_t_plus_one_votes.size(); i++) {
-    EXPECT_EQ(db_two_t_plus_one_votes[i]->rlp(true, true), verified_votes[i]->rlp(true, true));
+  EXPECT_TRUE(db.getAllFiveOfEightVotes().empty());
+  db.replaceFiveOfEightVotes(FiveOfEightVotedBlockType::SoftVotedBlock, verified_votes);
+  const auto db_five_of_eight_votes = db.getAllFiveOfEightVotes();
+  EXPECT_EQ(db_five_of_eight_votes.size(), verified_votes.size());
+  for (size_t i = 0; i < db_five_of_eight_votes.size(); i++) {
+    EXPECT_EQ(db_five_of_eight_votes[i]->rlp(true, true), verified_votes[i]->rlp(true, true));
   }
 
-  // Save new votes for different TwoTPlusOneVotedBlockType
+  // Save new votes for different FiveOfEightVotedBlockType
   const auto cert_vote = genDummyVote(PbftVoteTypes::cert_vote, 1, 1, 3);
   verified_votes.push_back(cert_vote);
-  db.replaceTwoTPlusOneVotes(TwoTPlusOneVotedBlockType::CertVotedBlock, {cert_vote});
+  db.replaceFiveOfEightVotes(FiveOfEightVotedBlockType::CertVotedBlock, {cert_vote});
 
   const auto next_vote = genDummyVote(PbftVoteTypes::next_vote, 1, 1, 4);
   verified_votes.push_back(next_vote);
-  db.replaceTwoTPlusOneVotes(TwoTPlusOneVotedBlockType::NextVotedBlock, {next_vote});
+  db.replaceFiveOfEightVotes(FiveOfEightVotedBlockType::NextVotedBlock, {next_vote});
 
   const auto next_null_vote = genDummyVote(PbftVoteTypes::next_vote, 1, 1, 5);
   verified_votes.push_back(next_null_vote);
-  db.replaceTwoTPlusOneVotes(TwoTPlusOneVotedBlockType::NextVotedNullBlock, {next_null_vote});
-  EXPECT_EQ(db.getAllTwoTPlusOneVotes().size(), verified_votes.size());
+  db.replaceFiveOfEightVotes(FiveOfEightVotedBlockType::NextVotedNullBlock, {next_null_vote});
+  EXPECT_EQ(db.getAllFiveOfEightVotes().size(), verified_votes.size());
 
   // Replace cert votes, size of all votes should not change
-  db.replaceTwoTPlusOneVotes(TwoTPlusOneVotedBlockType::CertVotedBlock, {cert_vote});
+  db.replaceFiveOfEightVotes(FiveOfEightVotedBlockType::CertVotedBlock, {cert_vote});
 
-  const auto new_db_two_t_plus_one_votes = db.getAllTwoTPlusOneVotes();
-  EXPECT_EQ(new_db_two_t_plus_one_votes.size(), verified_votes.size());
-  for (size_t i = 0; i < db_two_t_plus_one_votes.size(); i++) {
-    EXPECT_EQ(new_db_two_t_plus_one_votes[i]->rlp(true, true), verified_votes[i]->rlp(true, true));
+  const auto new_db_five_of_eight_votes = db.getAllFiveOfEightVotes();
+  EXPECT_EQ(new_db_five_of_eight_votes.size(), verified_votes.size());
+  for (size_t i = 0; i < db_five_of_eight_votes.size(); i++) {
+    EXPECT_EQ(new_db_five_of_eight_votes[i]->rlp(true, true), verified_votes[i]->rlp(true, true));
   }
 
   // Reward votes - cert votes for the latest finalized block

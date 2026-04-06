@@ -626,7 +626,7 @@ TEST_F(NetworkTest, node_pbft_sync) {
 
   db1->savePeriodData(period_data2, batch);
   node1->getVoteManager()->addVerifiedVote(votes_for_pbft_blk2[0]);
-  db1->replaceTwoTPlusOneVotesToBatch(TwoTPlusOneVotedBlockType::CertVotedBlock, votes_for_pbft_blk2, batch);
+  db1->replaceFiveOfEightVotesToBatch(FiveOfEightVotedBlockType::CertVotedBlock, votes_for_pbft_blk2, batch);
   node1->getVoteManager()->resetRewardVotes(2, 1, 3, pbft_block2.getBlockHash(), batch);
 
   // Update pbft chain
@@ -848,10 +848,10 @@ TEST_F(NetworkTest, pbft_next_votes_sync_in_same_round) {
   clearAllVotes({node1, node2});
 
   auto node1_pbft_2t_plus_1 =
-      node1_vote_mgr->getPbftTwoTPlusOne(node1->getPbftChain()->getPbftChainSize(), PbftVoteTypes::next_vote).value();
+      node1_vote_mgr->getPbftFiveOfEight(node1->getPbftChain()->getPbftChainSize(), PbftVoteTypes::next_vote).value();
   EXPECT_EQ(node1_pbft_2t_plus_1, 1);
   auto node2_pbft_2t_plus_1 =
-      node2_vote_mgr->getPbftTwoTPlusOne(node2->getPbftChain()->getPbftChainSize(), PbftVoteTypes::next_vote).value();
+      node2_vote_mgr->getPbftFiveOfEight(node2->getPbftChain()->getPbftChainSize(), PbftVoteTypes::next_vote).value();
   EXPECT_EQ(node2_pbft_2t_plus_1, 1);
 
   // Node1 generate 1 next vote voted at kNullBlockHash

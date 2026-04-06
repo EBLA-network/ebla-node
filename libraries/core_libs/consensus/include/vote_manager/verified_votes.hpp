@@ -8,7 +8,7 @@ namespace taraxa {
 
 class PbftVote;
 
-enum class TwoTPlusOneVotedBlockType { SoftVotedBlock, CertVotedBlock, NextVotedBlock, NextVotedNullBlock };
+enum class FiveOfEightVotedBlockType { SoftVotedBlock, CertVotedBlock, NextVotedBlock, NextVotedNullBlock };
 
 struct VerifiedVotes {
   struct StepVotes {
@@ -18,7 +18,7 @@ struct VerifiedVotes {
   };
 
   // 2t+1 voted blocks
-  std::unordered_map<TwoTPlusOneVotedBlockType, std::pair<blk_hash_t, PbftStep>> two_t_plus_one_voted_blocks_;
+  std::unordered_map<FiveOfEightVotedBlockType, std::pair<blk_hash_t, PbftStep>> five_of_eight_voted_blocks_;
 
   // Step votes
   std::map<PbftStep, StepVotes> step_votes;
@@ -26,8 +26,8 @@ struct VerifiedVotes {
   // Greatest step, for which there is at least t+1 next votes - it is used for lambda exponential backoff: Usually
   // when network gets stalled it is due to lack of 2t+1 voting power and steps keep increasing. When new node joins
   // the network, it should catch up with the rest of nodes asap so we dont start exponentially backing of its lambda
-  // if it's current step is far behind network_t_plus_one_step (at least 1 third of network is at this step)
-  PbftStep network_t_plus_one_step{0};
+  // if it's current step is far behind network_half_five_of_eight_step (at least half of quorum is at this step)
+  PbftStep network_half_five_of_eight_step{0};
 };
 
 }  // namespace taraxa

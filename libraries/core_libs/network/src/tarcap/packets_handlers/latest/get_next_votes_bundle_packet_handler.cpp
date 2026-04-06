@@ -31,9 +31,9 @@ void GetNextVotesBundlePacketHandler::process(const threadpool::PacketData &pack
   }
 
   auto next_votes =
-      vote_mgr_->getTwoTPlusOneVotedBlockVotes(pbft_period, pbft_round - 1, TwoTPlusOneVotedBlockType::NextVotedBlock);
-  auto next_null_votes = vote_mgr_->getTwoTPlusOneVotedBlockVotes(pbft_period, pbft_round - 1,
-                                                                  TwoTPlusOneVotedBlockType::NextVotedNullBlock);
+      vote_mgr_->getFiveOfEightVotedBlockVotes(pbft_period, pbft_round - 1, FiveOfEightVotedBlockType::NextVotedBlock);
+  auto next_null_votes = vote_mgr_->getFiveOfEightVotedBlockVotes(pbft_period, pbft_round - 1,
+                                                                  FiveOfEightVotedBlockType::NextVotedNullBlock);
 
   // In edge case this could theoretically happen due to race condition when we moved to the next period or round
   // right before calling getAllTwoTPlusOneNextVotes with specific period & round
@@ -52,10 +52,10 @@ void GetNextVotesBundlePacketHandler::process(const threadpool::PacketData &pack
       return;
     }
 
-    next_votes = vote_mgr_->getTwoTPlusOneVotedBlockVotes(pbft_period, pbft_round - 1,
-                                                          TwoTPlusOneVotedBlockType::NextVotedBlock);
-    next_null_votes = vote_mgr_->getTwoTPlusOneVotedBlockVotes(pbft_period, pbft_round - 1,
-                                                               TwoTPlusOneVotedBlockType::NextVotedNullBlock);
+    next_votes = vote_mgr_->getFiveOfEightVotedBlockVotes(pbft_period, pbft_round - 1,
+                                                          FiveOfEightVotedBlockType::NextVotedBlock);
+    next_null_votes = vote_mgr_->getFiveOfEightVotedBlockVotes(pbft_period, pbft_round - 1,
+                                                               FiveOfEightVotedBlockType::NextVotedNullBlock);
     if (next_votes.empty() && next_null_votes.empty()) {
       LOG(log_er_) << "No next votes returned for period " << tmp_pbft_period << ", round " << tmp_pbft_round - 1;
       return;

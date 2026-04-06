@@ -53,7 +53,7 @@ VoteManager::VoteManager(const FullNodeConfig& config, std::shared_ptr<DbStorage
   };
 
   // Load 2t+1 vote blocks votes
-  addVerifiedVotes(db_->getAllTwoTPlusOneVotes(), true);
+  addVerifiedVotes(db_->getAllFiveOfEightVotes(), true);
 
   // Load own votes
   const auto own_votes = db_->getOwnVerifiedVotes();
@@ -128,27 +128,27 @@ void VoteManager::setCurrentPbftPeriodAndRound(PbftPeriod pbft_period, PbftRound
   // Check if we already have 2t+1 votes bundles for specified pbft period & round. If so, save those votes into db
   // During normal node operation this should happen rarely - it can happen only if we receive 2t+1 future votes for
   // a period or round that we are not yet in
-  for (const auto& two_t_plus_one_voted_block : found_round_it->second.two_t_plus_one_voted_blocks_) {
-    const TwoTPlusOneVotedBlockType two_t_plus_one_voted_block_type = two_t_plus_one_voted_block.first;
+  for (const auto& five_of_eight_voted_block : found_round_it->second.five_of_eight_voted_blocks_) {
+    const FiveOfEightVotedBlockType five_of_eight_voted_block_type = five_of_eight_voted_block.first;
     // 2t+1 cert voted blocks are only saved to the database in a db batch when block is pushed to the chain
-    if (two_t_plus_one_voted_block_type != TwoTPlusOneVotedBlockType::CertVotedBlock) {
-      const auto& [two_t_plus_one_voted_block_hash, two_t_plus_one_voted_block_step] =
-          two_t_plus_one_voted_block.second;
+    if (five_of_eight_voted_block_type != FiveOfEightVotedBlockType::CertVotedBlock) {
+      const auto& [five_of_eight_voted_block_hash, five_of_eight_voted_block_step] =
+          five_of_eight_voted_block.second;
 
-      const auto found_step_votes_it = found_round_it->second.step_votes.find(two_t_plus_one_voted_block_step);
+      const auto found_step_votes_it = found_round_it->second.step_votes.find(five_of_eight_voted_block_step);
       if (found_step_votes_it == found_round_it->second.step_votes.end()) {
         LOG(log_er_) << "Unable to find 2t+1 votes in verified_votes for period " << pbft_period << ", round "
-                     << pbft_round << ", step " << two_t_plus_one_voted_block_step;
+                     << pbft_round << ", step " << five_of_eight_voted_block_step;
         assert(false);
         return;
       }
 
       // Find verified votes for specified block_hash based on found 2t+1 voted block of type "type"
-      const auto found_verified_votes_it = found_step_votes_it->second.votes.find(two_t_plus_one_voted_block_hash);
+      const auto found_verified_votes_it = found_step_votes_it->second.votes.find(five_of_eight_voted_block_hash);
       if (found_verified_votes_it == found_step_votes_it->second.votes.end()) {
         LOG(log_er_) << "Unable to find 2t+1 votes in verified_votes for period " << pbft_period << ", round "
-                     << pbft_round << ", step " << two_t_plus_one_voted_block_step << ", block hash "
-                     << two_t_plus_one_voted_block_hash;
+                     << pbft_round << ", step " << five_of_eight_voted_block_step << ", block hash "
+                     << five_of_eight_voted_block_hash;
         assert(false);
         return;
       }
@@ -159,7 +159,7 @@ void VoteManager::setCurrentPbftPeriodAndRound(PbftPeriod pbft_period, PbftRound
         votes.push_back(vote.second);
       }
 
-      db_->replaceTwoTPlusOneVotes(two_t_plus_one_voted_block_type, votes);
+      db_->replaceFiveOfEightVotes(five_of_eight_voted_block_type, votes);
     }
   }
 }
@@ -177,7 +177,7 @@ PbftStep VoteManager::getNetworkTplusOneNextVotingStep(PbftPeriod period, PbftRo
     return 0;
   }
 
-  return found_round_it->second.network_t_plus_one_step;
+  return found_round_it->second.network_half_five_of_eight_step;
 }
 
 bool VoteManager::addVerifiedVote(const std::shared_ptr<PbftVote>& vote) {
@@ -259,50 +259,50 @@ bool VoteManager::addVerifiedVote(const std::shared_ptr<PbftVote>& vote) {
     const auto total_weight = (found_voted_value_it->second.first += weight);
 
     // Unable to get 2t+1
-    const auto two_t_plus_one = getPbftTwoTPlusOne(vote->getPeriod() - 1, vote->getType());
-    if (!two_t_plus_one.has_value()) [[unlikely]] {
-      LOG(log_er_) << "Cannot set(or not) 2t+1 voted block as 2t+1 threshold is unavailable, vote " << vote->getHash();
+    const auto five_of_eight = getPbftFiveOfEight(vote->getPeriod() - 1, vote->getType());
+    if (!five_of_eight.has_value()) [[unlikely]] {
+      LOG(log_er_) << "Cannot set quorum voted block as 5/8 quorum threshold is unavailable, vote " << vote->getHash();
       return true;
     }
 
     // Calculate t+1
-    const auto t_plus_one = ((*two_t_plus_one - 1) / 2) + 1;
-    // Set network_t_plus_one_step - used for triggering exponential backoff
-    if (vote->getType() == PbftVoteTypes::next_vote && total_weight >= t_plus_one &&
-        vote->getStep() > found_round_it->second.network_t_plus_one_step) {
-      found_round_it->second.network_t_plus_one_step = vote->getStep();
-      LOG(log_nf_) << "Set t+1 next voted block " << vote->getHash() << " for period " << vote->getPeriod()
+    const auto half_five_of_eight = (*five_of_eight + 1) / 2;
+    // Set network_half_five_of_eight_step - used for triggering exponential backoff
+    if (vote->getType() == PbftVoteTypes::next_vote && total_weight >= half_five_of_eight &&
+        vote->getStep() > found_round_it->second.network_half_five_of_eight_step) {
+      found_round_it->second.network_half_five_of_eight_step = vote->getStep();
+      LOG(log_nf_) << "Set half-threshold next voted block " << vote->getHash() << " for period " << vote->getPeriod()
                    << ", round " << vote->getRound() << ", step " << vote->getStep();
     }
 
     // Not enough votes - do not set 2t+1 voted block for period,round and step
-    if (total_weight < *two_t_plus_one) {
+    if (total_weight < *five_of_eight) {
       return true;
     }
 
     // Function to save 2t+1 voted block + its votes
-    auto saveTwoTPlusOneVotesInDb = [this, &found_round_it, &found_voted_value_it](
-                                        TwoTPlusOneVotedBlockType two_plus_one_voted_block_type,
+    auto saveFiveOfEightVotesInDb = [this, &found_round_it, &found_voted_value_it](
+                                        FiveOfEightVotedBlockType five_of_eight_voted_block_type,
                                         const std::shared_ptr<PbftVote> vote) {
-      auto found_two_t_plus_one_voted_block =
-          found_round_it->second.two_t_plus_one_voted_blocks_.find(two_plus_one_voted_block_type);
+      auto found_five_of_eight_voted_block =
+          found_round_it->second.five_of_eight_voted_blocks_.find(five_of_eight_voted_block_type);
 
       // 2t+1 votes block already set
-      if (found_two_t_plus_one_voted_block != found_round_it->second.two_t_plus_one_voted_blocks_.end()) {
-        assert(found_two_t_plus_one_voted_block->second.first == vote->getBlockHash());
+      if (found_five_of_eight_voted_block != found_round_it->second.five_of_eight_voted_blocks_.end()) {
+        assert(found_five_of_eight_voted_block->second.first == vote->getBlockHash());
 
         // It is possible to have 2t+1 next votes for the same block in multiple steps
-        if (two_plus_one_voted_block_type != TwoTPlusOneVotedBlockType::NextVotedBlock &&
-            two_plus_one_voted_block_type != TwoTPlusOneVotedBlockType::NextVotedNullBlock) {
-          assert(found_two_t_plus_one_voted_block->second.second == vote->getStep());
+        if (five_of_eight_voted_block_type != FiveOfEightVotedBlockType::NextVotedBlock &&
+            five_of_eight_voted_block_type != FiveOfEightVotedBlockType::NextVotedNullBlock) {
+          assert(found_five_of_eight_voted_block->second.second == vote->getStep());
         }
 
         return;
       }
 
       // Insert new 2t+1 voted block
-      found_round_it->second.two_t_plus_one_voted_blocks_.insert(
-          {two_plus_one_voted_block_type, std::make_pair(vote->getBlockHash(), vote->getStep())});
+      found_round_it->second.five_of_eight_voted_blocks_.insert(
+          {five_of_eight_voted_block_type, std::make_pair(vote->getBlockHash(), vote->getStep())});
 
       // Save only current pbft period & round 2t+1 votes bundles into db
       // Cert votes are saved once the pbft block is pushed in the chain
@@ -314,22 +314,22 @@ bool VoteManager::addVerifiedVote(const std::shared_ptr<PbftVote>& vote) {
           votes.push_back(tmp_vote.second);
         }
 
-        db_->replaceTwoTPlusOneVotes(two_plus_one_voted_block_type, votes);
+        db_->replaceFiveOfEightVotes(five_of_eight_voted_block_type, votes);
       }
     };
 
     switch (vote->getType()) {
       case PbftVoteTypes::soft_vote:
-        saveTwoTPlusOneVotesInDb(TwoTPlusOneVotedBlockType::SoftVotedBlock, vote);
+        saveFiveOfEightVotesInDb(FiveOfEightVotedBlockType::SoftVotedBlock, vote);
         break;
       case PbftVoteTypes::cert_vote:
-        saveTwoTPlusOneVotesInDb(TwoTPlusOneVotedBlockType::CertVotedBlock, vote);
+        saveFiveOfEightVotesInDb(FiveOfEightVotedBlockType::CertVotedBlock, vote);
         break;
       case PbftVoteTypes::next_vote:
         if (vote_block_hash == kNullBlockHash) {
-          saveTwoTPlusOneVotesInDb(TwoTPlusOneVotedBlockType::NextVotedNullBlock, vote);
+          saveFiveOfEightVotesInDb(FiveOfEightVotedBlockType::NextVotedNullBlock, vote);
         } else {
-          saveTwoTPlusOneVotesInDb(TwoTPlusOneVotedBlockType::NextVotedBlock, vote);
+          saveFiveOfEightVotesInDb(FiveOfEightVotedBlockType::NextVotedBlock, vote);
         }
         break;
       default:
@@ -552,17 +552,17 @@ std::optional<PbftRound> VoteManager::determineNewRound(PbftPeriod current_pbft_
     }
 
     // Get either 2t+1 voted null or specific block
-    auto found_two_t_plus_one_voted_block =
-        round_rit->second.two_t_plus_one_voted_blocks_.find(TwoTPlusOneVotedBlockType::NextVotedBlock);
-    if (found_two_t_plus_one_voted_block == round_rit->second.two_t_plus_one_voted_blocks_.end()) {
-      found_two_t_plus_one_voted_block =
-          round_rit->second.two_t_plus_one_voted_blocks_.find(TwoTPlusOneVotedBlockType::NextVotedNullBlock);
+    auto found_five_of_eight_voted_block =
+        round_rit->second.five_of_eight_voted_blocks_.find(FiveOfEightVotedBlockType::NextVotedBlock);
+    if (found_five_of_eight_voted_block == round_rit->second.five_of_eight_voted_blocks_.end()) {
+      found_five_of_eight_voted_block =
+          round_rit->second.five_of_eight_voted_blocks_.find(FiveOfEightVotedBlockType::NextVotedNullBlock);
     }
 
-    if (found_two_t_plus_one_voted_block != round_rit->second.two_t_plus_one_voted_blocks_.end()) {
+    if (found_five_of_eight_voted_block != round_rit->second.five_of_eight_voted_blocks_.end()) {
       LOG(log_nf_) << "New round " << round_rit->first + 1 << " determined for period " << current_pbft_period
-                   << ". Found 2t+1 votes for block " << found_two_t_plus_one_voted_block->second.first << " in round "
-                   << round_rit->first << ", step " << found_two_t_plus_one_voted_block->second.second;
+                   << ". Found 5/8 quorum votes for block " << found_five_of_eight_voted_block->second.first << " in round "
+                   << round_rit->first << ", step " << found_five_of_eight_voted_block->second.second;
 
       return round_rit->first + 1;
     }
@@ -605,15 +605,15 @@ void VoteManager::resetRewardVotes(PbftPeriod period, PbftRound round, PbftStep 
     assert(false);
     return;
   }
-  auto found_two_t_plus_one_voted_block =
-      found_round_it->second.two_t_plus_one_voted_blocks_.find(TwoTPlusOneVotedBlockType::CertVotedBlock);
-  if (found_two_t_plus_one_voted_block == found_round_it->second.two_t_plus_one_voted_blocks_.end()) {
+  auto found_five_of_eight_voted_block =
+      found_round_it->second.five_of_eight_voted_blocks_.find(FiveOfEightVotedBlockType::CertVotedBlock);
+  if (found_five_of_eight_voted_block == found_round_it->second.five_of_eight_voted_blocks_.end()) {
     LOG(log_er_) << "resetRewardVotes missing cert voted block";
     assert(false);
     return;
   }
-  if (found_two_t_plus_one_voted_block->second.first != block_hash) {
-    LOG(log_er_) << "resetRewardVotes incorrect block " << found_two_t_plus_one_voted_block->second.first
+  if (found_five_of_eight_voted_block->second.first != block_hash) {
+    LOG(log_er_) << "resetRewardVotes incorrect block " << found_five_of_eight_voted_block->second.first
                  << " expected " << block_hash;
     assert(false);
     return;
@@ -630,7 +630,7 @@ void VoteManager::resetRewardVotes(PbftPeriod period, PbftRound round, PbftStep 
     votes.push_back(tmp_vote.second);
   }
 
-  db_->replaceTwoTPlusOneVotesToBatch(TwoTPlusOneVotedBlockType::CertVotedBlock, votes, batch);
+  db_->replaceFiveOfEightVotesToBatch(FiveOfEightVotedBlockType::CertVotedBlock, votes, batch);
   db_->removeExtraRewardVotes(extra_reward_votes_, batch);
   extra_reward_votes_.clear();
 
@@ -789,7 +789,7 @@ std::vector<std::shared_ptr<PbftVote>> VoteManager::getRewardVotes() {
   }
   std::shared_lock lock(verified_votes_access_);
   auto reward_votes =
-      getTwoTPlusOneVotedBlockVotes(reward_votes_period, reward_votes_round, TwoTPlusOneVotedBlockType::CertVotedBlock);
+      getFiveOfEightVotedBlockVotes(reward_votes_period, reward_votes_round, FiveOfEightVotedBlockType::CertVotedBlock);
 
   if (!reward_votes.empty() && reward_votes[0]->getBlockHash() != reward_votes_block_hash) {
     // This should never happen
@@ -923,15 +923,15 @@ std::pair<bool, std::string> VoteManager::validateVote(const std::shared_ptr<Pbf
   return {true, ""};
 }
 
-std::optional<uint64_t> VoteManager::getPbftTwoTPlusOne(PbftPeriod pbft_period, PbftVoteTypes vote_type) const {
+std::optional<uint64_t> VoteManager::getPbftFiveOfEight(PbftPeriod pbft_period, PbftVoteTypes vote_type) const {
   // Check cache first
   {
-    std::shared_lock lock(current_two_t_plus_one_mutex_);
-    const auto cached_two_t_plus_one_it = current_two_t_plus_one_.find(vote_type);
-    if (cached_two_t_plus_one_it != current_two_t_plus_one_.end()) {
-      const auto [cached_period, cached_two_t_plus_one] = cached_two_t_plus_one_it->second;
-      if (pbft_period == cached_period && cached_two_t_plus_one) {
-        return cached_two_t_plus_one;
+    std::shared_lock lock(current_five_of_eight_mutex_);
+    const auto cached_five_of_eight_it = current_five_of_eight_.find(vote_type);
+    if (cached_five_of_eight_it != current_five_of_eight_.end()) {
+      const auto [cached_period, cached_five_of_eight] = cached_five_of_eight_it->second;
+      if (pbft_period == cached_period && cached_five_of_eight) {
+        return cached_five_of_eight;
       }
     }
   }
@@ -946,15 +946,15 @@ std::optional<uint64_t> VoteManager::getPbftTwoTPlusOne(PbftPeriod pbft_period, 
     return {};
   }
 
-  const auto two_t_plus_one = getPbftSortitionThreshold(total_dpos_votes_count, vote_type) * 2 / 3 + 1;
+  const auto five_of_eight = (getPbftSortitionThreshold(total_dpos_votes_count, vote_type) * 5 + 7) / 8;
 
   // Cache is only for current pbft chain size
   if (pbft_period == pbft_chain_->getPbftChainSize()) {
-    std::scoped_lock lock(current_two_t_plus_one_mutex_);
-    current_two_t_plus_one_[vote_type] = std::make_pair(pbft_period, two_t_plus_one);
+    std::scoped_lock lock(current_five_of_eight_mutex_);
+    current_five_of_eight_[vote_type] = std::make_pair(pbft_period, five_of_eight);
   }
 
-  return two_t_plus_one;
+  return five_of_eight;
 }
 
 bool VoteManager::voteAlreadyValidated(const vote_hash_t& vote_hash) const {
@@ -993,8 +993,8 @@ bool VoteManager::genAndValidateVrfSortition(PbftPeriod pbft_period, PbftRound p
   return true;
 }
 
-std::optional<blk_hash_t> VoteManager::getTwoTPlusOneVotedBlock(PbftPeriod period, PbftRound round,
-                                                                TwoTPlusOneVotedBlockType type) const {
+std::optional<blk_hash_t> VoteManager::getFiveOfEightVotedBlock(PbftPeriod period, PbftRound round,
+                                                                FiveOfEightVotedBlockType type) const {
   std::shared_lock lock(verified_votes_access_);
 
   const auto found_period_it = verified_votes_.find(period);
@@ -1007,16 +1007,16 @@ std::optional<blk_hash_t> VoteManager::getTwoTPlusOneVotedBlock(PbftPeriod perio
     return {};
   }
 
-  const auto two_t_plus_one_voted_block_it = found_round_it->second.two_t_plus_one_voted_blocks_.find(type);
-  if (two_t_plus_one_voted_block_it == found_round_it->second.two_t_plus_one_voted_blocks_.end()) {
+  const auto five_of_eight_voted_block_it = found_round_it->second.five_of_eight_voted_blocks_.find(type);
+  if (five_of_eight_voted_block_it == found_round_it->second.five_of_eight_voted_blocks_.end()) {
     return {};
   }
 
-  return two_t_plus_one_voted_block_it->second.first;
+  return five_of_eight_voted_block_it->second.first;
 }
 
-std::vector<std::shared_ptr<PbftVote>> VoteManager::getTwoTPlusOneVotedBlockVotes(
-    PbftPeriod period, PbftRound round, TwoTPlusOneVotedBlockType type) const {
+std::vector<std::shared_ptr<PbftVote>> VoteManager::getFiveOfEightVotedBlockVotes(
+    PbftPeriod period, PbftRound round, FiveOfEightVotedBlockType type) const {
   std::shared_lock lock(verified_votes_access_);
   const auto found_period_it = verified_votes_.find(period);
   if (found_period_it == verified_votes_.end()) {
@@ -1028,21 +1028,21 @@ std::vector<std::shared_ptr<PbftVote>> VoteManager::getTwoTPlusOneVotedBlockVote
     return {};
   }
 
-  const auto two_t_plus_one_voted_block_it = found_round_it->second.two_t_plus_one_voted_blocks_.find(type);
-  if (two_t_plus_one_voted_block_it == found_round_it->second.two_t_plus_one_voted_blocks_.end()) {
+  const auto five_of_eight_voted_block_it = found_round_it->second.five_of_eight_voted_blocks_.find(type);
+  if (five_of_eight_voted_block_it == found_round_it->second.five_of_eight_voted_blocks_.end()) {
     return {};
   }
-  const auto [two_t_plus_one_voted_block_hash, two_t_plus_one_voted_block_step] = two_t_plus_one_voted_block_it->second;
+  const auto [five_of_eight_voted_block_hash, five_of_eight_voted_block_step] = five_of_eight_voted_block_it->second;
 
   // Find step votes for specified step based on found 2t+1 voted block of type "type"
-  const auto found_step_votes_it = found_round_it->second.step_votes.find(two_t_plus_one_voted_block_step);
+  const auto found_step_votes_it = found_round_it->second.step_votes.find(five_of_eight_voted_block_step);
   if (found_step_votes_it == found_round_it->second.step_votes.end()) {
     assert(false);
     return {};
   }
 
   // Find verified votes for specified block_hash based on found 2t+1 voted block of type "type"
-  const auto found_verified_votes_it = found_step_votes_it->second.votes.find(two_t_plus_one_voted_block_hash);
+  const auto found_verified_votes_it = found_step_votes_it->second.votes.find(five_of_eight_voted_block_hash);
   if (found_verified_votes_it == found_step_votes_it->second.votes.end()) {
     assert(false);
     return {};
