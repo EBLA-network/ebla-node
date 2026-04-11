@@ -93,9 +93,9 @@ GenesisConfig::GenesisConfig() {
 
   // DPOS config
   auto& dpos = state.dpos;
-  dpos.eligibility_balance_threshold = 1000000000;
-  dpos.vote_eligibility_balance_step = 1000000000;
-  dpos.validator_maximum_stake = dev::jsToU256("0x84595161401484A000000");
+  dpos.eligibility_balance_threshold = dev::jsToU256("0x10F0CF064DD59200000");
+  dpos.vote_eligibility_balance_step = dev::jsToU256("0x3635C9ADC5DEA00000");
+  dpos.validator_maximum_stake = dev::jsToU256("0xD3C21BCECCEDA1000000");
   dpos.yield_percentage = 20;
   updateBlocksPerYear();
 }
