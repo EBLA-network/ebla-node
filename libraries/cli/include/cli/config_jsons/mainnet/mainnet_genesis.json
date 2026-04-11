@@ -24,7 +24,7 @@
       {
         "address": "0x8dcc94cc57c72eaa6609ee77cb50c84141fa39bd",
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
-        "commission": 0,
+        "commission": 1000,
         "endpoint": "",
         "description": "Taraxa mainnet validator 1",
         "delegations": {
@@ -35,7 +35,7 @@
       {
         "address": "0x4bd4dbae73bfcd070ed01788bb8ecf18f152ef61",
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
-        "commission": 0,
+        "commission": 1000,
         "endpoint": "",
         "description": "Taraxa mainnet validator 2",
         "delegations": {
@@ -46,7 +46,7 @@
       {
         "address": "0xe90958a7e4a95ee0c3e2b36dcf6344835755fcfd",
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
-        "commission": 0,
+        "commission": 1000,
         "endpoint": "",
         "description": "Taraxa mainnet validator 3",
         "delegations": {
@@ -57,7 +57,7 @@
       {
         "address": "0x869b5f98b0e3aa50bc91be470a8c5d44e92b59d7",
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
-        "commission": 0,
+        "commission": 1000,
         "endpoint": "",
         "description": "Taraxa mainnet validator 4",
         "delegations": {
@@ -68,7 +68,7 @@
       {
         "address": "0x73ec3af8f07c964f13e0d105ac77951f4d80811f",
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
-        "commission": 0,
+        "commission": 1000,
         "endpoint": "",
         "description": "Taraxa mainnet validator 5",
         "delegations": {
@@ -79,7 +79,7 @@
       {
         "address": "0x0105deca852ae3e7e1fe17bc0db2271ad259e0d6",
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
-        "commission": 0,
+        "commission": 1000,
         "endpoint": "",
         "description": "Taraxa mainnet validator 6",
         "delegations": {
@@ -90,7 +90,7 @@
       {
         "address": "0xe143ededbf9285dc39daf64c120037a4b9a0f095",
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
-        "commission": 0,
+        "commission": 1000,
         "endpoint": "",
         "description": "Taraxa mainnet validator 7",
         "delegations": {
@@ -101,7 +101,7 @@
       {
         "address": "0xb743f776ddd8278325a6c64b8a7d6c409433c96e",
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
-        "commission": 0,
+        "commission": 1000,
         "endpoint": "",
         "description": "Taraxa mainnet validator 8",
         "delegations": {
@@ -112,7 +112,7 @@
       {
         "address": "0x7ab15fdcf5c1305541900bba926ac7b38b2acc7b",
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
-        "commission": 0,
+        "commission": 1000,
         "endpoint": "",
         "description": "Taraxa mainnet validator 9",
         "delegations": {
@@ -123,7 +123,7 @@
       {
         "address": "0xf9d0eada55b9a3e8d9fd69dc3c57163c0d42dc18",
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
-        "commission": 0,
+        "commission": 1000,
         "endpoint": "",
         "description": "Taraxa mainnet validator 10",
         "delegations": {
@@ -134,7 +134,7 @@
       {
         "address": "0xe3a497c34a0d5dcdbeff5b88063d9a87ff51bd80",
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
-        "commission": 0,
+        "commission": 1000,
         "endpoint": "",
         "description": "Taraxa mainnet validator 11",
         "delegations": {
@@ -145,7 +145,7 @@
       {
         "address": "0xe43d40a9bdff67ce7756bab3ff697192b466e6d6",
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
-        "commission": 0,
+        "commission": 1000,
         "endpoint": "",
         "description": "Taraxa mainnet validator 12",
         "delegations": {
@@ -156,7 +156,7 @@
       {
         "address": "0x94306df4a952bff4cb99c48859acf1178766fe34",
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
-        "commission": 0,
+        "commission": 1000,
         "endpoint": "",
         "description": "Taraxa mainnet validator 13",
         "delegations": {
@@ -167,7 +167,7 @@
       {
         "address": "0x5e70e5a2fda0675ea0f2453425190c02858b272a",
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
-        "commission": 0,
+        "commission": 1000,
         "endpoint": "",
         "description": "Taraxa mainnet validator 14",
         "delegations": {
@@ -178,7 +178,7 @@
       {
         "address": "0xebb12f67806703f7dd80ec1ea4c768fbce98c48c",
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
-        "commission": 0,
+        "commission": 1000,
         "endpoint": "",
         "description": "Taraxa mainnet validator 15",
         "delegations": {

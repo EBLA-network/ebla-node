@@ -85,7 +85,7 @@ SharedTransaction make_dpos_trx(const FullNodeConfig& sender_node_cfg, const u25
   const auto vrf_pub_key = vrf_wrapper::getVrfPublicKey(sender_node_cfg.getFirstWallet().vrf_secret);
 
   const auto input = util::EncodingSolidity::packFunctionCall(
-      "registerValidator(address,bytes,bytes,uint16,string,string)", addr, proof, vrf_pub_key.asBytes(), 10,
+      "registerValidator(address,bytes,bytes,uint16,string,string)", addr, proof, vrf_pub_key.asBytes(), 1000,
       dev::asBytes("test"), dev::asBytes("test"));
 
   return std::make_shared<Transaction>(nonce, value, gas_price, TEST_TX_GAS_LIMIT, std::move(input),

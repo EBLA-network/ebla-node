@@ -26,7 +26,7 @@ struct ValidatorInfo {
   addr_t address;
   addr_t owner;
   vrf_wrapper::vrf_pk_t vrf_key;
-  uint16_t commission = 0;
+  uint16_t commission = 1000;
   std::string endpoint;
   std::string description;
   BalanceMap delegations;
