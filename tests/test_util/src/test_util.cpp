@@ -316,7 +316,7 @@ std::vector<taraxa::FullNodeConfig> NodesTest::make_node_cfgs(size_t total_count
   // num_of_nodes * init_balance = 100 * max_supply / (100 + yield)
   // init_balance = 100 * max_supply / ((100 + yield) * num_of_nodes)
 
-  const taraxa::uint256_t yield{20};  // [%]
+  const taraxa::uint256_t yield{7};  // [%]
   const taraxa::uint256_t hundred{100};
   const taraxa::uint256_t num_of_nodes{total_count};
   const taraxa::uint256_t max_supply = ret_configs.back().genesis.state.hardforks.aspen_hf.max_supply;

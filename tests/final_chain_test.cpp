@@ -175,7 +175,7 @@ struct FinalChainTest : WithDataDir {
     cfg.genesis.state.dpos.vote_eligibility_balance_step = 1000 * kOneTara;
     cfg.genesis.state.dpos.validator_maximum_stake = 10000000 * kOneTara;
     cfg.genesis.state.dpos.minimum_deposit = 100 * kOneTara;
-    cfg.genesis.state.dpos.yield_percentage = 10;
+    cfg.genesis.state.dpos.yield_percentage = 7;
     cfg.genesis.state.dpos.blocks_per_year = 1000;
   }
 

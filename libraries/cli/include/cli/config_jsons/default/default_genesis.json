@@ -19,7 +19,7 @@
     "dag_proposers_reward": "0x32",
     "commission_change_delta": "0x0",
     "commission_change_frequency": "0x0",
-    "yield_percentage": "0x14",
+    "yield_percentage": "0x07",
     "initial_validators": [
       {
         "address": "0x780fe8b2226cf212c55635de399ee4c2a860810c",
