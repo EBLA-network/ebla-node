@@ -40,6 +40,7 @@
   },
   "db_config": {
     "db_snapshot_each_n_pbft_block": 10000,
+    "db_compression": true,
     "db_max_snapshots": 5
   },
   "logging": {

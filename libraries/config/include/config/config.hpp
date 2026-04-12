@@ -16,6 +16,7 @@ struct DBConfig {
   bool migrate_only = false;
   PbftPeriod rebuild_db_period = 0;
   bool migrate_receipts_by_period = false;
+  bool db_compression = true;  // Enable LZ4 compression on RocksDB column families
 };
 void dec_json(Json::Value const &json, DBConfig &db_config);
 

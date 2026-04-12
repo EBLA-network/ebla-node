@@ -15,6 +15,7 @@ void dec_json(Json::Value const &json, DBConfig &db_config) {
 
   db_config.db_max_snapshots = getConfigDataAsUInt(json, {"db_max_snapshots"}, true, db_config.db_max_snapshots);
   db_config.db_max_open_files = getConfigDataAsUInt(json, {"db_max_open_files"}, true, db_config.db_max_open_files);
+  db_config.db_compression = getConfigDataAsBoolean(json, {"db_compression"}, true, db_config.db_compression);
 }
 
 std::vector<logger::Config> FullNodeConfig::loadLoggingConfigs(const Json::Value &logging) {

@@ -167,6 +167,7 @@ class DbStorage : public std::enable_shared_from_this<DbStorage> {
   std::unique_ptr<rocksdb::DB> db_;
   std::vector<rocksdb::ColumnFamilyHandle*> handles_;
   std::mutex dag_blocks_mutex_;
+  bool compression_enabled_ = true;  // LZ4 compression toggle for all column families
   std::atomic<uint64_t> dag_blocks_count_;
   std::atomic<uint64_t> dag_edge_count_;
   const uint32_t kDbSnapshotsEachNblock = 0;
@@ -184,7 +185,7 @@ class DbStorage : public std::enable_shared_from_this<DbStorage> {
  public:
   explicit DbStorage(fs::path const& base_path, uint32_t db_snapshot_each_n_pbft_block = 0, uint32_t max_open_files = 0,
                      uint32_t db_max_snapshots = 0, PbftPeriod db_revert_to_period = 0, addr_t node_addr = addr_t(),
-                     bool rebuild = false);
+                     bool rebuild = false, bool enable_compression = true);
   ~DbStorage();
 
   DbStorage(const DbStorage&) = delete;

@@ -87,13 +87,15 @@ void App::init(const cli::Config &cli_conf) {
     if (conf_.db_config.rebuild_db) {
       old_db_ = std::make_shared<DbStorage>(conf_.db_path, conf_.db_config.db_snapshot_each_n_pbft_block,
                                             conf_.db_config.db_max_open_files, conf_.db_config.db_max_snapshots,
-                                            conf_.db_config.db_revert_to_period, node_addr, true);
+                                            conf_.db_config.db_revert_to_period, node_addr, true,
+                                            conf_.db_config.db_compression);
     }
     db_ = std::make_shared<DbStorage>(conf_.db_path,
                                       // Snapshots should be disabled while rebuilding
                                       conf_.db_config.rebuild_db ? 0 : conf_.db_config.db_snapshot_each_n_pbft_block,
                                       conf_.db_config.db_max_open_files, conf_.db_config.db_max_snapshots,
-                                      conf_.db_config.db_revert_to_period, node_addr, false);
+                                      conf_.db_config.db_revert_to_period, node_addr, false,
+                                      conf_.db_config.db_compression);
 
     if (db_->hasMajorVersionChanged()) {
       LOG(log_si_) << "Major DB version has changed. Rebuilding Db";
@@ -101,11 +103,13 @@ void App::init(const cli::Config &cli_conf) {
       db_ = nullptr;
       old_db_ = std::make_shared<DbStorage>(conf_.db_path, conf_.db_config.db_snapshot_each_n_pbft_block,
                                             conf_.db_config.db_max_open_files, conf_.db_config.db_max_snapshots,
-                                            conf_.db_config.db_revert_to_period, node_addr, true);
+                                            conf_.db_config.db_revert_to_period, node_addr, true,
+                                            conf_.db_config.db_compression);
       db_ = std::make_shared<DbStorage>(conf_.db_path,
                                         0,  // Snapshots should be disabled while rebuilding
                                         conf_.db_config.db_max_open_files, conf_.db_config.db_max_snapshots,
-                                        conf_.db_config.db_revert_to_period, node_addr);
+                                        conf_.db_config.db_revert_to_period, node_addr, false,
+                                        conf_.db_config.db_compression);
     }
 
     db_->updateDbVersions();

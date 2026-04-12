@@ -31,11 +31,13 @@ static constexpr uint16_t PILLAR_VOTES_POS_IN_PERIOD_DATA = 4;
 static constexpr uint16_t PREV_BLOCK_HASH_POS_IN_PBFT_BLOCK = 0;
 
 DbStorage::DbStorage(const fs::path& path, uint32_t db_snapshot_each_n_pbft_block, uint32_t max_open_files,
-                     uint32_t db_max_snapshots, PbftPeriod db_revert_to_period, addr_t node_addr, bool rebuild)
+                     uint32_t db_max_snapshots, PbftPeriod db_revert_to_period, addr_t node_addr, bool rebuild,
+                     bool enable_compression)
     : path_(path),
       handles_(Columns::all.size()),
       kDbSnapshotsEachNblock(db_snapshot_each_n_pbft_block),
-      kDbSnapshotsMaxCount(db_max_snapshots) {
+      kDbSnapshotsMaxCount(db_max_snapshots),
+      compression_enabled_(enable_compression) {
   db_path_ = (path / kDbDir);
   state_db_path_ = (path / kStateDbDir);
   async_write_.sync = false;
@@ -74,8 +76,11 @@ DbStorage::DbStorage(const fs::path& path, uint32_t db_snapshot_each_n_pbft_bloc
 
   std::vector<rocksdb::ColumnFamilyDescriptor> descriptors;
   descriptors.reserve(Columns::all.size());
-  std::transform(Columns::all.begin(), Columns::all.end(), std::back_inserter(descriptors), [](const Column& col) {
+  std::transform(Columns::all.begin(), Columns::all.end(), std::back_inserter(descriptors), [this](const Column& col) {
     auto options = rocksdb::ColumnFamilyOptions();
+    if (compression_enabled_) {
+      options.compression = rocksdb::CompressionType::kLZ4Compression;
+    }
     if (col.comparator_) options.comparator = col.comparator_;
     return rocksdb::ColumnFamilyDescriptor(col.name(), options);
   });
@@ -179,6 +184,9 @@ std::unique_ptr<rocksdb::ColumnFamilyHandle> DbStorage::copyColumn(rocksdb::Colu
 
   const rocksdb::Comparator* comparator = orig_column->GetComparator();
   auto options = rocksdb::ColumnFamilyOptions();
+  if (compression_enabled_) {
+    options.compression = rocksdb::CompressionType::kLZ4Compression;
+  }
   if (comparator != nullptr) {
     options.comparator = comparator;
   }
@@ -220,6 +228,9 @@ void DbStorage::deleteColumnData(const Column& c) {
   db_->DestroyColumnFamilyHandle(handle(c));
 
   auto options = rocksdb::ColumnFamilyOptions();
+  if (compression_enabled_) {
+    options.compression = rocksdb::CompressionType::kLZ4Compression;
+  }
   if (c.comparator_) {
     options.comparator = c.comparator_;
   }
@@ -239,12 +250,15 @@ void DbStorage::rebuildColumns(const rocksdb::Options& options) {
   descriptors.reserve(column_families.size());
   std::vector<rocksdb::ColumnFamilyHandle*> handles;
   handles.reserve(column_families.size());
-  std::transform(column_families.begin(), column_families.end(), std::back_inserter(descriptors), [](const auto& name) {
+  std::transform(column_families.begin(), column_families.end(), std::back_inserter(descriptors), [this](const auto& name) {
     const auto it = std::find_if(Columns::all.begin(), Columns::all.end(), [&name](const Column& col) {
       // "-copy" is there, so we will removed unsuccessful migrations
       return col.name() == name || col.name() + "-copy" == name;
     });
     auto options = rocksdb::ColumnFamilyOptions();
+    if (compression_enabled_) {
+      options.compression = rocksdb::CompressionType::kLZ4Compression;
+    }
     if (it != Columns::all.end() && it->comparator_) options.comparator = it->comparator_;
     return rocksdb::ColumnFamilyDescriptor(name, options);
   });
@@ -261,6 +275,9 @@ void DbStorage::rebuildColumns(const rocksdb::Options& options) {
         rocksdb::ColumnFamilyHandle* handle_dag_blocks_level;
 
         auto options = rocksdb::ColumnFamilyOptions();
+        if (compression_enabled_) {
+          options.compression = rocksdb::CompressionType::kLZ4Compression;
+        }
         options.comparator = getIntComparator<uint64_t>();
         checkStatus(db->CreateColumnFamily(options, Columns::dag_blocks_level.name(), &handle_dag_blocks_level));
 
