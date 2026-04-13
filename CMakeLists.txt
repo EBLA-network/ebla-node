@@ -10,8 +10,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # Set current version of the project
 set(TARAXA_MAJOR_VERSION 1)
-set(TARAXA_MINOR_VERSION 13)
-set(TARAXA_PATCH_VERSION 7)
+set(TARAXA_MINOR_VERSION 0)
+set(TARAXA_PATCH_VERSION 0)
 set(TARAXA_VERSION ${TARAXA_MAJOR_VERSION}.${TARAXA_MINOR_VERSION}.${TARAXA_PATCH_VERSION})
 message(CMAKE_BINARY_DIR ${CMAKE_BINARY_DIR})
 # Include Conan toolchain file
@@ -31,7 +31,7 @@ set(TARAXA_DB_MINOR_VERSION 2)
 
 
 # Defines Taraxa library target.
-project(taraxa-node VERSION ${TARAXA_VERSION})
+project(ebla-node VERSION ${TARAXA_VERSION})
 
 # export compile_commands.json file
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

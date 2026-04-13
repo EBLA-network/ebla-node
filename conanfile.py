@@ -2,13 +2,13 @@ from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeToolchain, CMakeDeps
 import os
 
-class TaraxaConan(ConanFile):
-    name = "taraxa-node"
+class EblaConan(ConanFile):
+    name = "ebla-node"
     version = "0.1"
-    description = "Taraxa is a Practical Byzantine Fault Tolerance blockchain."
-    topics = ("blockchain", "taraxa", "crypto")
-    url = "https://github.com/Taraxa-project/taraxa-node"
-    homepage = "https://www.taraxa.io"
+    description = "EBLA is a Practical Byzantine Fault Tolerance blockchain."
+    topics = ("blockchain", "ebla", "crypto")
+    url = "https://github.com/EBLA-network/ebla-node"
+    homepage = "https://eblanetwork.com"
     license = "MIT"
 
     settings = "os", "compiler", "build_type", "arch"
@@ -89,7 +89,7 @@ class TaraxaConan(ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libs = ["taraxa-node"]
+        self.cpp_info.libs = ["ebla-node"]
 
     def generate(self):
         tc = CMakeToolchain(self)
