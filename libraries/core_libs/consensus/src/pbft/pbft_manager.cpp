@@ -1514,7 +1514,7 @@ std::optional<PbftBlockExtraData> PbftManager::createPbftBlockExtraData(PbftPeri
     pillar_block_hash = pillar_block->getHash();
   }
 
-  return PbftBlockExtraData{TARAXA_MAJOR_VERSION, TARAXA_MINOR_VERSION, TARAXA_PATCH_VERSION, TARAXA_NET_VERSION, "T",
+  return PbftBlockExtraData{TARAXA_MAJOR_VERSION, TARAXA_MINOR_VERSION, TARAXA_PATCH_VERSION, TARAXA_NET_VERSION, "E",
                             pillar_block_hash};
 }
 
