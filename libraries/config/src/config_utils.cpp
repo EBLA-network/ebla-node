@@ -9,7 +9,7 @@
 #include "common/config_exception.hpp"
 #include "libdevcore/CommonJS.h"
 
-namespace taraxa {
+namespace ebla {
 
 std::string getConfigErr(const std::vector<std::string> &path) {
   std::string res = "Error in processing configuration file on param: ";
@@ -91,4 +91,4 @@ Json::Value getJsonFromFileOrString(const Json::Value &value) {
   }
   return value;
 }
-}  // namespace taraxa
+}  // namespace ebla

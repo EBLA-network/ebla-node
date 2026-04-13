@@ -7,7 +7,7 @@
 
 #include "common/thread_pool.hpp"
 
-namespace taraxa::util::event {
+namespace ebla::util::event {
 
 template <typename Payload>
 struct EventEmitter;
@@ -61,4 +61,4 @@ class Event : virtual EventEmitter<Payload>, public virtual EventSubscriber<Payl
   friend Owner;
 };
 
-}  // namespace taraxa::util::event
+}  // namespace ebla::util::event

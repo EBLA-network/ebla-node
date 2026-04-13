@@ -13,7 +13,7 @@
 #include "test_util/samples.hpp"
 #include "test_util/test_util.hpp"
 
-namespace taraxa::core_tests {
+namespace ebla::core_tests {
 using namespace dev;
 using namespace dev::p2p;
 
@@ -26,12 +26,12 @@ auto g_signed_trx_samples = Lazy([] { return samples::createSignedTrxSamples(0, 
 
 struct P2PTest : NodesTest {};
 
-class TestTaraxaCapability final : public dev::p2p::CapabilityFace {
+class TestEblaCapability final : public dev::p2p::CapabilityFace {
  public:
-  TestTaraxaCapability(taraxa::network::tarcap::TarcapVersion version) : version_(version) {}
+  TestEblaCapability(ebla::network::tarcap::TarcapVersion version) : version_(version) {}
 
   std::string name() const override { return ""; }
-  taraxa::network::tarcap::TarcapVersion version() const override { return version_; }
+  ebla::network::tarcap::TarcapVersion version() const override { return version_; }
   unsigned messageCount() const override { return 0; }
   void onConnect(std::weak_ptr<dev::p2p::Session>, u256 const &) override {}
   void onDisconnect(dev::p2p::NodeID const &) override {}
@@ -39,23 +39,23 @@ class TestTaraxaCapability final : public dev::p2p::CapabilityFace {
   std::string packetTypeToString(unsigned) const override { return ""; }
 
  private:
-  taraxa::network::tarcap::TarcapVersion version_{1};
+  ebla::network::tarcap::TarcapVersion version_{1};
 };
 
 std::shared_ptr<dev::p2p::Host> makeTestNode(unsigned short listenPort,
-                                             std::vector<taraxa::network::tarcap::TarcapVersion> tarcap_versions,
+                                             std::vector<ebla::network::tarcap::TarcapVersion> tarcap_versions,
                                              std::filesystem::path state_file_path) {
   auto makeTestTarcaps = [tarcap_versions](std::weak_ptr<dev::p2p::Host>) {
     Host::CapabilityList tarcaps;
     for (const auto &version : tarcap_versions) {
-      tarcaps.emplace_back(std::make_shared<TestTaraxaCapability>(version));
+      tarcaps.emplace_back(std::make_shared<TestEblaCapability>(version));
     }
 
     return tarcaps;
   };
 
-  return Host::make("TaraxaNode", makeTestTarcaps, dev::KeyPair::create(),
-                    dev::p2p::NetworkConfig("127.0.0.1", listenPort, false, true), TaraxaNetworkConfig{},
+  return Host::make("EblaNode", makeTestTarcaps, dev::KeyPair::create(),
+                    dev::p2p::NetworkConfig("127.0.0.1", listenPort, false, true), EblaNetworkConfig{},
                     state_file_path);
 }
 
@@ -70,18 +70,18 @@ TEST_F(P2PTest, p2p_discovery) {
   auto key = dev::KeyPair(secret);
   const int NUMBER_OF_NODES = 40;
   dev::p2p::NetworkConfig net_conf("127.0.0.1", 20001, false, true);
-  TaraxaNetworkConfig taraxa_net_conf;
-  taraxa_net_conf.is_boot_node = true;
+  EblaNetworkConfig ebla_net_conf;
+  ebla_net_conf.is_boot_node = true;
   auto dummy_capability_constructor = [](auto /*host*/) { return Host::CapabilityList{}; };
   util::ThreadPool tp;
-  auto bootHost = Host::make("TaraxaNode", dummy_capability_constructor, key, net_conf, taraxa_net_conf);
+  auto bootHost = Host::make("EblaNode", dummy_capability_constructor, key, net_conf, ebla_net_conf);
   tp.post_loop({}, [=] { bootHost->do_work(); });
   const auto &boot_node_key = bootHost->id();
   printf("Started Node id: %s\n", boot_node_key.hex().c_str());
 
   std::vector<std::shared_ptr<dev::p2p::Host>> nodes;
   for (int i = 0; i < NUMBER_OF_NODES; i++) {
-    auto node = nodes.emplace_back(Host::make("TaraxaNode", dummy_capability_constructor, dev::KeyPair::create(),
+    auto node = nodes.emplace_back(Host::make("EblaNode", dummy_capability_constructor, dev::KeyPair::create(),
                                               dev::p2p::NetworkConfig("127.0.0.1", 20002 + i, false, true)));
     tp.post_loop({}, [=] { node->do_work(); });
     nodes[i]->addNode(Node(boot_node_key, dev::p2p::NodeIPEndpoint(bi::make_address("127.0.0.1"), 20001, 20001)));
@@ -98,18 +98,18 @@ TEST_F(P2PTest, multiple_capabilities) {
                             dev::Secret::ConstructFromStringType::FromHex);
   auto key = dev::KeyPair(secret);
   dev::p2p::NetworkConfig net_conf("127.0.0.1", 20001, false, true);
-  TaraxaNetworkConfig taraxa_net_conf;
-  taraxa_net_conf.is_boot_node = true;
+  EblaNetworkConfig ebla_net_conf;
+  ebla_net_conf.is_boot_node = true;
   auto boot_node =
-      Host::make("TaraxaNode", [](auto /*host*/) { return Host::CapabilityList{}; }, key, net_conf, taraxa_net_conf);
+      Host::make("EblaNode", [](auto /*host*/) { return Host::CapabilityList{}; }, key, net_conf, ebla_net_conf);
   const auto &boot_node_key = boot_node->id();
 
   util::ThreadPool boot_node_tp;
   boot_node_tp.post_loop({}, [=] { boot_node->do_work(); });
 
   // Create 2 nodes(hosts) with specified tarcap versionS and wait for their connection being established
-  auto test_tarcaps = [boot_node_key](std::vector<taraxa::network::tarcap::TarcapVersion> node1_tarcap_versions,
-                                      std::vector<taraxa::network::tarcap::TarcapVersion> node2_tarcap_versions,
+  auto test_tarcaps = [boot_node_key](std::vector<ebla::network::tarcap::TarcapVersion> node1_tarcap_versions,
+                                      std::vector<ebla::network::tarcap::TarcapVersion> node2_tarcap_versions,
                                       bool wait_for_connection = true) -> std::vector<std::shared_ptr<dev::p2p::Host>> {
     std::filesystem::remove_all("/tmp/nw1");
     std::filesystem::remove_all("/tmp/nw2");
@@ -151,9 +151,9 @@ TEST_F(P2PTest, multiple_capabilities) {
   }
 }
 
-}  // namespace taraxa::core_tests
+}  // namespace ebla::core_tests
 
-using namespace taraxa;
+using namespace ebla;
 int main(int argc, char **argv) {
   static_init();
   auto logging = logger::createDefaultLoggingConfig();

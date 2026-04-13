@@ -5,7 +5,7 @@
 #include "config/config.hpp"
 #include "test_util/test_util.hpp"
 
-namespace taraxa::core_tests {
+namespace ebla::core_tests {
 
 struct GasPricerTest : NodesTest {};
 
@@ -69,4 +69,4 @@ TEST_F(GasPricerTest, random_test) {
   EXPECT_EQ(gp.bid(), prices[(prices.size() - 1) * config.gas_price.percentile / 100]);
 }
 
-}  // namespace taraxa::core_tests
+}  // namespace ebla::core_tests

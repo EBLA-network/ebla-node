@@ -1,6 +1,6 @@
 #include "common/thread_pool.hpp"
 
-namespace taraxa::util {
+namespace ebla::util {
 
 ThreadPool::ThreadPool(size_t num_threads, bool _start)
     : ioc_(num_threads), ioc_work_(boost::asio::make_work_guard(ioc_)) {
@@ -72,4 +72,4 @@ void ThreadPool::post_loop(Periodicity const &periodicity, std::function<void()>
 
 ThreadPool::~ThreadPool() { stop(); }
 
-}  // namespace taraxa::util
+}  // namespace ebla::util

@@ -2,7 +2,7 @@
 
 #include "common/encoding_rlp.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 PbftBlockExtraData::PbftBlockExtraData(const uint16_t major_version, const uint16_t minor_version,
                                        const uint16_t patch_version, const uint16_t net_version,
@@ -55,4 +55,4 @@ Json::Value PbftBlockExtraData::getJson() const {
 
 std::optional<blk_hash_t> PbftBlockExtraData::getPillarBlockHash() const { return pillar_block_hash_; }
 
-}  // namespace taraxa
+}  // namespace ebla

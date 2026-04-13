@@ -5,7 +5,7 @@
 #include <functional>
 #include <vector>
 
-namespace taraxa::cli {
+namespace ebla::cli {
 
 class ConfigUpdater {
  public:
@@ -26,4 +26,4 @@ class ConfigUpdater {
   std::vector<ConfigChange> config_changes_;
 };
 
-}  // namespace taraxa::cli
+}  // namespace ebla::cli

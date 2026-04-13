@@ -9,7 +9,7 @@
 #include "common/types.hpp"
 #include "pbft_block_extra_data.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 /** @addtogroup PBFT
  * @{
@@ -162,4 +162,4 @@ std::ostream& operator<<(std::ostream& strm, const PbftBlock& pbft_blk);
 
 /** @}*/
 
-}  // namespace taraxa
+}  // namespace ebla

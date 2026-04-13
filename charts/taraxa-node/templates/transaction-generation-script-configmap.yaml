@@ -7,7 +7,7 @@ metadata:
   labels:
     app: node
     app.kubernetes.io/name: node
-    helm.sh/chart: {{ include "taraxa-node.chart" . }}
+    helm.sh/chart: {{ include "ebla-node.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
@@ -78,14 +78,14 @@ data:
     chain_id = int(chain_id['result'])
     logger.info(f'Got chain ID: {chain_id}')
 
-    node_config = provider.make_request('taraxa_getConfig', [])
+    node_config = provider.make_request('ebla_getConfig', [])
     initial_validators = list(
         map(lambda x: Web3.to_checksum_address(x['address']), node_config['result']['dpos']['initial_validators']))
     logger.info(f'Got initial validators: {initial_validators}')
 
     web3 = Web3(provider)
     web3.eth.set_gas_price_strategy(rpc_gas_price_strategy)
-    logger.info(f'Connected to Taraxa node: {PROVIDER_URL}')
+    logger.info(f'Connected to Ebla node: {PROVIDER_URL}')
 
     last_block = web3.eth.getBlock('latest')
     logger.info(f'Last block: #{last_block.number}')

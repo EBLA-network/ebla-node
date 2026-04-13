@@ -7,7 +7,7 @@
 #include "vote/pbft_vote.hpp"
 #include "vote/votes_bundle_rlp.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 PbftSyncPacketHandler::PbftSyncPacketHandler(const FullNodeConfig &conf, std::shared_ptr<PeersState> peers_state,
                                              std::shared_ptr<TimePeriodPacketsStats> packets_stats,
@@ -23,7 +23,7 @@ PbftSyncPacketHandler::PbftSyncPacketHandler(const FullNodeConfig &conf, std::sh
       periodic_events_tp_(1, true) {}
 
 void PbftSyncPacketHandler::process(const threadpool::PacketData &packet_data,
-                                    const std::shared_ptr<TaraxaPeer> &peer) {
+                                    const std::shared_ptr<EblaPeer> &peer) {
   // Decode packet rlp into packet object
   auto packet = decodePacketRlp<PbftSyncPacket>(packet_data.rlp_);
 
@@ -259,4 +259,4 @@ void PbftSyncPacketHandler::delayedPbftSync(uint32_t counter) {
   }
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

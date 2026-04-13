@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace taraxa {
+namespace ebla {
 
 // TODO: could it be somehow prettier?
 // partial specialization is not allowed for functions, so make it with structs
@@ -174,4 +174,4 @@ class ValueByBlockCache {
   mutable DataMap data_by_block_;
 };
 
-}  // namespace taraxa
+}  // namespace ebla

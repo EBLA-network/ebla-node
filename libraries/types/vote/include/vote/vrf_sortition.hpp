@@ -7,7 +7,7 @@
 #include "common/types.hpp"
 #include "common/vrf_wrapper.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 /** @addtogroup Vote
  * @{
@@ -145,4 +145,4 @@ class VrfPbftSortition : public vrf_wrapper::VrfSortitionBase {
 
 /** @}*/
 
-}  // namespace taraxa
+}  // namespace ebla

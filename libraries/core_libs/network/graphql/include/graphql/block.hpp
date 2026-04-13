@@ -7,14 +7,14 @@
 #include "final_chain/final_chain.hpp"
 #include "transaction/transaction_manager.hpp"
 
-namespace graphql::taraxa {
+namespace graphql::ebla {
 class Block {
  public:
-  explicit Block(std::shared_ptr<::taraxa::final_chain::FinalChain> final_chain,
-                 std::shared_ptr<::taraxa::TransactionManager> trx_manager,
-                 std::function<std::shared_ptr<object::Block>(::taraxa::EthBlockNumber)> get_block_by_num,
-                 const ::taraxa::blk_hash_t& pbft_block_hash,
-                 std::shared_ptr<const ::taraxa::final_chain::BlockHeader> block_header) noexcept;
+  explicit Block(std::shared_ptr<::ebla::final_chain::FinalChain> final_chain,
+                 std::shared_ptr<::ebla::TransactionManager> trx_manager,
+                 std::function<std::shared_ptr<object::Block>(::ebla::EthBlockNumber)> get_block_by_num,
+                 const ::ebla::blk_hash_t& pbft_block_hash,
+                 std::shared_ptr<const ::ebla::final_chain::BlockHeader> block_header) noexcept;
 
   response::Value getNumber() const noexcept;
   response::Value getHash() const noexcept;
@@ -46,12 +46,12 @@ class Block {
   response::Value getEstimateGas(CallData&& dataArg) const noexcept;
 
  private:
-  std::shared_ptr<::taraxa::final_chain::FinalChain> final_chain_;
-  std::shared_ptr<::taraxa::TransactionManager> trx_manager_;
-  std::function<std::shared_ptr<object::Block>(::taraxa::EthBlockNumber)> get_block_by_num_;
-  const ::taraxa::blk_hash_t kPBftBlockHash;
-  std::shared_ptr<const ::taraxa::final_chain::BlockHeader> block_header_;
-  mutable std::vector<std::shared_ptr<::taraxa::Transaction>> transactions_;
+  std::shared_ptr<::ebla::final_chain::FinalChain> final_chain_;
+  std::shared_ptr<::ebla::TransactionManager> trx_manager_;
+  std::function<std::shared_ptr<object::Block>(::ebla::EthBlockNumber)> get_block_by_num_;
+  const ::ebla::blk_hash_t kPBftBlockHash;
+  std::shared_ptr<const ::ebla::final_chain::BlockHeader> block_header_;
+  mutable std::vector<std::shared_ptr<::ebla::Transaction>> transactions_;
 };
 
-}  // namespace graphql::taraxa
+}  // namespace graphql::ebla

@@ -32,18 +32,18 @@ You can see example config [here](doc/example_config.json)
 TODO: add explanation of all config parameters
 
 
-# Taraxa docker image
+# Ebla docker image
 
-There are 2 taraxa docker images:
+There are 2 ebla docker images:
 
-### taraxa-builder:latest 
-Contains all dependencies required for building taraxa-node project, you can create local taraxa-builder image 
+### ebla-builder:latest 
+Contains all dependencies required for building ebla-node project, you can create local ebla-builder image 
 by running this command in root directory:
 
-    DOCKER_BUILDKIT=1 docker build --progress=plain --target builder -t taraxa-builder:latest .
+    DOCKER_BUILDKIT=1 docker build --progress=plain --target builder -t ebla-builder:latest .
     
 
-### taraxa-node:latest
-Contains final taraxad binary + config. All dependencies are linked statically. To create taraxa-node image, run: 
+### ebla-node:latest
+Contains final eblad binary + config. All dependencies are linked statically. To create ebla-node image, run: 
 
-    DOCKER_BUILDKIT=1 docker build --progress=plain -t taraxa-node:latest .
+    DOCKER_BUILDKIT=1 docker build --progress=plain -t ebla-node:latest .

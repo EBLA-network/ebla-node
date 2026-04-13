@@ -5,7 +5,7 @@
 #include "libdevcore/CommonData.h"
 #include "vdf/config.hpp"
 
-namespace taraxa::vdf_sortition {
+namespace ebla::vdf_sortition {
 
 using namespace vrf_wrapper;
 
@@ -66,4 +66,4 @@ class VdfSortition : public vrf_wrapper::VrfSortitionBase {
   static const uint32_t kThresholdCorrection = 10;
 };
 
-}  // namespace taraxa::vdf_sortition
+}  // namespace ebla::vdf_sortition

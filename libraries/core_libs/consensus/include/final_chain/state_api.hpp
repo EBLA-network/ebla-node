@@ -1,13 +1,13 @@
 #pragma once
 
-#include <taraxa-evm/taraxa-evm.h>
+#include <ebla-evm/ebla-evm.h>
 
 #include <functional>
 
 #include "final_chain/state_api_data.hpp"
 #include "rewards/block_stats.hpp"
 
-namespace taraxa::state_api {
+namespace ebla::state_api {
 
 struct Config;
 struct Opts;
@@ -19,8 +19,8 @@ struct OptsDB;
 
 class StateAPI {
   std::function<h256(EthBlockNumber)> get_blk_hash_;
-  taraxa_evm_GetBlockHash get_blk_hash_c_;
-  taraxa_evm_state_API_ptr this_c_;
+  ebla_evm_GetBlockHash get_blk_hash_c_;
+  ebla_evm_state_API_ptr this_c_;
   dev::RLPStream rlp_enc_execution_result_;
   TransactionsExecutionResult result_buf_execution_result_;
   dev::RLPStream rlp_enc_rewards_distribution_;
@@ -68,8 +68,8 @@ class StateAPI {
 };
 /** @} */
 
-}  // namespace taraxa::state_api
+}  // namespace ebla::state_api
 
-namespace taraxa {
+namespace ebla {
 using state_api::StateAPI;
 }

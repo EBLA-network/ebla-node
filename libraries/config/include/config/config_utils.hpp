@@ -8,7 +8,7 @@ namespace Json {
 class Value;
 }  // namespace Json
 
-namespace taraxa {
+namespace ebla {
 std::string getConfigErr(const std::vector<std::string> &path);
 
 Json::Value getConfigData(Json::Value root, const std::vector<std::string> &path, bool optional = false);
@@ -24,4 +24,4 @@ bool getConfigDataAsBoolean(const Json::Value &root, const std::vector<std::stri
 
 Json::Value getJsonFromFileOrString(const Json::Value &value);
 
-}  // namespace taraxa
+}  // namespace ebla

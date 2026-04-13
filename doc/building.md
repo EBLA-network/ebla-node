@@ -1,4 +1,4 @@
-# Building taraxa-node
+# Building ebla-node
 
 ### Compile-Time Options (cmake)
 
@@ -44,8 +44,8 @@ First you need to get (Brew)[https://brew.sh/] package manager. After that you n
 
 ### 2. Clone the Repository
 
-    git clone https://github.com/Taraxa-project/taraxa-node.git
-    cd taraxa-node
+    git clone https://github.com/EBLA-network/ebla-node.git
+    cd ebla-node
     git submodule update --init --recursive
 
 ### 3. Compile
@@ -83,24 +83,24 @@ conan cache clean
     cd build/tests
     ctest
 
-### Running taraxa-node
+### Running ebla-node
 
     cd build/bin
 
-Run taraxa node with default testnet config which on initial run will generate default
-config and wallet file in `~/.taraxa/config.json` and `~/.taraxa/wallet.json`
+Run ebla node with default testnet config which on initial run will generate default
+config and wallet file in `~/.ebla/config.json` and `~/.ebla/wallet.json`
 
-    # run taraxa-node
-    ./taraxad
+    # run ebla-node
+    ./eblad
 
-Run taraxa node with specified config and wallet files
+Run ebla node with specified config and wallet files
 
-    # run taraxa-node
-    ./taraxad --config /path/to/config/file --wallet /path/to/wallet/file
+    # run ebla-node
+    ./eblad --config /path/to/config/file --wallet /path/to/wallet/file
 
 Run help message to display all command line options to run and configure node
 in devnet, testnet or custom network
 
     # help
-    ./taraxad --help
+    ./eblad --help
 

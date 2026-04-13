@@ -13,7 +13,7 @@
 #include "vote/vote.hpp"
 #include "vote/vrf_sortition.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 PbftVote::PbftVote(const blk_hash_t& block_hash, PbftPeriod period, PbftRound round, PbftStep step, dev::RLP const& rlp)
     : Vote(block_hash) {
@@ -125,8 +125,8 @@ PbftStep PbftVote::getStep() const { return vrf_sortition_.pbft_msg_.step_; }
 
 vote_hash_t PbftVote::sha3(bool inc_sig) const { return dev::sha3(rlp(inc_sig)); }
 
-void PbftVote::rlp(::taraxa::util::RLPDecoderRef encoding) { *this = PbftVote(encoding.value); }
+void PbftVote::rlp(::ebla::util::RLPDecoderRef encoding) { *this = PbftVote(encoding.value); }
 
-void PbftVote::rlp(::taraxa::util::RLPEncoderRef encoding) const { encoding.appendRaw(rlp()); }
+void PbftVote::rlp(::ebla::util::RLPEncoderRef encoding) const { encoding.appendRaw(rlp()); }
 
-}  // namespace taraxa
+}  // namespace ebla

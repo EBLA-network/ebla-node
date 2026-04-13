@@ -2,7 +2,7 @@
 
 #include <libdevcore/SHA3.h>
 
-namespace taraxa {
+namespace ebla {
 
 RLP_FIELDS_DEFINE(LogEntry, address, topics, data)
 
@@ -25,4 +25,4 @@ LogBloom TransactionReceipt::bloom() const {
   return ret;
 }
 
-}  // namespace taraxa
+}  // namespace ebla

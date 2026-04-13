@@ -27,7 +27,7 @@ fi
 conan install ${SOURCE_DIR} -s "build_type=Release" -s "&:build_type=${CMAKE_BUILD_TYPE}" --profile:host=clang --profile:build=clang --build=missing --output-folder=${BUILD_DIR}
 
 export CPU_COUNT=$(${SCRIPTPATH}/cpu_count.sh)
-echo "Building taraxa-node with ${CPU_COUNT} threads"
+echo "Building ebla-node with ${CPU_COUNT} threads"
 cd $BUILD_DIR
 cmake ${SOURCE_DIR}
 make -j $CPU_COUNT

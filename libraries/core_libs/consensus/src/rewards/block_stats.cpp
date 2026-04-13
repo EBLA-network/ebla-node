@@ -4,7 +4,7 @@
 
 #include "pbft/pbft_block.hpp"
 
-namespace taraxa::rewards {
+namespace ebla::rewards {
 
 BlockStats::BlockStats(const PeriodData& block, const std::vector<gas_t>& trxs_gas_used, uint64_t dpos_vote_count,
                        uint32_t committee_size, const bool aspen_dag_reward)
@@ -130,4 +130,4 @@ RLP_FIELDS_DEFINE(BlockStats::ValidatorStats, dag_blocks_count_, vote_weight_, f
 RLP_FIELDS_DEFINE(BlockStats, block_author_, validators_stats_, total_dag_blocks_count_, total_votes_weight_,
                   max_votes_weight_)
 
-}  // namespace taraxa::rewards
+}  // namespace ebla::rewards

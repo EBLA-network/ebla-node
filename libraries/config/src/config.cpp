@@ -7,7 +7,7 @@
 #include "common/config_exception.hpp"
 #include "config/config_utils.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 void dec_json(Json::Value const &json, DBConfig &db_config) {
   db_config.db_snapshot_each_n_pbft_block =
@@ -144,7 +144,7 @@ FullNodeConfig::FullNodeConfig(const Json::Value &string_or_object, const std::v
     try {
       if (!wallet_json["vrf_public"].isNull()) {
         auto vrf_public = vrf_wrapper::vrf_pk_t(wallet_json["vrf_public"].asString());
-        if (vrf_public != taraxa::vrf_wrapper::getVrfPublicKey(vrf_secret)) {
+        if (vrf_public != ebla::vrf_wrapper::getVrfPublicKey(vrf_secret)) {
           throw ConfigException(std::string("Vrf secret key and public key in wallet do not match"));
         }
       }
@@ -234,4 +234,4 @@ std::ostream &operator<<(std::ostream &strm, const FullNodeConfig &conf) {
   strm << std::ifstream(conf.json_file_name).rdbuf() << std::endl;
   return strm;
 }
-}  // namespace taraxa
+}  // namespace ebla

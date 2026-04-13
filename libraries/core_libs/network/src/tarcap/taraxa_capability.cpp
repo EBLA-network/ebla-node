@@ -1,4 +1,4 @@
-#include "network/tarcap/taraxa_capability.hpp"
+#include "network/tarcap/ebla_capability.hpp"
 
 #include <memory>
 
@@ -27,9 +27,9 @@
 #include "slashing_manager/slashing_manager.hpp"
 #include "transaction/transaction_manager.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
-TaraxaCapability::TaraxaCapability(
+EblaCapability::EblaCapability(
     TarcapVersion version, const FullNodeConfig &conf, const h256 &genesis_hash, std::weak_ptr<dev::p2p::Host> host,
     std::shared_ptr<network::threadpool::PacketsThreadPool> threadpool,
     std::shared_ptr<TimePeriodPacketsStats> packets_stats, std::shared_ptr<PbftSyncingState> syncing_state,
@@ -60,13 +60,13 @@ TaraxaCapability::TaraxaCapability(
   thread_pool_->setPacketsHandlers(version, packets_handlers_);
 }
 
-std::string TaraxaCapability::name() const { return TARAXA_CAPABILITY_NAME; }
+std::string EblaCapability::name() const { return EBLA_CAPABILITY_NAME; }
 
-TarcapVersion TaraxaCapability::version() const { return version_; }
+TarcapVersion EblaCapability::version() const { return version_; }
 
-unsigned TaraxaCapability::messageCount() const { return SubprotocolPacketType::kPacketCount; }
+unsigned EblaCapability::messageCount() const { return SubprotocolPacketType::kPacketCount; }
 
-void TaraxaCapability::onConnect(std::weak_ptr<dev::p2p::Session> session, u256 const &) {
+void EblaCapability::onConnect(std::weak_ptr<dev::p2p::Session> session, u256 const &) {
   const auto session_p = session.lock();
   if (!session_p) {
     LOG(log_er_) << "Unable to obtain session ptr !";
@@ -95,7 +95,7 @@ void TaraxaCapability::onConnect(std::weak_ptr<dev::p2p::Session> session, u256 
   status_packet_handler->sendStatus(node_id, true);
 }
 
-void TaraxaCapability::onDisconnect(dev::p2p::NodeID const &_nodeID) {
+void EblaCapability::onDisconnect(dev::p2p::NodeID const &_nodeID) {
   LOG(log_nf_) << "Node " << _nodeID << " disconnected";
   peers_state_->erasePeer(_nodeID);
 
@@ -111,11 +111,11 @@ void TaraxaCapability::onDisconnect(dev::p2p::NodeID const &_nodeID) {
   }
 }
 
-std::string TaraxaCapability::packetTypeToString(unsigned _packetType) const {
+std::string EblaCapability::packetTypeToString(unsigned _packetType) const {
   return convertPacketTypeToString(static_cast<SubprotocolPacketType>(_packetType));
 }
 
-void TaraxaCapability::interpretCapabilityPacket(std::weak_ptr<dev::p2p::Session> session, unsigned _id,
+void EblaCapability::interpretCapabilityPacket(std::weak_ptr<dev::p2p::Session> session, unsigned _id,
                                                  dev::RLP const &_r) {
   const auto session_p = session.lock();
   if (!session_p) {
@@ -189,7 +189,7 @@ void TaraxaCapability::interpretCapabilityPacket(std::weak_ptr<dev::p2p::Session
   thread_pool_->push({version(), threadpool::PacketData(packet_type, node_id, _r.data().toBytes())});
 }
 
-void TaraxaCapability::handlePacketQueueOverLimit(std::shared_ptr<dev::p2p::Host> host, dev::p2p::NodeID node_id,
+void EblaCapability::handlePacketQueueOverLimit(std::shared_ptr<dev::p2p::Host> host, dev::p2p::NodeID node_id,
                                                   size_t tp_queue_size) {
   if (!queue_over_limit_) {
     queue_over_limit_start_time_ = std::chrono::system_clock::now();
@@ -228,7 +228,7 @@ void TaraxaCapability::handlePacketQueueOverLimit(std::shared_ptr<dev::p2p::Host
   }
 }
 
-inline bool TaraxaCapability::filterSyncIrrelevantPackets(SubprotocolPacketType packet_type) const {
+inline bool EblaCapability::filterSyncIrrelevantPackets(SubprotocolPacketType packet_type) const {
   switch (packet_type) {
     case SubprotocolPacketType::kStatusPacket:
     case SubprotocolPacketType::kGetPbftSyncPacket:
@@ -239,9 +239,9 @@ inline bool TaraxaCapability::filterSyncIrrelevantPackets(SubprotocolPacketType 
   }
 }
 
-const std::shared_ptr<PeersState> &TaraxaCapability::getPeersState() { return peers_state_; }
+const std::shared_ptr<PeersState> &EblaCapability::getPeersState() { return peers_state_; }
 
-const TaraxaCapability::InitPacketsHandlers TaraxaCapability::kInitLatestVersionHandlers =
+const EblaCapability::InitPacketsHandlers EblaCapability::kInitLatestVersionHandlers =
     [](const std::string &logs_prefix, const FullNodeConfig &config, const h256 &genesis_hash,
        const std::shared_ptr<PeersState> &peers_state, const std::shared_ptr<PbftSyncingState> &pbft_syncing_state,
        const std::shared_ptr<tarcap::TimePeriodPacketsStats> &packets_stats, const std::shared_ptr<DbStorage> &db,
@@ -296,7 +296,7 @@ const TaraxaCapability::InitPacketsHandlers TaraxaCapability::kInitLatestVersion
       return packets_handlers;
     };
 
-const TaraxaCapability::InitPacketsHandlers TaraxaCapability::kInitV5VersionHandlers =
+const EblaCapability::InitPacketsHandlers EblaCapability::kInitV5VersionHandlers =
     [](const std::string &logs_prefix, const FullNodeConfig &config, const h256 &genesis_hash,
        const std::shared_ptr<PeersState> &peers_state, const std::shared_ptr<PbftSyncingState> &pbft_syncing_state,
        const std::shared_ptr<tarcap::TimePeriodPacketsStats> &packets_stats, const std::shared_ptr<DbStorage> &db,
@@ -349,4 +349,4 @@ const TaraxaCapability::InitPacketsHandlers TaraxaCapability::kInitV5VersionHand
       return packets_handlers;
     };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

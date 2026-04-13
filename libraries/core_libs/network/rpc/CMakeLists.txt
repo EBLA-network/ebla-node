@@ -5,7 +5,7 @@
 
 # find_program(ETH_JSON_RPC_STUB jsonrpcstub)
 
-# set(CPP_NAMESPACE taraxa::net)
+# set(CPP_NAMESPACE ebla::net)
 # file(GLOB API_DEF_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.jsonrpc.json")
 # add_custom_target(gen_rpc_stubs)
 # foreach (api_def_file ${API_DEF_FILES})

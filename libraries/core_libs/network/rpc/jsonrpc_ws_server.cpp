@@ -14,7 +14,7 @@
 #include "network/rpc/eth/LogFilter.hpp"
 #include "network/subscriptions.hpp"
 
-namespace taraxa::net {
+namespace ebla::net {
 
 std::string JsonRpcWsSession::processRequest(const std::string_view &req_str) {
   Json::Value req;
@@ -121,4 +121,4 @@ std::shared_ptr<WsSession> JsonRpcWsServer::createSession(tcp::socket &&socket) 
   return std::make_shared<JsonRpcWsSession>(std::move(socket), node_addr_, shared_from_this());
 }
 
-}  // namespace taraxa::net
+}  // namespace ebla::net

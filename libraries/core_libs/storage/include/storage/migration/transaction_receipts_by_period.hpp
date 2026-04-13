@@ -3,7 +3,7 @@
 
 #include "storage/migration/migration_base.hpp"
 
-namespace taraxa::storage::migration {
+namespace ebla::storage::migration {
 class TransactionReceiptsByPeriod : public migration::Base {
  public:
   TransactionReceiptsByPeriod(std::shared_ptr<DbStorage> db);
@@ -13,4 +13,4 @@ class TransactionReceiptsByPeriod : public migration::Base {
  protected:
   void migrate(logger::Logger& log) override;
 };
-}  // namespace taraxa::storage::migration
+}  // namespace ebla::storage::migration

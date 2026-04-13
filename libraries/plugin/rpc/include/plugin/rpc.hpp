@@ -5,15 +5,15 @@
 #include "network/ws_server.hpp"
 #include "plugin/plugin.hpp"
 
-namespace taraxa::net {
-class TaraxaFace;
+namespace ebla::net {
+class EblaFace;
 class NetFace;
 class EthFace;
 class TestFace;
 class DebugFace;
-}  // namespace taraxa::net
+}  // namespace ebla::net
 
-namespace taraxa::plugin {
+namespace ebla::plugin {
 
 class Rpc : public Plugin {
  public:
@@ -29,7 +29,7 @@ class Rpc : public Plugin {
   void shutdown() override;
 
  private:
-  using JsonRpcServer = ModularServer<net::TaraxaFace, net::NetFace, net::EthFace, net::TestFace, net::DebugFace>;
+  using JsonRpcServer = ModularServer<net::EblaFace, net::NetFace, net::EthFace, net::TestFace, net::DebugFace>;
 
   // should be destroyed after all components, since they may depend on it through unsafe pointers
   std::shared_ptr<util::ThreadPool> rpc_thread_pool_;
@@ -46,4 +46,4 @@ class Rpc : public Plugin {
   bool enable_debug_ = false;
 };
 
-}  // namespace taraxa::plugin
+}  // namespace ebla::plugin

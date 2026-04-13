@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: "{{ include "taraxa-node.fullname" . }}-helm-scripts"
+  name: "{{ include "ebla-node.fullname" . }}-helm-scripts"
 data:
   {{- range $path, $bytes := .Files.Glob "helmtests/*" }}
   {{ base $path }}: |-
@@ -14,7 +14,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: "{{ include "taraxa-node.fullname" . }}-helm-imports"
+  name: "{{ include "ebla-node.fullname" . }}-helm-imports"
 data:
   {{- range $path, $bytes := .Files.Glob "helmtests/imports/*" }}
   {{ base $path }}: |-
@@ -28,17 +28,17 @@ data:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "{{ include "taraxa-node.fullname" $ }}-helm-{{ base $path | replace "." "-" }}"
+  name: "{{ include "ebla-node.fullname" $ }}-helm-{{ base $path | replace "." "-" }}"
   labels:
     app: "helm-{{ base $path }}"
-    app.kubernetes.io/name: {{ include "taraxa-node.name" $ }}
-    helm.sh/chart: {{ include "taraxa-node.chart" $ }}
+    app.kubernetes.io/name: {{ include "ebla-node.name" $ }}
+    helm.sh/chart: {{ include "ebla-node.chart" $ }}
     app.kubernetes.io/instance: {{ $.Release.Name }}
     app.kubernetes.io/managed-by: {{ $.Release.Service }}
   annotations:
     "helm.sh/hook": test-success
 spec:
-  serviceAccountName: "{{ include "taraxa-node.fullname" $ }}-python-tester"
+  serviceAccountName: "{{ include "ebla-node.fullname" $ }}-python-tester"
   containers:
   - image: "{{ $.Values.test.image.repository }}:{{ $.Values.test.image.tag }}"
     imagePullPolicy: {{ $.Values.test.image.pullPolicy }}
@@ -59,12 +59,12 @@ spec:
     - name: REPLICAS
       value: "{{ $.Values.node.replicaCount }}"
     - name: TEMPLATE_NODE_NAME
-      value: "{{ include "taraxa-node.fullname" $ }}-{}.taraxa-node.{{ $.Release.Namespace }}"
+      value: "{{ include "ebla-node.fullname" $ }}-{}.ebla-node.{{ $.Release.Namespace }}"
     - name: TEMPLATE_BOOT_NODE_NAME
       value: "{{ $.Release.Name }}-boot-node-0.boot-node.{{ $.Release.Namespace }}"
     - name: RELEASE
       value: "{{ $.Release.Name }}"
-    name: "{{ include "taraxa-node.fullname" $ }}-helm-{{ base $path | replace "." "-" }}"
+    name: "{{ include "ebla-node.fullname" $ }}-helm-{{ base $path | replace "." "-" }}"
     volumeMounts:
     - name: tests
       mountPath: /tests
@@ -74,10 +74,10 @@ spec:
   volumes:
   - name: tests
     configMap:
-      name: "{{ include "taraxa-node.fullname" $ }}-helm-scripts"
+      name: "{{ include "ebla-node.fullname" $ }}-helm-scripts"
   - name: imports
     configMap:
-      name: "{{ include "taraxa-node.fullname" $ }}-helm-imports"
+      name: "{{ include "ebla-node.fullname" $ }}-helm-imports"
   {{- with $.Values.nodeSelector }}
   nodeSelector:
     {{- toYaml . | nindent 4 }}

@@ -8,7 +8,7 @@
 #include "pbft/pbft_manager.hpp"
 #include "vote_manager/vote_manager.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 StatusPacketHandler::StatusPacketHandler(const FullNodeConfig& conf, std::shared_ptr<PeersState> peers_state,
                                          std::shared_ptr<TimePeriodPacketsStats> packets_stats,
@@ -20,7 +20,7 @@ StatusPacketHandler::StatusPacketHandler(const FullNodeConfig& conf, std::shared
                          std::move(pbft_mgr), std::move(dag_mgr), std::move(db), node_addr, logs_prefix + "STATUS_PH"),
       kGenesisHash(genesis_hash) {}
 
-void StatusPacketHandler::process(const threadpool::PacketData& packet_data, const std::shared_ptr<TaraxaPeer>& peer) {
+void StatusPacketHandler::process(const threadpool::PacketData& packet_data, const std::shared_ptr<EblaPeer>& peer) {
   // Decode packet rlp into packet object
   auto packet = decodePacketRlp<StatusPacket>(packet_data.rlp_);
 
@@ -138,4 +138,4 @@ void StatusPacketHandler::process(const threadpool::PacketData& packet_data, con
   }
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

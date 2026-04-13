@@ -18,7 +18,7 @@
 #include "transaction/transaction_manager.hpp"
 
 // TODO rename this namespace to `util_test`
-namespace taraxa {
+namespace ebla {
 using dev::KeyPair;
 using dev::Secret;
 using std::filesystem::is_regular_file;
@@ -233,12 +233,12 @@ struct NodesTest : virtual WithDataDir {
   std::shared_ptr<AppBase> create_node(TestConfig& cfg, bool start);
   std::shared_ptr<AppBase> create_node(const FullNodeConfig& cfg, bool start);
 
-  std::vector<taraxa::FullNodeConfig> make_node_cfgs(size_t total_count, size_t validators_count = 1,
+  std::vector<ebla::FullNodeConfig> make_node_cfgs(size_t total_count, size_t validators_count = 1,
                                                      uint tests_speed = 1, bool enable_rpc_http = false,
                                                      bool enable_rpc_ws = false);
   std::vector<TestConfig> make_test_cfgs(const std::vector<FullNodeConfig>& cfgs);
 
-  bool wait_connect(const std::vector<std::shared_ptr<taraxa::AppBase>>& nodes);
+  bool wait_connect(const std::vector<std::shared_ptr<ebla::AppBase>>& nodes);
 
   std::vector<std::shared_ptr<AppBase>> create_nodes(uint count, bool start = false);
 
@@ -248,7 +248,7 @@ struct NodesTest : virtual WithDataDir {
   std::vector<std::shared_ptr<AppBase>> launch_nodes(std::vector<TestConfig>& cfgs);
   std::vector<std::shared_ptr<AppBase>> launch_nodes(const std::vector<FullNodeConfig>& cfgs);
 
-  std::vector<taraxa::FullNodeConfig> node_cfgs;
+  std::vector<ebla::FullNodeConfig> node_cfgs;
 };
 
-}  // namespace taraxa
+}  // namespace ebla

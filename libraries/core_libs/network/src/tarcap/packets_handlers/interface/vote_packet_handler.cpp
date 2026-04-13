@@ -2,7 +2,7 @@
 
 #include "network/tarcap/packets/latest/vote_packet.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 IVotePacketHandler::IVotePacketHandler(const FullNodeConfig &conf, std::shared_ptr<PeersState> peers_state,
                                        std::shared_ptr<TimePeriodPacketsStats> packets_stats,
@@ -59,7 +59,7 @@ void IVotePacketHandler::onNewPbftVotesBundle(const std::vector<std::shared_ptr<
   }
 }
 
-void IVotePacketHandler::sendPbftVote(const std::shared_ptr<TaraxaPeer> &peer, const std::shared_ptr<PbftVote> &vote,
+void IVotePacketHandler::sendPbftVote(const std::shared_ptr<EblaPeer> &peer, const std::shared_ptr<PbftVote> &vote,
                                       const std::shared_ptr<PbftBlock> &block) {
   if (block && block->getBlockHash() != vote->getBlockHash()) {
     LOG(log_er_) << "Vote " << vote->getHash().abridged() << " voted block " << vote->getBlockHash().abridged()
@@ -85,7 +85,7 @@ void IVotePacketHandler::sendPbftVote(const std::shared_ptr<TaraxaPeer> &peer, c
   }
 }
 
-void IVotePacketHandler::sendPbftVotesBundle(const std::shared_ptr<TaraxaPeer> &peer,
+void IVotePacketHandler::sendPbftVotesBundle(const std::shared_ptr<EblaPeer> &peer,
                                              std::vector<std::shared_ptr<PbftVote>> &&votes) {
   if (votes.empty()) {
     return;
@@ -124,4 +124,4 @@ void IVotePacketHandler::sendPbftVotesBundle(const std::shared_ptr<TaraxaPeer> &
   }
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

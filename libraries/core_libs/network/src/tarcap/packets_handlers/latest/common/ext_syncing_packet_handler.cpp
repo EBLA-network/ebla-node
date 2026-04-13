@@ -6,7 +6,7 @@
 #include "pbft/pbft_chain.hpp"
 #include "pbft/pbft_manager.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 ExtSyncingPacketHandler::ExtSyncingPacketHandler(const FullNodeConfig &conf, std::shared_ptr<PeersState> peers_state,
                                                  std::shared_ptr<TimePeriodPacketsStats> packets_stats,
@@ -22,9 +22,9 @@ ExtSyncingPacketHandler::ExtSyncingPacketHandler(const FullNodeConfig &conf, std
       dag_mgr_(std::move(dag_mgr)),
       db_(std::move(db)) {}
 
-void ExtSyncingPacketHandler::requestPendingDagBlocks(std::shared_ptr<TaraxaPeer> peer) {
+void ExtSyncingPacketHandler::requestPendingDagBlocks(std::shared_ptr<EblaPeer> peer) {
   if (!peer) {
-    peer = peers_state_->getMaxChainPeer(pbft_mgr_, [](const std::shared_ptr<TaraxaPeer> &peer) {
+    peer = peers_state_->getMaxChainPeer(pbft_mgr_, [](const std::shared_ptr<EblaPeer> &peer) {
       if (peer->peer_dag_synced_ || !peer->dagSyncingAllowed()) {
         return false;
       }
@@ -74,4 +74,4 @@ void ExtSyncingPacketHandler::requestDagBlocks(const dev::p2p::NodeID &_nodeID, 
                     encodePacketRlp(GetDagSyncPacket{period, std::move(blocks)}));
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

@@ -3,7 +3,7 @@
 #include <libdevcore/CommonJS.h>
 #include <libdevcore/RLP.h>
 
-namespace taraxa {
+namespace ebla {
 
 Json::Value enc_json(PbftConfig const& obj) {
   Json::Value ret(Json::objectValue);
@@ -39,4 +39,4 @@ bytes PbftConfig::rlp() const {
   return s.out();
 }
 
-}  // namespace taraxa
+}  // namespace ebla

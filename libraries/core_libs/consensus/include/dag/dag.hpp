@@ -16,7 +16,7 @@
 #include "common/types.hpp"
 #include "logger/logger.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 /** @addtogroup DAG
  * @{
@@ -149,4 +149,4 @@ class edge_label_writer {
 };
 /** @}*/
 
-}  // namespace taraxa
+}  // namespace ebla

@@ -10,11 +10,11 @@
 #include "transaction/receipt.hpp"
 #include "transaction/transaction.hpp"
 
-namespace taraxa {
+namespace ebla {
 class PbftBlock;
 }
 
-namespace taraxa::final_chain {
+namespace ebla::final_chain {
 
 /** @addtogroup FinalChain
  * @{
@@ -87,4 +87,4 @@ struct FinalizationResult : NewBlock {
 
 /** @} */
 
-}  // namespace taraxa::final_chain
+}  // namespace ebla::final_chain

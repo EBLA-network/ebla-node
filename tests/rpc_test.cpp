@@ -6,7 +6,7 @@
 #include "network/rpc/eth/Eth.h"
 #include "test_util/samples.hpp"
 
-namespace taraxa::core_tests {
+namespace ebla::core_tests {
 
 struct RPCTest : NodesTest {};
 
@@ -279,11 +279,11 @@ TEST_F(RPCTest, transaction_json) {
   EXPECT_EQ(json["chainId"], dev::toJS(trx->getChainID()));
 }
 
-}  // namespace taraxa::core_tests
+}  // namespace ebla::core_tests
 
-using namespace taraxa;
+using namespace ebla;
 int main(int argc, char** argv) {
-  taraxa::static_init();
+  ebla::static_init();
 
   auto logging = logger::createDefaultLoggingConfig();
   logging.verbosity = logger::Verbosity::Error;

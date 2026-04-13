@@ -10,7 +10,7 @@
 
 #include "common/config_exception.hpp"
 
-namespace taraxa::logger {
+namespace ebla::logger {
 
 BOOST_LOG_ATTRIBUTE_KEYWORD(channel, "Channel", std::string)
 BOOST_LOG_ATTRIBUTE_KEYWORD(short_node_id, "ShortNodeId", std::string)
@@ -172,4 +172,4 @@ void Config::DeinitLogging() {
   logging_initialized_ = false;
 }
 
-}  // namespace taraxa::logger
+}  // namespace ebla::logger

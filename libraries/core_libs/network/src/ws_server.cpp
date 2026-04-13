@@ -9,7 +9,7 @@
 #include "network/rpc/eth/data.hpp"
 #include "transaction/transaction.hpp"
 
-namespace taraxa::net {
+namespace ebla::net {
 namespace http = beast::http;
 
 void WsSession::run() {
@@ -223,7 +223,7 @@ WsServer::WsServer(boost::asio::io_context &ioc, tcp::endpoint endpoint, addr_t 
     if (!stopped_) LOG(log_er_) << ec << " listen";
     return;
   }
-  LOG(log_si_) << "Taraxa WS started at port: " << endpoint;
+  LOG(log_si_) << "Ebla WS started at port: " << endpoint;
 }
 
 // Start accepting incoming connections
@@ -271,7 +271,7 @@ void WsServer::on_accept(beast::error_code ec, tcp::socket socket) {
   if (!stopped_) do_accept();
 }
 
-void WsServer::newEthBlock(const ::taraxa::final_chain::BlockHeader &header, const TransactionHashes &trx_hashes) {
+void WsServer::newEthBlock(const ::ebla::final_chain::BlockHeader &header, const TransactionHashes &trx_hashes) {
   boost::shared_lock<boost::shared_mutex> lock(sessions_mtx_);
   if (sessions_.empty()) return;
 
@@ -285,7 +285,7 @@ void WsServer::newEthBlock(const ::taraxa::final_chain::BlockHeader &header, con
   }
 }
 
-void WsServer::newLogs(const ::taraxa::final_chain::BlockHeader &header, TransactionHashes trx_hashes,
+void WsServer::newLogs(const ::ebla::final_chain::BlockHeader &header, TransactionHashes trx_hashes,
                        const TransactionReceipts &receipts) {
   boost::shared_lock<boost::shared_mutex> lock(sessions_mtx_);
   if (sessions_.empty()) return;
@@ -358,4 +358,4 @@ uint32_t WsServer::numberOfSessions() {
   return sessions_.size();
 }
 
-}  // namespace taraxa::net
+}  // namespace ebla::net

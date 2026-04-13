@@ -4,7 +4,7 @@
 #include "network/tarcap/packets_handlers/interface/get_pillar_votes_bundle_packet_handler.hpp"
 #include "pillar_chain/pillar_chain_manager.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 class GetPillarVotesBundlePacketHandler : public IGetPillarVotesBundlePacketHandler {
  public:
@@ -14,16 +14,16 @@ class GetPillarVotesBundlePacketHandler : public IGetPillarVotesBundlePacketHand
                                     const addr_t& node_addr, const std::string& logs_prefix = "");
 
   void requestPillarVotesBundle(PbftPeriod period, const blk_hash_t& pillar_block_hash,
-                                const std::shared_ptr<TaraxaPeer>& peer) override;
+                                const std::shared_ptr<EblaPeer>& peer) override;
 
   // Packet type that is processed by this handler
   static constexpr SubprotocolPacketType kPacketType_ = SubprotocolPacketType::kGetPillarVotesBundlePacket;
 
  private:
-  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<TaraxaPeer>& peer) override;
+  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<EblaPeer>& peer) override;
 
  protected:
   std::shared_ptr<pillar_chain::PillarChainManager> pillar_chain_manager_;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

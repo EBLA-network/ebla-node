@@ -4,7 +4,7 @@
 #include "transaction/transaction.hpp"
 #include "transaction/transaction_manager.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 TransactionPacketHandler::TransactionPacketHandler(const FullNodeConfig &conf, std::shared_ptr<PeersState> peers_state,
                                                    std::shared_ptr<TimePeriodPacketsStats> packets_stats,
@@ -15,7 +15,7 @@ TransactionPacketHandler::TransactionPacketHandler(const FullNodeConfig &conf, s
       trx_mgr_(std::move(trx_mgr)) {}
 
 inline void TransactionPacketHandler::process(const threadpool::PacketData &packet_data,
-                                              const std::shared_ptr<TaraxaPeer> &peer) {
+                                              const std::shared_ptr<EblaPeer> &peer) {
   // Decode packet rlp into packet object
   auto packet = decodePacketRlp<TransactionPacket>(packet_data.rlp_);
 
@@ -86,7 +86,7 @@ inline void TransactionPacketHandler::process(const threadpool::PacketData &pack
   }
 }
 
-void TransactionPacketHandler::sendTransactions(std::shared_ptr<TaraxaPeer> peer,
+void TransactionPacketHandler::sendTransactions(std::shared_ptr<EblaPeer> peer,
                                                 std::pair<SharedTransactions, std::vector<trx_hash_t>> &&transactions) {
   if (!peer) return;
   const auto peer_id = peer->getId();
@@ -103,4 +103,4 @@ void TransactionPacketHandler::sendTransactions(std::shared_ptr<TaraxaPeer> peer
   }
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

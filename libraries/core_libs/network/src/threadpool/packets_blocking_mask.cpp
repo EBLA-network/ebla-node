@@ -3,7 +3,7 @@
 #include "dag/dag_block.hpp"
 #include "pbft/pbft_manager.hpp"
 
-namespace taraxa::network::threadpool {
+namespace ebla::network::threadpool {
 
 PacketsBlockingMask::PacketsBlockingMask(const std::shared_ptr<PbftManager>& pbft_mgr) : pbft_mgr_(pbft_mgr) {}
 
@@ -71,7 +71,7 @@ void PacketsBlockingMask::markPacketAsPeerOrderUnblocked(const PacketData& block
   // to keep it always in memory (even with 0 size) rather than deleting and creating it
 }
 
-std::optional<taraxa::level_t> PacketsBlockingMask::getSmallestDagLevelBeingProcessed() const {
+std::optional<ebla::level_t> PacketsBlockingMask::getSmallestDagLevelBeingProcessed() const {
   if (!processing_dag_levels_.empty()) {
     return {processing_dag_levels_.begin()->first};
   }
@@ -231,4 +231,4 @@ bool PacketsBlockingMask::isPacketBlocked(const PacketData& packet_data) const {
   return false;
 }
 
-}  // namespace taraxa::network::threadpool
+}  // namespace ebla::network::threadpool

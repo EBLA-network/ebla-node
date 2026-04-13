@@ -7,11 +7,11 @@ namespace dev::eth {
 class Client;
 }
 
-namespace taraxa::net {
+namespace ebla::net {
 
 class Test : public TestFace {
  public:
-  explicit Test(const std::shared_ptr<taraxa::AppBase>& app) : app_(app), kChainId(app->getConfig().genesis.chain_id) {}
+  explicit Test(const std::shared_ptr<ebla::AppBase>& app) : app_(app), kChainId(app->getConfig().genesis.chain_id) {}
   virtual RPCModules implementedModules() const override { return RPCModules{RPCModule{"test", "1.0"}}; }
 
   virtual Json::Value get_sortition_change(const Json::Value& param1) override;
@@ -23,8 +23,8 @@ class Test : public TestFace {
   virtual Json::Value get_all_nodes() override;
 
  private:
-  std::weak_ptr<taraxa::AppBase> app_;
+  std::weak_ptr<ebla::AppBase> app_;
   const uint64_t kChainId;
 };
 
-}  // namespace taraxa::net
+}  // namespace ebla::net

@@ -4,7 +4,7 @@
 
 #include "storage/storage.hpp"
 
-namespace taraxa::rewards {
+namespace ebla::rewards {
 Stats::Stats(uint32_t committee_size, const HardforksConfig& hardforks, std::shared_ptr<DbStorage> db,
              std::function<uint64_t(EthBlockNumber)>&& dpos_eligible_total_vote_count, EthBlockNumber last_blk_num)
     : kCommitteeSize(committee_size),
@@ -116,4 +116,4 @@ std::vector<BlockStats> Stats::processStats(const PeriodData& current_blk, const
   return res;
 }
 
-}  // namespace taraxa::rewards
+}  // namespace ebla::rewards

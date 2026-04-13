@@ -4,7 +4,7 @@
 
 #include "test_util/gtest.hpp"
 
-namespace taraxa::final_chain {
+namespace ebla::final_chain {
 
 struct CacheTest : WithDataDir {};
 
@@ -122,6 +122,6 @@ TEST_F(CacheTest, map_overwrite) {
   EXPECT_EQ(cache.blocksSize(), 3);
 }
 
-}  // namespace taraxa::final_chain
+}  // namespace ebla::final_chain
 
-TARAXA_TEST_MAIN({})
+EBLA_TEST_MAIN({})

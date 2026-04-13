@@ -3,7 +3,7 @@
 #include "dag/dag_manager.hpp"
 #include "test_util/samples.hpp"
 
-namespace taraxa::core_tests {
+namespace ebla::core_tests {
 
 void NodeDagCreationFixture::modifyConfig(FullNodeConfig &cfg) {
   auto &vdf_config = cfg.genesis.sortition.vdf;
@@ -175,4 +175,4 @@ std::vector<NodeDagCreationFixture::DagBlockWithTxs> NodeDagCreationFixture::gen
   return result;
 }
 
-}  // namespace taraxa::core_tests
+}  // namespace ebla::core_tests

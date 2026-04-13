@@ -6,7 +6,7 @@
 #include "config/genesis.hpp"
 #include "transaction/transaction.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 class DbStorage;
 class TransactionManager;
@@ -68,4 +68,4 @@ class GasPricer {
 
 /** @}*/
 
-}  // namespace taraxa
+}  // namespace ebla

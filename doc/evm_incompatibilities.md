@@ -10,7 +10,7 @@ Following EIPs are not supported by our EVM:
 We currently support `0.8.26`.
 
 ## go-ethereum library
-If you are having issue with go-ethereum library, please use our slightly modified version https://github.com/Taraxa-project/go-ethereum
+If you are having issue with go-ethereum library, please use our slightly modified version https://github.com/EBLA-network/go-ethereum
 
 # Nonce handling
 Due to nature of DAG which can reorder transactions: 

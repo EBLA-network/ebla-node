@@ -16,7 +16,7 @@
 #include "pbft/pbft_chain.hpp"
 #include "slashing_manager/slashing_manager.hpp"
 
-namespace taraxa {
+namespace ebla {
 class DbStorage;
 class PbftManager;
 class PbftChain;
@@ -34,9 +34,9 @@ namespace final_chain {
 class FinalChain;
 }
 
-}  // namespace taraxa
+}  // namespace ebla
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 class ISyncPacketHandler;
 class IVotePacketHandler;
@@ -46,12 +46,12 @@ class ITransactionPacketHandler;
 class IDagBlockPacketHandler;
 
 class PbftSyncingState;
-class TaraxaPeer;
+class EblaPeer;
 
-class TaraxaCapability final : public dev::p2p::CapabilityFace {
+class EblaCapability final : public dev::p2p::CapabilityFace {
  public:
   /**
-   * @brief Function signature for creating taraxa capability packets handlers
+   * @brief Function signature for creating ebla capability packets handlers
    */
   using InitPacketsHandlers = std::function<std::shared_ptr<PacketsHandler>(
       const std::string &logs_prefix, const FullNodeConfig &config, const h256 &genesis_hash,
@@ -71,7 +71,7 @@ class TaraxaCapability final : public dev::p2p::CapabilityFace {
   static const InitPacketsHandlers kInitV5VersionHandlers;
 
  public:
-  TaraxaCapability(TarcapVersion version, const FullNodeConfig &conf, const h256 &genesis_hash,
+  EblaCapability(TarcapVersion version, const FullNodeConfig &conf, const h256 &genesis_hash,
                    std::weak_ptr<dev::p2p::Host> host,
                    std::shared_ptr<network::threadpool::PacketsThreadPool> threadpool,
                    std::shared_ptr<TimePeriodPacketsStats> packets_stats,
@@ -83,11 +83,11 @@ class TaraxaCapability final : public dev::p2p::CapabilityFace {
                    std::shared_ptr<final_chain::FinalChain> final_chain,
                    InitPacketsHandlers init_packets_handlers = kInitLatestVersionHandlers);
 
-  virtual ~TaraxaCapability() = default;
-  TaraxaCapability(const TaraxaCapability &ro) = delete;
-  TaraxaCapability &operator=(const TaraxaCapability &ro) = delete;
-  TaraxaCapability(TaraxaCapability &&ro) = delete;
-  TaraxaCapability &operator=(TaraxaCapability &&ro) = delete;
+  virtual ~EblaCapability() = default;
+  EblaCapability(const EblaCapability &ro) = delete;
+  EblaCapability &operator=(const EblaCapability &ro) = delete;
+  EblaCapability(EblaCapability &&ro) = delete;
+  EblaCapability &operator=(EblaCapability &&ro) = delete;
 
   // CapabilityFace implemented interface
   std::string name() const override;
@@ -146,9 +146,9 @@ class TaraxaCapability final : public dev::p2p::CapabilityFace {
 };
 
 template <typename PacketHandlerType>
-std::shared_ptr<PacketHandlerType> TaraxaCapability::getSpecificHandler(SubprotocolPacketType packet_type) const {
+std::shared_ptr<PacketHandlerType> EblaCapability::getSpecificHandler(SubprotocolPacketType packet_type) const {
   // Note: Allow to manually cast only to known base classes types.
-  // We support multiple taraxa capabilities, which can contain different versions of packet handlers and casting
+  // We support multiple ebla capabilities, which can contain different versions of packet handlers and casting
   // directly to final classes types breaks the functionality...
   switch (packet_type) {
     case SubprotocolPacketType::kPbftSyncPacket:
@@ -198,4 +198,4 @@ std::shared_ptr<PacketHandlerType> TaraxaCapability::getSpecificHandler(Subproto
   return std::dynamic_pointer_cast<PacketHandlerType>(handler);
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

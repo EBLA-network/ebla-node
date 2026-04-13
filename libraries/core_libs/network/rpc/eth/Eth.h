@@ -7,7 +7,7 @@
 #include "network/rpc/EthFace.h"
 #include "watches.hpp"
 
-namespace taraxa::net::rpc::eth {
+namespace ebla::net::rpc::eth {
 
 struct EthParams {
   Address address;
@@ -22,7 +22,7 @@ struct EthParams {
   WatchesConfig watches_cfg;
 };
 
-struct Eth : virtual ::taraxa::net::EthFace {
+struct Eth : virtual ::ebla::net::EthFace {
   Eth() = default;
   virtual ~Eth() = default;
 
@@ -30,7 +30,7 @@ struct Eth : virtual ::taraxa::net::EthFace {
   Eth(Eth&&) = default;
   Eth& operator=(const Eth&) = default;
   Eth& operator=(Eth&& rhs) {
-    ::taraxa::net::EthFace::operator=(std::move(rhs));
+    ::ebla::net::EthFace::operator=(std::move(rhs));
     return *this;
   }
   virtual void note_block_executed(const final_chain::BlockHeader&, const SharedTransactions&,
@@ -41,4 +41,4 @@ struct Eth : virtual ::taraxa::net::EthFace {
 std::shared_ptr<Eth> NewEth(EthParams&&);
 
 Address toAddress(const std::string& s);
-}  // namespace taraxa::net::rpc::eth
+}  // namespace ebla::net::rpc::eth

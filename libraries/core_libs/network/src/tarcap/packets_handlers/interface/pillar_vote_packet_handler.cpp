@@ -1,6 +1,6 @@
 #include "network/tarcap/packets_handlers/interface/pillar_vote_packet_handler.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 IPillarVotePacketHandler::IPillarVotePacketHandler(
     const FullNodeConfig& conf, std::shared_ptr<PeersState> peers_state,
@@ -26,4 +26,4 @@ void IPillarVotePacketHandler::onNewPillarVote(const std::shared_ptr<PillarVote>
   }
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

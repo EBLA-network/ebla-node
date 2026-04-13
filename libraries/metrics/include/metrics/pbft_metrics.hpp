@@ -2,7 +2,7 @@
 
 #include "metrics/metrics_group.hpp"
 
-namespace taraxa::metrics {
+namespace ebla::metrics {
 class PbftMetrics : public MetricsGroup {
  public:
   inline static const std::string group_name = "pbft";
@@ -18,4 +18,4 @@ class PbftMetrics : public MetricsGroup {
   ADD_GAUGE_METRIC(setBlockTimestamp, "block_timestamp", "Number of transactions in block")
 };
 
-}  // namespace taraxa::metrics
+}  // namespace ebla::metrics

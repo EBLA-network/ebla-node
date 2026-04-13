@@ -11,27 +11,27 @@
 
 static_assert(sizeof(char) == sizeof(uint8_t));
 
-namespace taraxa::state_api {
+namespace ebla::state_api {
 
-bytesConstRef map_bytes(const taraxa_evm_Bytes& b) { return {b.Data, b.Len}; }
+bytesConstRef map_bytes(const ebla_evm_Bytes& b) { return {b.Data, b.Len}; }
 
-taraxa_evm_Bytes map_bytes(const bytes& b) { return {const_cast<uint8_t*>(b.data()), b.size()}; }
+ebla_evm_Bytes map_bytes(const bytes& b) { return {const_cast<uint8_t*>(b.data()), b.size()}; }
 
 template <typename Result>
-void from_rlp(taraxa_evm_Bytes b, Result& result) {
+void from_rlp(ebla_evm_Bytes b, Result& result) {
   util::rlp(dev::RLP(map_bytes(b), 0), result);
 }
 
-void to_str(taraxa_evm_Bytes b, std::string& result) { result = {reinterpret_cast<char*>(b.Data), b.Len}; }
+void to_str(ebla_evm_Bytes b, std::string& result) { result = {reinterpret_cast<char*>(b.Data), b.Len}; }
 
-void to_bytes(taraxa_evm_Bytes b, bytes& result) { result.assign(b.Data, b.Data + b.Len); }
+void to_bytes(ebla_evm_Bytes b, bytes& result) { result.assign(b.Data, b.Data + b.Len); }
 
-void to_u256(taraxa_evm_Bytes b, u256& result) { result = fromBigEndian<u256>(map_bytes(b)); }
+void to_u256(ebla_evm_Bytes b, u256& result) { result = fromBigEndian<u256>(map_bytes(b)); }
 
-void to_h256(taraxa_evm_Bytes b, h256& result) { result = h256(fromBigEndian<u256>(map_bytes(b))); }
+void to_h256(ebla_evm_Bytes b, h256& result) { result = h256(fromBigEndian<u256>(map_bytes(b))); }
 
-template <typename Result, void (*decode)(taraxa_evm_Bytes, Result&)>
-taraxa_evm_BytesCallback decoder_cb_c(Result& res) {
+template <typename Result, void (*decode)(ebla_evm_Bytes, Result&)>
+ebla_evm_BytesCallback decoder_cb_c(Result& res) {
   return {
       &res,
       [](auto receiver, auto b) { decode(b, *static_cast<Result*>(receiver)); },
@@ -44,7 +44,7 @@ class ErrorHandler {
  public:
   ErrorHandler() = default;
 
-  taraxa_evm_BytesCallback const cgo_part_{
+  ebla_evm_BytesCallback const cgo_part_{
       this,
       [](auto self, auto err_bytes) {
         auto& raise = decltype(this)(self)->raise_;
@@ -55,15 +55,15 @@ class ErrorHandler {
         std::string type(err_str.substr(0, delim_pos));
         std::string msg(err_str.substr(delim_pos + delim_len));
 
-        if (type == "github.com/Taraxa-project/taraxa-evm/taraxa/state/state_db/ErrFutureBlock") {
+        if (type == "github.com/EBLA-network/ebla-evm/ebla/state/state_db/ErrFutureBlock") {
           raise = [err = ErrFutureBlock(std::move(type), msg)] { BOOST_THROW_EXCEPTION(err); };
           return;
         }
 
         std::string traceback;
-        taraxa_evm_traceback(decoder_cb_c<std::string, to_str>(traceback));
+        ebla_evm_traceback(decoder_cb_c<std::string, to_str>(traceback));
         msg += "\nGo stack trace:\n" + traceback;
-        raise = [err = TaraxaEVMError(std::move(type), msg)] { BOOST_THROW_EXCEPTION(err); };
+        raise = [err = EblaEVMError(std::move(type), msg)] { BOOST_THROW_EXCEPTION(err); };
       },
   };
 
@@ -76,11 +76,11 @@ class ErrorHandler {
 };
 
 template <typename Result,                            //
-          void (*decode)(taraxa_evm_Bytes, Result&),  //
-          void (*fn)(taraxa_evm_state_API_ptr, taraxa_evm_Bytes, taraxa_evm_BytesCallback,
-                     taraxa_evm_BytesCallback),  //
+          void (*decode)(ebla_evm_Bytes, Result&),  //
+          void (*fn)(ebla_evm_state_API_ptr, ebla_evm_Bytes, ebla_evm_BytesCallback,
+                     ebla_evm_BytesCallback),  //
           typename... Params>
-void c_method_args_rlp(taraxa_evm_state_API_ptr this_c, dev::RLPStream& encoding, Result& ret, const Params&... args) {
+void c_method_args_rlp(ebla_evm_state_API_ptr this_c, dev::RLPStream& encoding, Result& ret, const Params&... args) {
   util::rlp_tuple(encoding, args...);
   ErrorHandler err_h;
   fn(this_c, map_bytes(encoding.out()), decoder_cb_c<Result, decode>(ret), err_h.cgo_part_);
@@ -88,19 +88,19 @@ void c_method_args_rlp(taraxa_evm_state_API_ptr this_c, dev::RLPStream& encoding
 }
 
 template <typename Result,                            //
-          void (*decode)(taraxa_evm_Bytes, Result&),  //
-          void (*fn)(taraxa_evm_state_API_ptr, taraxa_evm_Bytes, taraxa_evm_BytesCallback,
-                     taraxa_evm_BytesCallback),  //
+          void (*decode)(ebla_evm_Bytes, Result&),  //
+          void (*fn)(ebla_evm_state_API_ptr, ebla_evm_Bytes, ebla_evm_BytesCallback,
+                     ebla_evm_BytesCallback),  //
           typename... Params>
-Result c_method_args_rlp(taraxa_evm_state_API_ptr this_c, const Params&... args) {
+Result c_method_args_rlp(ebla_evm_state_API_ptr this_c, const Params&... args) {
   dev::RLPStream encoding;
   Result ret;
   c_method_args_rlp<Result, decode, fn, Params...>(this_c, encoding, ret, args...);
   return ret;
 }
 
-template <void (*fn)(taraxa_evm_state_API_ptr, taraxa_evm_Bytes, taraxa_evm_BytesCallback), typename... Params>
-void c_method_args_rlp(taraxa_evm_state_API_ptr this_c, const Params&... args) {
+template <void (*fn)(ebla_evm_state_API_ptr, ebla_evm_Bytes, ebla_evm_BytesCallback), typename... Params>
+void c_method_args_rlp(ebla_evm_state_API_ptr this_c, const Params&... args) {
   dev::RLPStream encoding;
   util::rlp_tuple(encoding, args...);
   ErrorHandler err_h;
@@ -115,7 +115,7 @@ StateAPI::StateAPI(decltype(get_blk_hash_) get_blk_hash, const Config& state_con
           this,
           [](auto receiver, auto arg) {
             const auto& ret = decltype(this)(receiver)->get_blk_hash_(arg);
-            taraxa_evm_Hash ret_c;
+            ebla_evm_Hash ret_c;
             std::copy_n(ret.data(), 32, std::begin(ret_c.Val));
             return ret_c;
           },
@@ -127,13 +127,13 @@ StateAPI::StateAPI(decltype(get_blk_hash_) get_blk_hash, const Config& state_con
   dev::RLPStream encoding;
   util::rlp_tuple(encoding, reinterpret_cast<uintptr_t>(&get_blk_hash_c_), state_config, opts, opts_db);
   ErrorHandler err_h;
-  this_c_ = taraxa_evm_state_api_new(map_bytes(encoding.out()), err_h.cgo_part_);
+  this_c_ = ebla_evm_state_api_new(map_bytes(encoding.out()), err_h.cgo_part_);
   err_h.check();
 }
 
 StateAPI::~StateAPI() {
   ErrorHandler err_h;
-  taraxa_evm_state_api_free(this_c_, err_h.cgo_part_);
+  ebla_evm_state_api_free(this_c_, err_h.cgo_part_);
   err_h.check();
 }
 
@@ -142,38 +142,38 @@ void StateAPI::update_state_config(const Config& new_config) {
   util::rlp_tuple(encoding, new_config);
 
   ErrorHandler err_h;
-  taraxa_evm_state_api_update_state_config(this_c_, map_bytes(encoding.out()), err_h.cgo_part_);
+  ebla_evm_state_api_update_state_config(this_c_, map_bytes(encoding.out()), err_h.cgo_part_);
   err_h.check();
 }
 
 std::optional<Account> StateAPI::get_account(EthBlockNumber blk_num, const addr_t& addr) const {
-  return c_method_args_rlp<std::optional<Account>, from_rlp, taraxa_evm_state_api_get_account>(this_c_, blk_num, addr);
+  return c_method_args_rlp<std::optional<Account>, from_rlp, ebla_evm_state_api_get_account>(this_c_, blk_num, addr);
 }
 
 h256 StateAPI::get_account_storage(EthBlockNumber blk_num, const addr_t& addr, const u256& key) const {
-  return c_method_args_rlp<h256, to_h256, taraxa_evm_state_api_get_account_storage>(this_c_, blk_num, addr, key);
+  return c_method_args_rlp<h256, to_h256, ebla_evm_state_api_get_account_storage>(this_c_, blk_num, addr, key);
 }
 
 bytes StateAPI::get_code_by_address(EthBlockNumber blk_num, const addr_t& addr) const {
-  return c_method_args_rlp<bytes, to_bytes, taraxa_evm_state_api_get_code_by_address>(this_c_, blk_num, addr);
+  return c_method_args_rlp<bytes, to_bytes, ebla_evm_state_api_get_code_by_address>(this_c_, blk_num, addr);
 }
 
 ExecutionResult StateAPI::dry_run_transaction(EthBlockNumber blk_num, const EVMBlock& blk,
                                               const EVMTransaction& trx) const {
-  return c_method_args_rlp<ExecutionResult, from_rlp, taraxa_evm_state_api_dry_run_transaction>(this_c_, blk_num, blk,
+  return c_method_args_rlp<ExecutionResult, from_rlp, ebla_evm_state_api_dry_run_transaction>(this_c_, blk_num, blk,
                                                                                                 trx);
 }
 
 bytes StateAPI::trace(EthBlockNumber blk_num, const EVMBlock& blk, const std::vector<EVMTransaction>& state_trxs,
                       const std::vector<EVMTransaction>& trxs, std::optional<Tracing> params) const {
-  return c_method_args_rlp<bytes, from_rlp, taraxa_evm_state_api_trace_transactions>(this_c_, blk_num, blk, state_trxs,
+  return c_method_args_rlp<bytes, from_rlp, ebla_evm_state_api_trace_transactions>(this_c_, blk_num, blk, state_trxs,
                                                                                      trxs, params);
 }
 
 StateDescriptor StateAPI::get_last_committed_state_descriptor() const {
   StateDescriptor ret;
   ErrorHandler err_h;
-  taraxa_evm_state_api_get_last_committed_state_descriptor(this_c_, decoder_cb_c<StateDescriptor, from_rlp>(ret),
+  ebla_evm_state_api_get_last_committed_state_descriptor(this_c_, decoder_cb_c<StateDescriptor, from_rlp>(ret),
                                                            err_h.cgo_part_);
   err_h.check();
   return ret;
@@ -183,7 +183,7 @@ const TransactionsExecutionResult& StateAPI::execute_transactions(const EVMBlock
                                                                   const std::vector<EVMTransaction>& transactions) {
   result_buf_execution_result_.execution_results.clear();
   rlp_enc_execution_result_.clear();
-  c_method_args_rlp<TransactionsExecutionResult, from_rlp, taraxa_evm_state_api_execute_transactions>(
+  c_method_args_rlp<TransactionsExecutionResult, from_rlp, ebla_evm_state_api_execute_transactions>(
       this_c_, rlp_enc_execution_result_, result_buf_execution_result_, block, transactions);
   return result_buf_execution_result_;
 }
@@ -191,14 +191,14 @@ const TransactionsExecutionResult& StateAPI::execute_transactions(const EVMBlock
 const RewardsDistributionResult& StateAPI::distribute_rewards(const std::vector<rewards::BlockStats>& rewards_stats) {
   // result_buf_rewards_distribution_;
   rlp_enc_rewards_distribution_.clear();
-  c_method_args_rlp<RewardsDistributionResult, from_rlp, taraxa_evm_state_api_distribute_rewards>(
+  c_method_args_rlp<RewardsDistributionResult, from_rlp, ebla_evm_state_api_distribute_rewards>(
       this_c_, rlp_enc_rewards_distribution_, result_buf_rewards_distribution_, rewards_stats);
   return result_buf_rewards_distribution_;
 }
 
 void StateAPI::transition_state_commit() {
   ErrorHandler err_h;
-  taraxa_evm_state_api_transition_state_commit(this_c_, err_h.cgo_part_);
+  ebla_evm_state_api_transition_state_commit(this_c_, err_h.cgo_part_);
   err_h.check();
 }
 
@@ -208,17 +208,17 @@ void StateAPI::create_snapshot(PbftPeriod period) {
   go_path.p = path.c_str();
   go_path.n = path.size();
   ErrorHandler err_h;
-  taraxa_evm_state_api_db_snapshot(this_c_, go_path, 0, err_h.cgo_part_);
+  ebla_evm_state_api_db_snapshot(this_c_, go_path, 0, err_h.cgo_part_);
   err_h.check();
 }
 
 void StateAPI::prune(const std::vector<dev::h256>& state_root_to_keep, EthBlockNumber blk_num) {
-  return c_method_args_rlp<taraxa_evm_state_api_prune>(this_c_, state_root_to_keep, blk_num);
+  return c_method_args_rlp<ebla_evm_state_api_prune>(this_c_, state_root_to_keep, blk_num);
 }
 
 uint64_t StateAPI::dpos_eligible_total_vote_count(EthBlockNumber blk_num) const {
   ErrorHandler err_h;
-  auto ret = taraxa_evm_state_api_dpos_eligible_vote_count(this_c_, blk_num, err_h.cgo_part_);
+  auto ret = ebla_evm_state_api_dpos_eligible_vote_count(this_c_, blk_num, err_h.cgo_part_);
   err_h.check();
   return ret;
 }
@@ -228,7 +228,7 @@ uint64_t StateAPI::dpos_eligible_vote_count(EthBlockNumber blk_num, const addr_t
   encoding.reserve(sizeof(EthBlockNumber) + sizeof(addr_t) + 8, 1);
   util::rlp_tuple(encoding, blk_num, addr);
   ErrorHandler err_h;
-  auto ret = taraxa_evm_state_api_dpos_get_eligible_vote_count(this_c_, map_bytes(encoding.out()), err_h.cgo_part_);
+  auto ret = ebla_evm_state_api_dpos_get_eligible_vote_count(this_c_, map_bytes(encoding.out()), err_h.cgo_part_);
   err_h.check();
   return ret;
 }
@@ -238,24 +238,24 @@ bool StateAPI::dpos_is_eligible(EthBlockNumber blk_num, const addr_t& addr) cons
   encoding.reserve(sizeof(EthBlockNumber) + sizeof(addr_t) + 8, 1);
   util::rlp_tuple(encoding, blk_num, addr);
   ErrorHandler err_h;
-  auto ret = taraxa_evm_state_api_dpos_is_eligible(this_c_, map_bytes(encoding.out()), err_h.cgo_part_);
+  auto ret = ebla_evm_state_api_dpos_is_eligible(this_c_, map_bytes(encoding.out()), err_h.cgo_part_);
   err_h.check();
   return ret;
 }
 
 u256 StateAPI::get_staking_balance(EthBlockNumber blk_num, const addr_t& addr) const {
-  return c_method_args_rlp<u256, to_u256, taraxa_evm_state_api_dpos_get_staking_balance>(this_c_, blk_num, addr);
+  return c_method_args_rlp<u256, to_u256, ebla_evm_state_api_dpos_get_staking_balance>(this_c_, blk_num, addr);
 }
 
 vrf_wrapper::vrf_pk_t StateAPI::dpos_get_vrf_key(EthBlockNumber blk_num, const addr_t& addr) const {
   return vrf_wrapper::vrf_pk_t(
-      c_method_args_rlp<bytes, to_bytes, taraxa_evm_state_api_dpos_get_vrf_key>(this_c_, blk_num, addr));
+      c_method_args_rlp<bytes, to_bytes, ebla_evm_state_api_dpos_get_vrf_key>(this_c_, blk_num, addr));
 }
 
 std::vector<ValidatorStake> StateAPI::dpos_validators_total_stakes(EthBlockNumber blk_num) const {
   ErrorHandler err_h;
   std::vector<ValidatorStake> ret;
-  taraxa_evm_state_api_validators_stakes(this_c_, blk_num, decoder_cb_c<std::vector<ValidatorStake>, from_rlp>(ret),
+  ebla_evm_state_api_validators_stakes(this_c_, blk_num, decoder_cb_c<std::vector<ValidatorStake>, from_rlp>(ret),
                                          err_h.cgo_part_);
   err_h.check();
   return ret;
@@ -264,7 +264,7 @@ std::vector<ValidatorStake> StateAPI::dpos_validators_total_stakes(EthBlockNumbe
 std::vector<ValidatorVoteCount> StateAPI::dpos_validators_vote_counts(EthBlockNumber blk_num) const {
   ErrorHandler err_h;
   std::vector<ValidatorVoteCount> ret;
-  taraxa_evm_state_api_validators_vote_counts(
+  ebla_evm_state_api_validators_vote_counts(
       this_c_, blk_num, decoder_cb_c<std::vector<ValidatorVoteCount>, from_rlp>(ret), err_h.cgo_part_);
   err_h.check();
   return ret;
@@ -272,7 +272,7 @@ std::vector<ValidatorVoteCount> StateAPI::dpos_validators_vote_counts(EthBlockNu
 
 uint64_t StateAPI::dpos_yield(EthBlockNumber blk_num) const {
   ErrorHandler err_h;
-  auto ret = taraxa_evm_state_api_dpos_yield(this_c_, blk_num, err_h.cgo_part_);
+  auto ret = ebla_evm_state_api_dpos_yield(this_c_, blk_num, err_h.cgo_part_);
   err_h.check();
   return ret;
 }
@@ -280,7 +280,7 @@ uint64_t StateAPI::dpos_yield(EthBlockNumber blk_num) const {
 u256 StateAPI::dpos_total_supply(EthBlockNumber blk_num) const {
   u256 ret;
   ErrorHandler err_h;
-  taraxa_evm_state_api_dpos_total_supply(this_c_, blk_num, decoder_cb_c<u256, to_u256>(ret), err_h.cgo_part_);
+  ebla_evm_state_api_dpos_total_supply(this_c_, blk_num, decoder_cb_c<u256, to_u256>(ret), err_h.cgo_part_);
   err_h.check();
   return ret;
 }
@@ -288,9 +288,9 @@ u256 StateAPI::dpos_total_supply(EthBlockNumber blk_num) const {
 u256 StateAPI::dpos_total_amount_delegated(EthBlockNumber blk_num) const {
   u256 ret;
   ErrorHandler err_h;
-  taraxa_evm_state_api_dpos_total_amount_delegated(this_c_, blk_num, decoder_cb_c<u256, to_u256>(ret), err_h.cgo_part_);
+  ebla_evm_state_api_dpos_total_amount_delegated(this_c_, blk_num, decoder_cb_c<u256, to_u256>(ret), err_h.cgo_part_);
   err_h.check();
   return ret;
 }
 
-}  // namespace taraxa::state_api
+}  // namespace ebla::state_api

@@ -50,7 +50,7 @@ find_package(RocksDB REQUIRED)
 target_link_libraries(core_libs PUBLIC
   cli
   pbft_block
-  taraxa-evm
+  ebla-evm
   p2p
   metrics
   Jsonrpccpp

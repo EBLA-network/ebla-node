@@ -6,13 +6,13 @@
 #include "logger/logger.hpp"
 #include "test_util/test_util.hpp"
 
-namespace taraxa::core_tests {
+namespace ebla::core_tests {
 
 struct DagTest : NodesTest {};
 
 TEST_F(DagTest, build_dag) {
   const blk_hash_t GENESIS("0000000000000000000000000000000000000000000000000000000000000001");
-  taraxa::Dag graph(GENESIS, addr_t());
+  ebla::Dag graph(GENESIS, addr_t());
 
   // a genesis vertex
   EXPECT_EQ(1, graph.getNumVertices());
@@ -42,7 +42,7 @@ TEST_F(DagTest, build_dag) {
 
 TEST_F(DagTest, dag_traverse_get_children_tips) {
   const blk_hash_t GENESIS("0000000000000000000000000000000000000000000000000000000000000001");
-  taraxa::Dag graph(GENESIS, addr_t());
+  ebla::Dag graph(GENESIS, addr_t());
 
   // a genesis vertex
   EXPECT_EQ(1, graph.getNumVertices());
@@ -92,7 +92,7 @@ TEST_F(DagTest, dag_traverse_get_children_tips) {
 
 TEST_F(DagTest, dag_traverse2_get_children_tips) {
   const blk_hash_t GENESIS("0000000000000000000000000000000000000000000000000000000000000001");
-  taraxa::Dag graph(GENESIS, addr_t());
+  ebla::Dag graph(GENESIS, addr_t());
 
   // a genesis vertex
   EXPECT_EQ(1, graph.getNumVertices());
@@ -120,7 +120,7 @@ TEST_F(DagTest, dag_traverse2_get_children_tips) {
 
 TEST_F(DagTest, genesis_get_pivot) {
   const blk_hash_t GENESIS("0000000000000000000000000000000000000000000000000000000000000001");
-  taraxa::PivotTree graph(GENESIS, addr_t());
+  ebla::PivotTree graph(GENESIS, addr_t());
 
   std::vector<blk_hash_t> leaves;
   auto pivot_chain = graph.getGhostPath(GENESIS);
@@ -172,14 +172,14 @@ TEST_F(DagTest, compute_epoch) {
   EXPECT_TRUE(mgr->addDagBlock(std::move(blkC)).first);
   EXPECT_TRUE(mgr->addDagBlock(std::move(blkD)).first);
   EXPECT_TRUE(mgr->addDagBlock(std::move(blkF)).first);
-  taraxa::thisThreadSleepForMilliSeconds(100);
+  ebla::thisThreadSleepForMilliSeconds(100);
   EXPECT_TRUE(mgr->addDagBlock(std::move(blkE)).first);
   EXPECT_TRUE(mgr->addDagBlock(std::move(blkG)).first);
   EXPECT_TRUE(mgr->addDagBlock(std::move(blkJ)).first);
   EXPECT_TRUE(mgr->addDagBlock(std::move(blkI)).first);
   EXPECT_TRUE(mgr->addDagBlock(std::move(blkH)).first);
   EXPECT_TRUE(mgr->addDagBlock(std::move(blkK)).first);
-  taraxa::thisThreadSleepForMilliSeconds(100);
+  ebla::thisThreadSleepForMilliSeconds(100);
 
   vec_blk_t orders;
   PbftPeriod period;
@@ -279,7 +279,7 @@ TEST_F(DagTest, dag_expiry) {
   mgr->addDagBlock(std::move(blkI));
   mgr->addDagBlock(std::move(blkH));
   mgr->addDagBlock(std::move(blkK));
-  taraxa::thisThreadSleepForMilliSeconds(100);
+  ebla::thisThreadSleepForMilliSeconds(100);
 
   vec_blk_t orders;
   orders = mgr->getDagBlockOrder(blkK_hash, 1);
@@ -343,7 +343,7 @@ TEST_F(DagTest, receive_block_in_order) {
   EXPECT_EQ(mgr->getNumEdgesInDag().first, 2);
 
   mgr->addDagBlock(std::move(blk3));
-  taraxa::thisThreadSleepForMilliSeconds(500);
+  ebla::thisThreadSleepForMilliSeconds(500);
 
   auto ret = mgr->getLatestPivotAndTips();
 
@@ -400,12 +400,12 @@ TEST_F(DagTest, compute_epoch_2) {
   mgr->addDagBlock(std::move(blkF));
   mgr->addDagBlock(std::move(blkJ));
   mgr->addDagBlock(std::move(blkE));
-  taraxa::thisThreadSleepForMilliSeconds(100);
+  ebla::thisThreadSleepForMilliSeconds(100);
   mgr->addDagBlock(std::move(blkG));
   mgr->addDagBlock(std::move(blkI));
   mgr->addDagBlock(std::move(blkH));
   mgr->addDagBlock(std::move(blkK));
-  taraxa::thisThreadSleepForMilliSeconds(100);
+  ebla::thisThreadSleepForMilliSeconds(100);
 
   vec_blk_t orders;
   PbftPeriod period = 1;
@@ -470,7 +470,7 @@ TEST_F(DagTest, get_latest_pivot_tips) {
   mgr->addDagBlock(std::move(blk4));
   mgr->addDagBlock(std::move(blk5));
   mgr->addDagBlock(std::move(blk6));
-  taraxa::thisThreadSleepForMilliSeconds(100);
+  ebla::thisThreadSleepForMilliSeconds(100);
 
   auto ret = mgr->getLatestPivotAndTips();
 
@@ -491,9 +491,9 @@ TEST_F(DagTest, initial_pivot) {
   EXPECT_TRUE(pt->second.empty());
   EXPECT_EQ(pt->first, node_cfgs[0].genesis.dag_genesis_block.getHash());
 }
-}  // namespace taraxa::core_tests
+}  // namespace ebla::core_tests
 
-using namespace taraxa;
+using namespace ebla;
 int main(int argc, char **argv) {
   static_init();
   auto logging = logger::createDefaultLoggingConfig();

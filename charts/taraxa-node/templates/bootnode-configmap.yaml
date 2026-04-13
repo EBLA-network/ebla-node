@@ -7,14 +7,14 @@ metadata:
   labels:
     app: boot-node
     app.kubernetes.io/name: boot-node
-    helm.sh/chart: {{ include "taraxa-node.chart" . }}
+    helm.sh/chart: {{ include "ebla-node.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
   entrypoint.sh: |-
     #!/bin/bash
-    DATA_PATH=/root/.taraxa
-    WALLET_PATH=$DATA_PATH/wallet_taraxa.json
+    DATA_PATH=/root/.ebla
+    WALLET_PATH=$DATA_PATH/wallet_ebla.json
 
     echo "Generating wallet..."
     INDEX=${HOSTNAME##*-}
@@ -24,7 +24,7 @@ data:
     KEY="${!KEY}"
     VRF="${!VRF}"
 
-    taraxad --command config \
+    eblad --command config \
       --node-secret ${KEY} \
       --vrf-secret ${VRF} \
       --wallet $WALLET_PATH

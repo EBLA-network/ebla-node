@@ -27,7 +27,7 @@
 #include "transaction/transaction_manager.hpp"
 #include "vote_manager/vote_manager.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 App::App() {}
 
@@ -370,4 +370,4 @@ void App::rebuildDb() {
   LOG(log_si_) << "Rebuild completed";
 }
 
-}  // namespace taraxa
+}  // namespace ebla

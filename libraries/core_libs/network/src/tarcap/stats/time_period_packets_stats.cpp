@@ -3,9 +3,9 @@
 #include <json/writer.h>
 
 #include "common/util.hpp"
-#include "network/tarcap/taraxa_peer.hpp"
+#include "network/tarcap/ebla_peer.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 TimePeriodPacketsStats::TimePeriodPacketsStats(std::chrono::milliseconds reset_time_period, const addr_t& node_addr)
     : kResetTimePeriod(reset_time_period) {
@@ -39,7 +39,7 @@ std::pair<bool, std::chrono::milliseconds> TimePeriodPacketsStats::validMaxStats
   return {false, reset_time_period};
 }
 
-void TimePeriodPacketsStats::processStats(const std::vector<std::shared_ptr<TaraxaPeer>>& all_peers) {
+void TimePeriodPacketsStats::processStats(const std::vector<std::shared_ptr<EblaPeer>>& all_peers) {
   LOG(log_nf_) << "Received packets stats: " << jsonToUnstyledString(received_packets_stats_.getStatsJson());
   LOG(log_nf_) << "Sent packets stats: " << jsonToUnstyledString(sent_packets_stats_.getStatsJson());
 
@@ -72,4 +72,4 @@ void TimePeriodPacketsStats::processStats(const std::vector<std::shared_ptr<Tara
   LOG(log_dg_) << "Max packets stats: " << jsonToUnstyledString(max_stats_json);
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

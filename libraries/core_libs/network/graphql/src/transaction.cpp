@@ -8,12 +8,12 @@
 
 using namespace std::literals;
 
-namespace graphql::taraxa {
+namespace graphql::ebla {
 
-Transaction::Transaction(std::shared_ptr<::taraxa::final_chain::FinalChain> final_chain,
-                         std::shared_ptr<::taraxa::TransactionManager> trx_manager,
-                         std::function<std::shared_ptr<object::Block>(::taraxa::EthBlockNumber)> get_block_by_num,
-                         std::shared_ptr<::taraxa::Transaction> transaction) noexcept
+Transaction::Transaction(std::shared_ptr<::ebla::final_chain::FinalChain> final_chain,
+                         std::shared_ptr<::ebla::TransactionManager> trx_manager,
+                         std::function<std::shared_ptr<object::Block>(::ebla::EthBlockNumber)> get_block_by_num,
+                         std::shared_ptr<::ebla::Transaction> transaction) noexcept
     : final_chain_(std::move(final_chain)),
       trx_manager_(std::move(trx_manager)),
       get_block_by_num_(std::move(get_block_by_num)),
@@ -105,4 +105,4 @@ response::Value Transaction::getS() const noexcept { return response::Value(dev:
 
 response::Value Transaction::getV() const noexcept { return response::Value(dev::toJS(transaction_->getVRS().v)); }
 
-}  // namespace graphql::taraxa
+}  // namespace graphql::ebla

@@ -3,16 +3,16 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "taraxa-node.fullname" . }}
+  name: {{ include "ebla-node.fullname" . }}
   labels:
-    app: taraxa-node
-    app.kubernetes.io/name: {{ include "taraxa-node.name" . }}
-    helm.sh/chart: {{ include "taraxa-node.chart" . }}
+    app: ebla-node
+    app.kubernetes.io/name: {{ include "ebla-node.name" . }}
+    helm.sh/chart: {{ include "ebla-node.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     {{ if .Values.kubemonkey.enabled }}
     kube-monkey/enabled: enabled
-    kube-monkey/identifier: {{ include "taraxa-node.fullname" . }}
+    kube-monkey/identifier: {{ include "ebla-node.fullname" . }}
     kube-monkey/mtbf: {{ .Values.kubemonkey.mtbf | quote }}
     kube-monkey/kill-mode: {{ .Values.kubemonkey.killMode | quote }}
     kube-monkey/kill-value: {{ .Values.kubemonkey.killValue | quote }}
@@ -22,24 +22,24 @@ spec:
   # to launch or terminate all Pods in parallel.
   # https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#parallel-pod-management
   podManagementPolicy: Parallel
-  serviceName: {{ include "taraxa-node.fullname" . }}
+  serviceName: {{ include "ebla-node.fullname" . }}
   selector:
     matchLabels:
-      app: taraxa-node
+      app: ebla-node
       partition: a
-      app.kubernetes.io/name: {{ include "taraxa-node.name" . }}
+      app.kubernetes.io/name: {{ include "ebla-node.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
-      name: taraxa-node
+      name: ebla-node
       labels:
-        app: taraxa-node
+        app: ebla-node
         partition: a
-        app.kubernetes.io/name: {{ include "taraxa-node.name" . }}
+        app.kubernetes.io/name: {{ include "ebla-node.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         {{ if .Values.kubemonkey.enabled }}
         kube-monkey/enabled: enabled
-        kube-monkey/identifier: {{ include "taraxa-node.fullname" . }}
+        kube-monkey/identifier: {{ include "ebla-node.fullname" . }}
         kube-monkey/mtbf: {{ .Values.kubemonkey.mtbf | quote }}
         kube-monkey/kill-mode: {{ .Values.kubemonkey.killMode | quote }}
         kube-monkey/kill-value: {{ .Values.kubemonkey.killValue | quote }}
@@ -60,7 +60,7 @@ spec:
               readOnly: true
               subPath: entrypoint.sh
             - name: data
-              mountPath: /root/.taraxa
+              mountPath: /root/.ebla
           securityContext:
             runAsUser: 0
         {{- end }}
@@ -100,7 +100,7 @@ spec:
               readOnly: true
               subPath: genconfig.py
             - name: data
-              mountPath: /root/.taraxa
+              mountPath: /root/.ebla
       containers:
         {{- if .Values.slack.enabled }}
         - name: status
@@ -129,10 +129,10 @@ spec:
               subPath: status.py
         {{- end }}
         {{- if .Values.node.indexer.enabled }}
-        - name: taraxa-indexer
+        - name: ebla-indexer
           image: "{{ .Values.node.indexer.image.repository }}:{{ .Values.node.indexer.image.tag }}"
           imagePullPolicy: {{ .Values.node.indexer.image.pullPolicy }}
-          command: ["/taraxa-indexer"]
+          command: ["/ebla-indexer"]
           args:
             - -data_dir 
             - {{ .Values.node.indexer.persistence.mountPoint }}
@@ -146,7 +146,7 @@ spec:
             - name: indexer-data
               mountPath: /data
         {{- end }}
-        - name: taraxa-node
+        - name: ebla-node
           {{- if and .Values.node.image.repository .Values.node.image.tag }}
           image: "{{ .Values.node.image.repository }}:{{ .Values.node.image.tag }}"
           {{- else }}
@@ -171,7 +171,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
           {{- if not .Values.node.probes.enabled }}
-            - name: TARAXA_SLEEP_DIAGNOSE
+            - name: EBLA_SLEEP_DIAGNOSE
               value: "true"
           {{- end }}
           {{ if .Values.node.loadBalancer.enabled }}
@@ -194,7 +194,7 @@ spec:
               command:
               - /bin/sh
               - -c
-              - "ps -A | grep taraxad"
+              - "ps -A | grep eblad"
             initialDelaySeconds: 10
             periodSeconds: 5
           readinessProbe:
@@ -206,7 +206,7 @@ spec:
               - -H
               - "'Content-Type: application/json'"
               - -d
-              - "'{\"jsonrpc\":\"2.0\",\"method\":\"taraxa_protocolVersion\",\"params\": [],\"id\":1}'"
+              - "'{\"jsonrpc\":\"2.0\",\"method\":\"ebla_protocolVersion\",\"params\": [],\"id\":1}'"
               - http://127.0.0.1:7777
             initialDelaySeconds: 10
             periodSeconds: 5
@@ -215,7 +215,7 @@ spec:
             {{- toYaml .Values.node.resources | nindent 12 }}
           volumeMounts:
             - name: data
-              mountPath: /root/.taraxa
+              mountPath: /root/.ebla
           securityContext:
             capabilities:
               add:

@@ -4,7 +4,7 @@
 #include "vote/pbft_vote.hpp"
 #include "vote/votes_bundle_rlp.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 struct PbftSyncPacket {
   bool last_block;
@@ -19,7 +19,7 @@ struct PbftSyncPacketRaw {
   dev::bytes period_data;
   std::optional<OptimizedPbftVotesBundle> current_block_cert_votes_bundle;
 
-  void rlp(::taraxa::util::RLPEncoderRef encoding) const {
+  void rlp(::ebla::util::RLPEncoderRef encoding) const {
     encoding.appendList(3);
     encoding.append(last_block);
     encoding.appendRaw(period_data);
@@ -27,4 +27,4 @@ struct PbftSyncPacketRaw {
   }
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

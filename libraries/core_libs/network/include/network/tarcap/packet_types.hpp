@@ -4,7 +4,7 @@
 
 #include "common/types.hpp"
 
-namespace taraxa::network {
+namespace ebla::network {
 
 /**
  * @brief SubprotocolPacketType is used in networking layer to differentiate packet types
@@ -78,4 +78,4 @@ inline std::string convertPacketTypeToString(SubprotocolPacketType packet_type) 
   return "Unknown packet type: " + std::to_string(packet_type);
 }
 
-}  // namespace taraxa::network
+}  // namespace ebla::network

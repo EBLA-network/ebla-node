@@ -5,7 +5,7 @@
 #include "common/types.hpp"
 #include "sodium/crypto_vrf.h"
 
-namespace taraxa::vrf_wrapper {
+namespace ebla::vrf_wrapper {
 
 using dev::bytes;
 using vrf_pk_t = dev::FixedHash<crypto_vrf_PUBLICKEYBYTES>;   // 32
@@ -34,7 +34,7 @@ class VrfSortitionBase {
     thresholdFromOutput(vote_count);
   }
 
-  static dev::bytes makeVrfInput(taraxa::level_t level, const dev::h256 &period_hash);
+  static dev::bytes makeVrfInput(ebla::level_t level, const dev::h256 &period_hash);
 
   bool verify(const vrf_pk_t &pk, const bytes &msg, uint16_t vote_count = 1, bool strict = true) const;
 
@@ -75,4 +75,4 @@ class VrfSortitionBase {
   mutable uint16_t threshold_;
 };
 
-}  // namespace taraxa::vrf_wrapper
+}  // namespace ebla::vrf_wrapper

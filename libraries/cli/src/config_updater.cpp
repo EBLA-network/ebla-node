@@ -2,7 +2,7 @@
 
 #include "cli/tools.hpp"
 
-namespace taraxa::cli {
+namespace ebla::cli {
 
 //// NetworkIPChange
 auto NetworkIPChange = [](Json::Value&, const Json::Value&) {
@@ -27,4 +27,4 @@ void ConfigUpdater::UpdateConfig(Json::Value& old_conf) {
   }
 }
 
-}  // namespace taraxa::cli
+}  // namespace ebla::cli

@@ -3,7 +3,7 @@
 #include "network/tarcap/packets_handlers/latest/common/exceptions.hpp"
 #include "network/tarcap/stats/time_period_packets_stats.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 PacketHandler::PacketHandler(const FullNodeConfig& conf, std::shared_ptr<PeersState> peers_state,
                              std::shared_ptr<TimePeriodPacketsStats> packets_stats, const addr_t& node_addr,
@@ -95,7 +95,7 @@ bool PacketHandler::sealAndSend(const dev::p2p::NodeID& node_id, SubprotocolPack
   const auto begin = std::chrono::steady_clock::now();
   const size_t packet_size = rlp_bytes.size();
 
-  host->send(node_id, TARAXA_CAPABILITY_NAME, packet_type, std::move(rlp_bytes),
+  host->send(node_id, EBLA_CAPABILITY_NAME, packet_type, std::move(rlp_bytes),
              [begin, node_id, packet_size, packet_type, this]() {
                if (!kConf.network.ddos_protection.log_packets_stats) {
                  return;
@@ -121,4 +121,4 @@ void PacketHandler::disconnect(const dev::p2p::NodeID& node_id, dev::p2p::Discon
   }
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

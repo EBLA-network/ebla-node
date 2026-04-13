@@ -20,7 +20,7 @@ namespace beast = boost::beast;          // from <boost/beast.hpp>
 namespace websocket = beast::websocket;  // from <boost/beast/websocket.hpp>
 using tcp = boost::asio::ip::tcp;        // from <boost/asio/ip/tcp.hpp>
 
-namespace taraxa::net {
+namespace ebla::net {
 
 class WsServer;
 class WsSession : public std::enable_shared_from_this<WsSession> {
@@ -74,4 +74,4 @@ class WsSession : public std::enable_shared_from_this<WsSession> {
   std::atomic<bool> closed_ = false;
   std::string ip_;
 };
-}  // namespace taraxa::net
+}  // namespace ebla::net

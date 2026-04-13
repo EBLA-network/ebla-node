@@ -2,7 +2,7 @@
 
 #include "common/types.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 /** @addtogroup Vote
  * @{
@@ -79,4 +79,4 @@ class Vote {
 
 /** @}*/
 
-}  // namespace taraxa
+}  // namespace ebla

@@ -5,7 +5,7 @@
 #include "common/global_const.hpp"
 #include "common/types.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 GLOBAL_CONST(h256, ZeroHash);
 GLOBAL_CONST(h256, EmptyRLPListSHA3);
@@ -49,5 +49,5 @@ static const u256 kOneTara = dev::exp10<18>();
 // static const u256 kShannon = dev::exp10<9>();
 // static const u256 kWei = exp10<0>();
 
-static const addr_t kTaraxaSystemAccount = addr_t("0x0054617261786153797374656d4163636f756e74");
-}  // namespace taraxa
+static const addr_t kEblaSystemAccount = addr_t("0x0054617261786153797374656d4163636f756e74");
+}  // namespace ebla

@@ -20,7 +20,7 @@
 #include "vote/pbft_vote.hpp"
 #include "vote/votes_bundle_rlp.hpp"
 
-namespace taraxa {
+namespace ebla {
 namespace fs = std::filesystem;
 
 static constexpr uint16_t PBFT_BLOCK_POS_IN_PERIOD_DATA = 0;
@@ -104,9 +104,9 @@ DbStorage::DbStorage(const fs::path& path, uint32_t db_snapshot_each_n_pbft_bloc
 
   kMajorVersion_ = getStatusField(StatusDbField::DbMajorVersion);
   uint32_t minor_version = getStatusField(StatusDbField::DbMinorVersion);
-  if (kMajorVersion_ != 0 && kMajorVersion_ != TARAXA_DB_MAJOR_VERSION) {
+  if (kMajorVersion_ != 0 && kMajorVersion_ != EBLA_DB_MAJOR_VERSION) {
     major_version_changed_ = true;
-  } else if (minor_version != TARAXA_DB_MINOR_VERSION) {
+  } else if (minor_version != EBLA_DB_MINOR_VERSION) {
     minor_version_changed_ = true;
   }
 }
@@ -153,9 +153,9 @@ void DbStorage::deleteTmpDirectories(const std::string& path) const {
 }
 
 void DbStorage::updateDbVersions() {
-  saveStatusField(StatusDbField::DbMajorVersion, TARAXA_DB_MAJOR_VERSION);
-  saveStatusField(StatusDbField::DbMinorVersion, TARAXA_DB_MINOR_VERSION);
-  kMajorVersion_ = TARAXA_DB_MAJOR_VERSION;
+  saveStatusField(StatusDbField::DbMajorVersion, EBLA_DB_MAJOR_VERSION);
+  saveStatusField(StatusDbField::DbMinorVersion, EBLA_DB_MINOR_VERSION);
+  kMajorVersion_ = EBLA_DB_MAJOR_VERSION;
 }
 
 std::unique_ptr<rocksdb::ColumnFamilyHandle> DbStorage::copyColumn(rocksdb::ColumnFamilyHandle* orig_column,
@@ -1102,7 +1102,7 @@ void DbStorage::savePbftHead(blk_hash_t const& hash, std::string const& pbft_cha
   insert(Columns::pbft_head, toSlice(hash.asBytes()), pbft_chain_head_str);
 }
 
-void DbStorage::addPbftHeadToBatch(taraxa::blk_hash_t const& head_hash, std::string const& head_str,
+void DbStorage::addPbftHeadToBatch(ebla::blk_hash_t const& head_hash, std::string const& head_str,
                                    Batch& write_batch) {
   insert(write_batch, Columns::pbft_head, toSlice(head_hash.asBytes()), head_str);
 }
@@ -1193,12 +1193,12 @@ std::vector<std::shared_ptr<PbftVote>> DbStorage::getRewardVotes() {
   return votes;
 }
 
-void DbStorage::addPbftBlockPeriodToBatch(PbftPeriod period, taraxa::blk_hash_t const& pbft_block_hash,
+void DbStorage::addPbftBlockPeriodToBatch(PbftPeriod period, ebla::blk_hash_t const& pbft_block_hash,
                                           Batch& write_batch) {
   insert(write_batch, Columns::pbft_block_period, toSlice(pbft_block_hash.asBytes()), toSlice(period));
 }
 
-std::pair<bool, PbftPeriod> DbStorage::getPeriodFromPbftHash(taraxa::blk_hash_t const& pbft_block_hash) {
+std::pair<bool, PbftPeriod> DbStorage::getPeriodFromPbftHash(ebla::blk_hash_t const& pbft_block_hash) {
   auto data = lookup(toSlice(pbft_block_hash.asBytes()), Columns::pbft_block_period);
 
   if (!data.empty()) {
@@ -1300,4 +1300,4 @@ void DbStorage::forEach(Column const& col, OnEntry const& f) {
   }
 }
 
-}  // namespace taraxa
+}  // namespace ebla

@@ -2,7 +2,7 @@
 
 #include <libdevcore/CommonJS.h>
 
-namespace taraxa {
+namespace ebla {
 
 Vote::Vote(const blk_hash_t& block_hash) : block_hash_(block_hash) {}
 
@@ -36,4 +36,4 @@ bool Vote::verifyVote() const {
   return !pk.isZero();  // recovered public key means that it was verified
 }
 
-}  // namespace taraxa
+}  // namespace ebla

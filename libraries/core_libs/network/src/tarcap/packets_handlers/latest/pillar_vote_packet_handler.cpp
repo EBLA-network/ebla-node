@@ -2,7 +2,7 @@
 
 #include "vote/pillar_vote.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 PillarVotePacketHandler::PillarVotePacketHandler(const FullNodeConfig &conf, std::shared_ptr<PeersState> peers_state,
                                                  std::shared_ptr<TimePeriodPacketsStats> packets_stats,
@@ -12,7 +12,7 @@ PillarVotePacketHandler::PillarVotePacketHandler(const FullNodeConfig &conf, std
                                node_addr, logs_prefix + "PILLAR_VOTE_PH") {}
 
 void PillarVotePacketHandler::process(const threadpool::PacketData &packet_data,
-                                      const std::shared_ptr<TaraxaPeer> &peer) {
+                                      const std::shared_ptr<EblaPeer> &peer) {
   // Decode packet rlp into packet object
   auto packet = decodePacketRlp<PillarVotePacket>(packet_data.rlp_);
 
@@ -28,7 +28,7 @@ void PillarVotePacketHandler::process(const threadpool::PacketData &packet_data,
   }
 }
 
-void PillarVotePacketHandler::sendPillarVote(const std::shared_ptr<TaraxaPeer> &peer,
+void PillarVotePacketHandler::sendPillarVote(const std::shared_ptr<EblaPeer> &peer,
                                              const std::shared_ptr<PillarVote> &vote) {
   if (sealAndSend(peer->getId(), SubprotocolPacketType::kPillarVotePacket, encodePacketRlp(PillarVotePacket(vote)))) {
     peer->markPillarVoteAsKnown(vote->getHash());
@@ -37,4 +37,4 @@ void PillarVotePacketHandler::sendPillarVote(const std::shared_ptr<TaraxaPeer> &
   }
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

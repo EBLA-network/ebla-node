@@ -3,7 +3,7 @@
 #include "common/constants.hpp"
 #include "common/encoding_rlp.hpp"
 
-namespace taraxa {
+namespace ebla {
 SystemTransaction::SystemTransaction(const trx_nonce_t &nonce, const val_t &value, const val_t &gas_price, gas_t gas,
                                      bytes data, const std::optional<addr_t> &receiver, uint64_t chain_id) {
   nonce_ = nonce;
@@ -13,7 +13,7 @@ SystemTransaction::SystemTransaction(const trx_nonce_t &nonce, const val_t &valu
   data_ = std::move(data);
   receiver_ = receiver;
   chain_id_ = chain_id;
-  sender_ = kTaraxaSystemAccount;
+  sender_ = kEblaSystemAccount;
 }
 
 SystemTransaction::SystemTransaction(const bytes &_bytes, bool verify_strict) {
@@ -30,12 +30,12 @@ SystemTransaction::SystemTransaction(const bytes &_bytes, bool verify_strict) {
   }
 
   fromRLP(rlp, verify_strict);
-  sender_ = kTaraxaSystemAccount;
+  sender_ = kEblaSystemAccount;
 }
 
 SystemTransaction::SystemTransaction(const dev::RLP &_rlp, bool verify_strict) {
   fromRLP(_rlp, verify_strict);
-  sender_ = kTaraxaSystemAccount;
+  sender_ = kEblaSystemAccount;
 }
 
 const addr_t &SystemTransaction::getSender() const { return sender_; }
@@ -58,4 +58,4 @@ void SystemTransaction::fromRLP(const dev::RLP &_rlp, bool verify_strict) {
                   vrs_.r, vrs_.s);
 }
 
-}  // namespace taraxa
+}  // namespace ebla

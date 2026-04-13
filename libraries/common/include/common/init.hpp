@@ -9,7 +9,7 @@
 
 namespace fs = std::filesystem;
 
-namespace taraxa {
+namespace ebla {
 
 inline void static_init() {
   if (sodium_init() == -1) {
@@ -44,4 +44,4 @@ inline bool checkDiskSpace(const fs::path& path, uint64_t required_space_MB) {
   }
 }
 
-}  // namespace taraxa
+}  // namespace ebla

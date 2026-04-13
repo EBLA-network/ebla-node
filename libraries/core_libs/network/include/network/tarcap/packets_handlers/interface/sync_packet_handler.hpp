@@ -2,7 +2,7 @@
 
 #include "network/tarcap/packets_handlers/latest/common/ext_syncing_packet_handler.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 class ISyncPacketHandler : public ExtSyncingPacketHandler {
  public:
@@ -35,4 +35,4 @@ class ISyncPacketHandler : public ExtSyncingPacketHandler {
   const h256 kGenesisHash;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

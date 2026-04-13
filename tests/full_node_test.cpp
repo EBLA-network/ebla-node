@@ -23,7 +23,7 @@
 #include "transaction/transaction_manager.hpp"
 
 // TODO rename this namespace to `tests`
-namespace taraxa::core_tests {
+namespace ebla::core_tests {
 
 const unsigned NUM_TRX = 200;
 const unsigned SYNC_TIMEOUT = 400;
@@ -508,7 +508,7 @@ TEST_F(FullNodeTest, sync_five_nodes) {
       context.dummy_transaction();
     }
 
-    taraxa::thisThreadSleepForMilliSeconds(500);
+    ebla::thisThreadSleepForMilliSeconds(500);
   }
 
   ASSERT_EQ(nodes[0]->getTransactionManager()->getTransactionCount(), context.getIssuedTrxCount());
@@ -570,7 +570,7 @@ TEST_F(FullNodeTest, sync_five_nodes) {
                   << issued_trx_count << " packed transactions!!!";
       }
     }
-    taraxa::thisThreadSleepForMilliSeconds(500);
+    ebla::thisThreadSleepForMilliSeconds(500);
     if (i % 100 == 0) {
       if (trx_executed1 != issued_trx_count) {
         std::cout << " Node 1: executed blk= " << nodes[0]->getDB()->getNumBlockExecuted()
@@ -774,7 +774,7 @@ TEST_F(FullNodeTest, reconstruct_anchors) {
   {
     auto node = create_nodes(node_cfgs, true /*start*/).front();
 
-    taraxa::thisThreadSleepForMilliSeconds(500);
+    ebla::thisThreadSleepForMilliSeconds(500);
 
     TransactionClient trx_client(node);
 
@@ -782,17 +782,17 @@ TEST_F(FullNodeTest, reconstruct_anchors) {
       auto result = trx_client.coinTransfer(KeyPair::create().address(), 10, false);
     }
 
-    taraxa::thisThreadSleepForMilliSeconds(500);
+    ebla::thisThreadSleepForMilliSeconds(500);
     anchors = node->getDagManager()->getAnchors();
   }
   {
     auto node = create_nodes(node_cfgs, true /*start*/).front();
 
-    taraxa::thisThreadSleepForMilliSeconds(500);
+    ebla::thisThreadSleepForMilliSeconds(500);
 
     EXPECT_EQ(anchors, node->getDagManager()->getAnchors());
   }
-}  // namespace taraxa
+}  // namespace ebla
 
 TEST_F(FullNodeTest, reconstruct_dag) {
   auto node_cfgs = make_node_cfgs(1);
@@ -808,19 +808,19 @@ TEST_F(FullNodeTest, reconstruct_dag) {
   {
     auto node = create_nodes(node_cfgs, true /*start*/).front();
 
-    taraxa::thisThreadSleepForMilliSeconds(100);
+    ebla::thisThreadSleepForMilliSeconds(100);
 
     for (size_t i = 0; i < num_blks; i++) {
       EXPECT_EQ(true, node->getDagManager()->addDagBlock(mock_dags[i]).first);
     }
 
-    taraxa::thisThreadSleepForMilliSeconds(100);
+    ebla::thisThreadSleepForMilliSeconds(100);
     vertices1 = node->getDagManager()->getNumVerticesInDag().first;
     EXPECT_EQ(vertices1, num_blks);
   }
   {
     auto node = create_nodes(node_cfgs, true /*start*/).front();
-    taraxa::thisThreadSleepForMilliSeconds(100);
+    ebla::thisThreadSleepForMilliSeconds(100);
 
     vertices2 = node->getDagManager()->getNumVerticesInDag().first;
     EXPECT_EQ(vertices2, num_blks);
@@ -833,12 +833,12 @@ TEST_F(FullNodeTest, reconstruct_dag) {
     for (size_t i = 0; i < num_blks; i++) {
       EXPECT_EQ(true, node->getDagManager()->addDagBlock(mock_dags[i]).first);
     }
-    taraxa::thisThreadSleepForMilliSeconds(100);
+    ebla::thisThreadSleepForMilliSeconds(100);
     vertices3 = node->getDagManager()->getNumVerticesInDag().first;
   }
   {
     auto node = create_nodes(node_cfgs, true /*start*/).front();
-    taraxa::thisThreadSleepForMilliSeconds(100);
+    ebla::thisThreadSleepForMilliSeconds(100);
     vertices4 = node->getDagManager()->getNumVerticesInDag().first;
   }
   EXPECT_EQ(vertices1, vertices2);
@@ -863,7 +863,7 @@ TEST_F(FullNodeTest, sync_two_nodes1) {
   // add more delay if sync is not done
   for (unsigned i = 0; i < SYNC_TIMEOUT; i++) {
     if (num_trx1 == 1000 && num_trx2 == 1000) break;
-    taraxa::thisThreadSleepForMilliSeconds(500);
+    ebla::thisThreadSleepForMilliSeconds(500);
     num_trx1 = nodes[0]->getTransactionManager()->getTransactionCount();
     num_trx2 = nodes[1]->getTransactionManager()->getTransactionCount();
   }
@@ -876,7 +876,7 @@ TEST_F(FullNodeTest, sync_two_nodes1) {
     if (nodes[0]->getTransactionManager()->getTransactionPoolSize() == 0 &&
         nodes[1]->getTransactionManager()->getTransactionPoolSize() == 0 && num_vertices1 == num_vertices2)
       break;
-    taraxa::thisThreadSleepForMilliSeconds(500);
+    ebla::thisThreadSleepForMilliSeconds(500);
     num_vertices1 = nodes[0]->getDagManager()->getNumVerticesInDag();
     num_vertices2 = nodes[1]->getDagManager()->getNumVerticesInDag();
   }
@@ -907,7 +907,7 @@ TEST_F(FullNodeTest, persist_counter) {
     // add more delay if sync is not done
     for (unsigned i = 0; i < SYNC_TIMEOUT; i++) {
       if (num_trx1 == count && num_trx2 == count) break;
-      taraxa::thisThreadSleepForMilliSeconds(500);
+      ebla::thisThreadSleepForMilliSeconds(500);
       num_trx1 = nodes[0]->getTransactionManager()->getTransactionCount();
       num_trx2 = nodes[1]->getTransactionManager()->getTransactionCount();
     }
@@ -932,7 +932,7 @@ TEST_F(FullNodeTest, persist_counter) {
     // add more delay if sync is not done
     for (unsigned i = 0; i < SYNC_TIMEOUT; i++) {
       if (num_exe_trx1 == 1001 && num_exe_trx2 == 1001) break;
-      taraxa::thisThreadSleepForMilliSeconds(200);
+      ebla::thisThreadSleepForMilliSeconds(200);
       num_exe_trx1 = nodes[0]->getDB()->getNumTransactionExecuted();
       num_exe_trx2 = nodes[1]->getDB()->getNumTransactionExecuted();
     }
@@ -971,7 +971,7 @@ TEST_F(FullNodeTest, save_network_to_file) {
     auto nodes = create_nodes({node_cfgs[1], node_cfgs[2]}, true /*start*/);
 
     for (unsigned i = 0; i < SYNC_TIMEOUT; i++) {
-      taraxa::thisThreadSleepForSeconds(1);
+      ebla::thisThreadSleepForSeconds(1);
       if (1 == nodes[0]->getNetwork()->getPeerCount() && 1 == nodes[1]->getNetwork()->getPeerCount()) break;
     }
 
@@ -1565,13 +1565,13 @@ TEST_F(FullNodeTest, graphql_test) {
   }
 
   // Objects needed to run the query
-  auto q = std::make_shared<graphql::taraxa::Query>(nodes[0]->getFinalChain(), nodes[0]->getDagManager(),
+  auto q = std::make_shared<graphql::ebla::Query>(nodes[0]->getFinalChain(), nodes[0]->getDagManager(),
                                                     nodes[0]->getPbftManager(), nodes[0]->getTransactionManager(),
                                                     nodes[0]->getDB(), nodes[0]->getGasPricer(), nodes[0]->getNetwork(),
                                                     nodes[0]->getConfig().genesis.chain_id);
-  auto mutation = std::make_shared<graphql::taraxa::Mutation>(nodes[0]->getTransactionManager());
-  auto subscription = std::make_shared<graphql::taraxa::Subscription>();
-  auto _service = std::make_shared<graphql::taraxa::Operations>(q, mutation, subscription);
+  auto mutation = std::make_shared<graphql::ebla::Mutation>(nodes[0]->getTransactionManager());
+  auto subscription = std::make_shared<graphql::ebla::Subscription>();
+  auto _service = std::make_shared<graphql::ebla::Operations>(q, mutation, subscription);
 
   // Get latest block number with query
   using namespace graphql;
@@ -1644,10 +1644,10 @@ TEST_F(FullNodeTest, multiple_wallets_support) {
   });
 }
 
-}  // namespace taraxa::core_tests
+}  // namespace ebla::core_tests
 
 int main(int argc, char **argv) {
-  taraxa::static_init();
+  ebla::static_init();
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

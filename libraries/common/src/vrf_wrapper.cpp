@@ -1,6 +1,6 @@
 #include "common/vrf_wrapper.hpp"
 
-namespace taraxa::vrf_wrapper {
+namespace ebla::vrf_wrapper {
 
 std::pair<vrf_pk_t, vrf_sk_t> getVrfKeyPair() {
   vrf_sk_t sk;
@@ -45,7 +45,7 @@ std::optional<vrf_output_t> getVrfOutput(vrf_pk_t const &pk, vrf_proof_t const &
   return {};
 }
 
-dev::bytes VrfSortitionBase::makeVrfInput(taraxa::level_t level, const dev::h256 &period_hash) {
+dev::bytes VrfSortitionBase::makeVrfInput(ebla::level_t level, const dev::h256 &period_hash) {
   dev::RLPStream s;
   s << level;
   s << period_hash;
@@ -62,4 +62,4 @@ bool VrfSortitionBase::verify(const vrf_pk_t &pk, const bytes &msg, uint16_t vot
   return false;
 }
 
-}  // namespace taraxa::vrf_wrapper
+}  // namespace ebla::vrf_wrapper

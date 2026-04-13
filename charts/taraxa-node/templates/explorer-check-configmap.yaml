@@ -1,11 +1,11 @@
-{{- $fullName := include "taraxa-node.fullname" . -}}
+{{- $fullName := include "ebla-node.fullname" . -}}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ $fullName }}-explorer-check
   labels:
-    helm.sh/chart: {{ include "taraxa-node.chart" . }}
+    helm.sh/chart: {{ include "ebla-node.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:

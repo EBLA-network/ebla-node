@@ -12,7 +12,7 @@
 #include "rewards/rewards_stats.hpp"
 #include "storage/storage.hpp"
 
-namespace taraxa::final_chain {
+namespace ebla::final_chain {
 
 /** @addtogroup FinalChain
  * @{
@@ -35,7 +35,7 @@ class FinalChain {
   decltype(block_applying_emitter_)::Subscriber const& block_applying_ = block_applying_emitter_;
 
   ~FinalChain() = default;
-  FinalChain(const std::shared_ptr<DbStorage>& db, const taraxa::FullNodeConfig& config, const addr_t& node_addr);
+  FinalChain(const std::shared_ptr<DbStorage>& db, const ebla::FullNodeConfig& config, const addr_t& node_addr);
   FinalChain(const FinalChain&) = delete;
   FinalChain(FinalChain&&) = delete;
   FinalChain& operator=(const FinalChain&) = delete;
@@ -350,4 +350,4 @@ class FinalChain {
 
 /** @} */
 
-}  // namespace taraxa::final_chain
+}  // namespace ebla::final_chain

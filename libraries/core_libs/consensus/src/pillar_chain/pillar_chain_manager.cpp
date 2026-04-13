@@ -9,7 +9,7 @@
 #include "storage/storage.hpp"
 #include "vote/pillar_vote.hpp"
 
-namespace taraxa::pillar_chain {
+namespace ebla::pillar_chain {
 
 PillarChainManager::PillarChainManager(const FicusHardforkConfig& ficus_hf_config, std::shared_ptr<DbStorage> db,
                                        std::shared_ptr<final_chain::FinalChain> final_chain,
@@ -426,4 +426,4 @@ std::vector<PillarBlock::ValidatorVoteCountChange> PillarChainManager::getOrdere
 
 void PillarChainManager::setNetwork(std::weak_ptr<Network> network) { network_ = std::move(network); }
 
-}  // namespace taraxa::pillar_chain
+}  // namespace ebla::pillar_chain

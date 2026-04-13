@@ -3,19 +3,19 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "taraxa-node.fullname" . }}
+  name: {{ include "ebla-node.fullname" . }}
   labels:
-    name: taraxa-node
-    app.kubernetes.io/name: taraxa-node
-    helm.sh/chart: {{ include "taraxa-node.chart" . }}
+    name: ebla-node
+    app.kubernetes.io/name: ebla-node
+    helm.sh/chart: {{ include "ebla-node.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   type: ClusterIP
   clusterIP: None
   selector:
-    app: taraxa-node
-    app.kubernetes.io/name: {{ include "taraxa-node.name" . }}
+    app: ebla-node
+    app.kubernetes.io/name: {{ include "ebla-node.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
   ports:
   {{- range $port := .Values.node.service.ports }}
@@ -31,17 +31,17 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "taraxa-node.fullname" . }}-head
+  name: {{ include "ebla-node.fullname" . }}-head
   labels:
-    app.kubernetes.io/name: taraxa-node-head
-    helm.sh/chart: {{ include "taraxa-node.chart" . }}
+    app.kubernetes.io/name: ebla-node-head
+    helm.sh/chart: {{ include "ebla-node.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   type: ClusterIP
   selector:
-    app: taraxa-node
-    app.kubernetes.io/name: {{ include "taraxa-node.name" . }}
+    app: ebla-node
+    app.kubernetes.io/name: {{ include "ebla-node.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
   ports:
   {{- range $port := .Values.node.service.ports }}
@@ -59,15 +59,15 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ $.Release.Name }}-taraxa-node-udp-{{ $key }}
+  name: {{ $.Release.Name }}-ebla-node-udp-{{ $key }}
   labels:
-    name: {{ $.Release.Name }}-taraxa-node-udp-{{ $key }}
+    name: {{ $.Release.Name }}-ebla-node-udp-{{ $key }}
 spec:
   type: LoadBalancer
   loadBalancerIP: {{ $value | quote }}
   externalTrafficPolicy: Local
   selector:
-    statefulset.kubernetes.io/pod-name: {{ $.Release.Name }}-taraxa-node-{{ $key }}
+    statefulset.kubernetes.io/pod-name: {{ $.Release.Name }}-ebla-node-{{ $key }}
   ports:
     - name: udp-listen-port
       port: 10002
@@ -78,15 +78,15 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ $.Release.Name }}-taraxa-node-tcp-{{ $key }}
+  name: {{ $.Release.Name }}-ebla-node-tcp-{{ $key }}
   labels:
-    name: {{ $.Release.Name }}-taraxa-node-tcp-{{ $key }}
+    name: {{ $.Release.Name }}-ebla-node-tcp-{{ $key }}
 spec:
   type: LoadBalancer
   loadBalancerIP: {{ $value | quote }}
   externalTrafficPolicy: Local
   selector:
-    statefulset.kubernetes.io/pod-name: {{ $.Release.Name }}-taraxa-node-{{ $key }}
+    statefulset.kubernetes.io/pod-name: {{ $.Release.Name }}-ebla-node-{{ $key }}
   ports:
     - name: tcp-listen-port
       port: 10002
@@ -101,13 +101,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ $.Release.Name }}-taraxa-node-discovery-{{ $key }}
+  name: {{ $.Release.Name }}-ebla-node-discovery-{{ $key }}
   labels:
-    name: {{ $.Release.Name }}-taraxa-node-discovery-{{ $key }}
+    name: {{ $.Release.Name }}-ebla-node-discovery-{{ $key }}
 spec:
   type: NodePort
   selector:
-    statefulset.kubernetes.io/pod-name: {{ $.Release.Name }}-taraxa-node-{{ $key }}
+    statefulset.kubernetes.io/pod-name: {{ $.Release.Name }}-ebla-node-{{ $key }}
   ports:
     - name: udp-listen-port
       port: {{ $value }}

@@ -1,6 +1,6 @@
 #include "watches.hpp"
 
-namespace taraxa::net::rpc::eth {
+namespace ebla::net::rpc::eth {
 
 GLOBAL_CONST_DEF(watch_id_type_mask_bits, WatchType(ceil(log2(float(COUNT)))))
 
@@ -44,4 +44,4 @@ Watches::~Watches() {
   watch_cleaner_.join();
 }
 
-}  // namespace taraxa::net::rpc::eth
+}  // namespace ebla::net::rpc::eth

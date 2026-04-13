@@ -4,7 +4,7 @@
 #include "storage/storage.hpp"
 #include "vdf/config.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 using EfficienciesMap = std::map<uint16_t, int32_t>;
 
@@ -84,4 +84,4 @@ class SortitionParamsManager {
 };
 /** @}*/
 
-}  // namespace taraxa
+}  // namespace ebla

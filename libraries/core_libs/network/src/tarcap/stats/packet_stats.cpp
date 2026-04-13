@@ -1,6 +1,6 @@
 #include "network/tarcap/stats/packet_stats.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 std::string PacketStats::getStatsJsonStr(const std::string &packet_type, const dev::p2p::NodeID &node) const {
   std::ostringstream ret;
@@ -32,4 +32,4 @@ Json::Value PacketStats::getStatsJson() const {
   return ret;
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

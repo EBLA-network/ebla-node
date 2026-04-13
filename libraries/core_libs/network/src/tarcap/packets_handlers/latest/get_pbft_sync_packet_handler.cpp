@@ -11,7 +11,7 @@
 #include "vote/votes_bundle_rlp.hpp"
 #include "vote_manager/vote_manager.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 GetPbftSyncPacketHandler::GetPbftSyncPacketHandler(const FullNodeConfig &conf, std::shared_ptr<PeersState> peers_state,
                                                    std::shared_ptr<TimePeriodPacketsStats> packets_stats,
@@ -29,7 +29,7 @@ GetPbftSyncPacketHandler::GetPbftSyncPacketHandler(const FullNodeConfig &conf, s
       db_(std::move(db)) {}
 
 void GetPbftSyncPacketHandler::process(const threadpool::PacketData &packet_data,
-                                       const std::shared_ptr<TaraxaPeer> &peer) {
+                                       const std::shared_ptr<EblaPeer> &peer) {
   // Decode packet rlp into packet object
   auto packet = decodePacketRlp<GetPbftSyncPacket>(packet_data.rlp_);
 
@@ -90,7 +90,7 @@ void GetPbftSyncPacketHandler::process(const threadpool::PacketData &packet_data
 }
 
 // api for pbft syncing
-void GetPbftSyncPacketHandler::sendPbftBlocks(const std::shared_ptr<TaraxaPeer> &peer, PbftPeriod from_period,
+void GetPbftSyncPacketHandler::sendPbftBlocks(const std::shared_ptr<EblaPeer> &peer, PbftPeriod from_period,
                                               size_t blocks_to_transfer, bool pbft_chain_synced) {
   const auto &peer_id = peer->getId();
   LOG(log_tr_) << "sendPbftBlocks: peer want to sync from pbft chain height " << from_period << ", will send at most "
@@ -130,4 +130,4 @@ void GetPbftSyncPacketHandler::sendPbftBlocks(const std::shared_ptr<TaraxaPeer> 
   }
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

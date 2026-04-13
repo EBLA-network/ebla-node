@@ -6,11 +6,11 @@
 #include "pbft/pbft_chain.hpp"
 #include "pbft/pbft_manager.hpp"
 
-namespace taraxa {
+namespace ebla {
 class PbftManager;
-}  // namespace taraxa
+}  // namespace ebla
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 /**
  * @brief ExtSyncingPacketHandler is extended abstract PacketHandler with added functions that are used in packet
@@ -29,7 +29,7 @@ class ExtSyncingPacketHandler : public PacketHandler {
   ExtSyncingPacketHandler &operator=(ExtSyncingPacketHandler &&) = delete;
 
   void requestDagBlocks(const dev::p2p::NodeID &_nodeID, std::vector<blk_hash_t> &&blocks, PbftPeriod period);
-  void requestPendingDagBlocks(std::shared_ptr<TaraxaPeer> peer = nullptr);
+  void requestPendingDagBlocks(std::shared_ptr<EblaPeer> peer = nullptr);
 
  protected:
   std::shared_ptr<PbftSyncingState> pbft_syncing_state_{nullptr};
@@ -40,4 +40,4 @@ class ExtSyncingPacketHandler : public PacketHandler {
   std::shared_ptr<DbStorage> db_{nullptr};
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

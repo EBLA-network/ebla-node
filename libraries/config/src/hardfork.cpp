@@ -2,7 +2,7 @@
 
 #include "common/config_exception.hpp"
 
-namespace taraxa {
+namespace ebla {
 Json::Value enc_json(const Redelegation& obj) {
   Json::Value json(Json::objectValue);
   json["validator"] = dev::toJS(obj.validator);
@@ -12,8 +12,8 @@ Json::Value enc_json(const Redelegation& obj) {
 }
 
 void dec_json(const Json::Value& json, Redelegation& obj) {
-  obj.validator = taraxa::addr_t(json["validator"].asString());
-  obj.delegator = taraxa::addr_t(json["delegator"].asString());
+  obj.validator = ebla::addr_t(json["validator"].asString());
+  obj.delegator = ebla::addr_t(json["delegator"].asString());
   obj.amount = dev::jsToU256(json["amount"].asString());
 }
 
@@ -51,21 +51,21 @@ void dec_json(const Json::Value& json, AspenHardfork& obj) {
 }
 RLP_FIELDS_DEFINE(AspenHardfork, block_num_part_one, block_num_part_two, max_supply, generated_rewards)
 
-bool FicusHardforkConfig::isFicusHardfork(taraxa::PbftPeriod period) const { return period >= block_num; }
+bool FicusHardforkConfig::isFicusHardfork(ebla::PbftPeriod period) const { return period >= block_num; }
 
-bool FicusHardforkConfig::isPillarBlockPeriod(taraxa::PbftPeriod period, bool skip_first_pillar_block) const {
+bool FicusHardforkConfig::isPillarBlockPeriod(ebla::PbftPeriod period, bool skip_first_pillar_block) const {
   return period >= block_num &&
          period >= firstPillarBlockPeriod() + (skip_first_pillar_block ? 1 : 0) * pillar_blocks_interval &&
          period % pillar_blocks_interval == 0;
 }
 
-bool FicusHardforkConfig::isPbftWithPillarBlockPeriod(taraxa::PbftPeriod period) const {
+bool FicusHardforkConfig::isPbftWithPillarBlockPeriod(ebla::PbftPeriod period) const {
   // Pillar block hash is included in the next pbft block with period +1
   return period >= firstPillarBlockPeriod() && period % pillar_blocks_interval == 1;
 }
 
 // Returns first pillar block period
-taraxa::PbftPeriod FicusHardforkConfig::firstPillarBlockPeriod() const {
+ebla::PbftPeriod FicusHardforkConfig::firstPillarBlockPeriod() const {
   return block_num ? block_num : pillar_blocks_interval;
 }
 
@@ -76,15 +76,15 @@ void FicusHardforkConfig::validate(uint32_t delegation_delay) const {
   }
 
   if (block_num < delegation_delay) {
-    throw taraxa::ConfigException("ficus_hf.block_num must be >= dpos.delegation_delay");
+    throw ebla::ConfigException("ficus_hf.block_num must be >= dpos.delegation_delay");
   }
 
   if (pillar_blocks_interval <= 1) {
-    throw taraxa::ConfigException("ficus_hf.pillar_blocks_interval must be > 1");
+    throw ebla::ConfigException("ficus_hf.pillar_blocks_interval must be > 1");
   }
 
   if (block_num % pillar_blocks_interval) {
-    throw taraxa::ConfigException("ficus_hf.block_num % ficus_hf.pillar_blocks_interval must == 0");
+    throw ebla::ConfigException("ficus_hf.block_num % ficus_hf.pillar_blocks_interval must == 0");
   }
 }
 
@@ -99,7 +99,7 @@ Json::Value enc_json(const FicusHardforkConfig& obj) {
 void dec_json(const Json::Value& json, FicusHardforkConfig& obj) {
   obj.block_num = json["block_num"].isUInt64() ? dev::getUInt(json["block_num"]) : uint64_t(-1);
   obj.pillar_blocks_interval = dev::getUInt(json["pillar_blocks_interval"]);
-  obj.bridge_contract_address = taraxa::addr_t(json["bridge_contract_address"].asString());
+  obj.bridge_contract_address = ebla::addr_t(json["bridge_contract_address"].asString());
 }
 
 RLP_FIELDS_DEFINE(FicusHardforkConfig, block_num, pillar_blocks_interval, bridge_contract_address)
@@ -112,7 +112,7 @@ RLP_FIELDS_DEFINE(FicusHardforkConfig, block_num, pillar_blocks_interval, bridge
 // }
 
 // void dec_json(const Json::Value& json, BambooRedelegation& obj) {
-//   obj.validator = taraxa::addr_t(json["validator"].asString());
+//   obj.validator = ebla::addr_t(json["validator"].asString());
 //   obj.amount = dev::jsToU256(json["amount"].asString());
 // }
 
@@ -231,4 +231,4 @@ void dec_json(const Json::Value& json, HardforksConfig& obj) {
 
 RLP_FIELDS_DEFINE(HardforksConfig, fix_redelegate_block_num, redelegations, rewards_distribution_frequency, magnolia_hf,
                   phalaenopsis_hf_block_num, fix_claim_all_block_num, aspen_hf, ficus_hf, cornus_hf, soleirolia_hf)
-}  // namespace taraxa
+}  // namespace ebla

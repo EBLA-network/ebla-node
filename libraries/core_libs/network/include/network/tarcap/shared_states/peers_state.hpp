@@ -6,13 +6,13 @@
 #include "libp2p/Host.h"
 #include "network/tarcap/packet_types.hpp"
 #include "network/tarcap/stats/time_period_packets_stats.hpp"
-#include "network/tarcap/taraxa_peer.hpp"
+#include "network/tarcap/ebla_peer.hpp"
 
-namespace taraxa {
+namespace ebla {
 class PbftManager;
 }
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 /**
  * @brief PeersState contains common members and functions related to peers, host, etc... that are shared among multiple
@@ -20,30 +20,30 @@ namespace taraxa::network::tarcap {
  */
 class PeersState {
  public:
-  using PeersMap = std::unordered_map<dev::p2p::NodeID, std::shared_ptr<TaraxaPeer>>;
+  using PeersMap = std::unordered_map<dev::p2p::NodeID, std::shared_ptr<EblaPeer>>;
 
   PeersState(std::weak_ptr<dev::p2p::Host> host, const FullNodeConfig& conf);
 
-  std::shared_ptr<TaraxaPeer> getPeer(const dev::p2p::NodeID& node_id) const;
-  std::shared_ptr<TaraxaPeer> getPendingPeer(const dev::p2p::NodeID& node_id) const;
+  std::shared_ptr<EblaPeer> getPeer(const dev::p2p::NodeID& node_id) const;
+  std::shared_ptr<EblaPeer> getPendingPeer(const dev::p2p::NodeID& node_id) const;
 
   /**
    * @brief Get known peer based on packet sender and packet type. For StatusPacket peer can be obtained from
    *        pending_peers, for all other packet types peer can be obtained only from peers map, in which are only
    *        peers that already sent initial StatusPacket
    *
-   * @return <std::shared_ptr<TaraxaPeer>, ""> if packet sender is known peer, otherwise <nullptr, "err message">
+   * @return <std::shared_ptr<EblaPeer>, ""> if packet sender is known peer, otherwise <nullptr, "err message">
    */
-  std::pair<std::shared_ptr<TaraxaPeer>, std::string> getPacketSenderPeer(const dev::p2p::NodeID& node_id,
+  std::pair<std::shared_ptr<EblaPeer>, std::string> getPacketSenderPeer(const dev::p2p::NodeID& node_id,
                                                                           SubprotocolPacketType packet_type) const;
 
   PeersMap getAllPeers() const;
   std::vector<dev::p2p::NodeID> getAllPendingPeersIDs() const;
   size_t getPeersCount() const;
-  std::shared_ptr<TaraxaPeer> addPendingPeer(const dev::p2p::NodeID& node_id, const std::string& address);
+  std::shared_ptr<EblaPeer> addPendingPeer(const dev::p2p::NodeID& node_id, const std::string& address);
   void erasePeer(const dev::p2p::NodeID& node_id);
-  std::shared_ptr<TaraxaPeer> setPeerAsReadyToSendMessages(dev::p2p::NodeID const& node_id,
-                                                           std::shared_ptr<TaraxaPeer> peer);
+  std::shared_ptr<EblaPeer> setPeerAsReadyToSendMessages(dev::p2p::NodeID const& node_id,
+                                                           std::shared_ptr<EblaPeer> peer);
 
   /**
    * @brief Marks peer as malicious
@@ -65,11 +65,11 @@ class PeersState {
 
   /**
    * @param filter_func
-   * @return TaraxaPeer shared_ptr with max chain size
+   * @return EblaPeer shared_ptr with max chain size
    */
-  std::shared_ptr<TaraxaPeer> getMaxChainPeer(
-      const std::shared_ptr<PbftManager> pbft_mgr, std::function<bool(const std::shared_ptr<TaraxaPeer>&)> filter_func =
-                                                       [](const std::shared_ptr<TaraxaPeer>&) { return true; });
+  std::shared_ptr<EblaPeer> getMaxChainPeer(
+      const std::shared_ptr<PbftManager> pbft_mgr, std::function<bool(const std::shared_ptr<EblaPeer>&)> filter_func =
+                                                       [](const std::shared_ptr<EblaPeer>&) { return true; });
 
  private:
   /**
@@ -90,4 +90,4 @@ class PeersState {
   const FullNodeConfig kConf;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

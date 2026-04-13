@@ -4,7 +4,7 @@
 #include "logger/logger.hpp"
 #include "test_util/gtest.hpp"
 
-namespace taraxa::core_tests {
+namespace ebla::core_tests {
 
 struct ABITest : BaseTest {};
 
@@ -58,11 +58,11 @@ TEST_F(ABITest, abi_dynamic_encoding) {
           "00000000000000000000047465737400000000000000000000000000000000000000000000000000000000"));
 }
 
-}  // namespace taraxa::core_tests
+}  // namespace ebla::core_tests
 
-using namespace taraxa;
+using namespace ebla;
 int main(int argc, char** argv) {
-  taraxa::static_init();
+  ebla::static_init();
 
   auto logging = logger::createDefaultLoggingConfig();
   logging.verbosity = logger::Verbosity::Error;

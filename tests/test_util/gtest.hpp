@@ -9,14 +9,14 @@
 #include "config/config.hpp"
 
 namespace fs = std::filesystem;
-using ::taraxa::util::lazy::Lazy;
+using ::ebla::util::lazy::Lazy;
 
 inline auto const DIR = fs::path(__FILE__).parent_path();
 inline auto const DIR_CONF = DIR / "conf";
 
-#define TARAXA_TEST_MAIN(_extension)                          \
+#define EBLA_TEST_MAIN(_extension)                          \
   int main(int argc, char **argv) {                           \
-    taraxa::static_init();                                    \
+    ebla::static_init();                                    \
     std::function<void(int, char **)> extension = _extension; \
     if (extension) {                                          \
       extension(argc, argv);                                  \
@@ -39,7 +39,7 @@ struct BaseTest : virtual testing::Test {
 };
 
 struct WithDataDir : virtual BaseTest {
-  std::filesystem::path data_dir = std::filesystem::temp_directory_path() / "taraxa_node_tests" /
+  std::filesystem::path data_dir = std::filesystem::temp_directory_path() / "ebla_node_tests" /
                                    current_test_info->test_suite_name() / current_test_info->test_case_name();
 
   WithDataDir() : BaseTest() {

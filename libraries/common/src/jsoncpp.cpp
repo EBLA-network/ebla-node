@@ -10,7 +10,7 @@
 #include <stdexcept>
 #include <string_view>
 
-namespace taraxa::util {
+namespace ebla::util {
 
 Json::Value parse_json(std::string_view const& str) {
   // TODO optimize jsoncpp objects creation
@@ -72,4 +72,4 @@ Json::Value readJsonFromString(std::string_view str) {
   return json;
 }
 
-}  // namespace taraxa::util
+}  // namespace ebla::util

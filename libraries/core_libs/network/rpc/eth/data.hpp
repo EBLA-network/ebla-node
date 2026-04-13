@@ -2,13 +2,13 @@
 
 #include "final_chain/data.hpp"
 
-namespace taraxa::net::rpc::eth {
+namespace ebla::net::rpc::eth {
 
-using taraxa::LogBloom;
-using taraxa::LogBlooms;
-using taraxa::LogEntry;
-using taraxa::TransactionLocation;
-using taraxa::TransactionReceipt;
+using ebla::LogBloom;
+using ebla::LogBlooms;
+using ebla::LogEntry;
+using ebla::TransactionLocation;
+using ebla::TransactionReceipt;
 
 struct TransactionLocationWithBlockHash : TransactionLocation {
   h256 blk_h{};
@@ -91,4 +91,4 @@ Json::Value toJson(const std::optional<T>& t) {
 // ERRORS
 const int CALL_EXCEPTION = 3;
 
-}  // namespace taraxa::net::rpc::eth
+}  // namespace ebla::net::rpc::eth

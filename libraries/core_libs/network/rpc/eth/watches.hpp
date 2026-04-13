@@ -7,11 +7,11 @@
 #include "common/global_const.hpp"
 #include "data.hpp"
 
-namespace taraxa::net::rpc::eth {
+namespace ebla::net::rpc::eth {
 
 using time_point = std::chrono::system_clock::time_point;
 
-// TODO taraxa simple exception
+// TODO ebla simple exception
 DEV_SIMPLE_EXCEPTION(WatchLimitExceeded);
 
 enum WatchType {
@@ -192,4 +192,4 @@ class Watches {
   }
 };
 
-}  // namespace taraxa::net::rpc::eth
+}  // namespace ebla::net::rpc::eth

@@ -2,7 +2,7 @@
 
 #include "metrics/metrics_group.hpp"
 
-namespace taraxa::metrics {
+namespace ebla::metrics {
 class JsonRpcMetrics : public MetricsGroup {
  public:
   inline static const std::string group_name = "jsonrpc";
@@ -45,4 +45,4 @@ class JsonRpcMetrics : public MetricsGroup {
   }
 };
 
-}  // namespace taraxa::metrics
+}  // namespace ebla::metrics

@@ -5,7 +5,7 @@
 #include "pbft/period_data.hpp"
 #include "vote/pbft_vote.hpp"
 
-namespace taraxa::rewards {
+namespace ebla::rewards {
 
 /**
  * @class RewardsStats
@@ -109,4 +109,4 @@ class BlockStats {
   uint64_t max_votes_weight_{0};
 };
 
-}  // namespace taraxa::rewards
+}  // namespace ebla::rewards

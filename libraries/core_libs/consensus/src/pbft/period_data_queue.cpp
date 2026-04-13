@@ -4,7 +4,7 @@
 #include "pbft/pbft_chain.hpp"
 #include "transaction/transaction.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 uint64_t PeriodDataQueue::getPeriod() const {
   std::shared_lock lock(queue_access_);
@@ -80,4 +80,4 @@ void PeriodDataQueue::cleanOldData(uint64_t period) {
   }
 }
 
-}  // namespace taraxa
+}  // namespace ebla

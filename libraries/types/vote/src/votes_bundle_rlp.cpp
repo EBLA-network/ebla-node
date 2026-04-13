@@ -3,7 +3,7 @@
 #include "vote/pbft_vote.hpp"
 #include "vote/pillar_vote.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 dev::bytes encodePbftVotesBundleRlp(const std::vector<std::shared_ptr<PbftVote>>& votes) {
   if (votes.empty()) {
@@ -50,10 +50,10 @@ std::vector<std::shared_ptr<PbftVote>> decodePbftVotesBundleRlp(const dev::RLP& 
   return votes;
 }
 
-void OptimizedPbftVotesBundle::rlp(::taraxa::util::RLPDecoderRef encoding) {
+void OptimizedPbftVotesBundle::rlp(::ebla::util::RLPDecoderRef encoding) {
   votes = decodePbftVotesBundleRlp(encoding.value);
 }
-void OptimizedPbftVotesBundle::rlp(::taraxa::util::RLPEncoderRef encoding) const {
+void OptimizedPbftVotesBundle::rlp(::ebla::util::RLPEncoderRef encoding) const {
   encoding.appendRaw(encodePbftVotesBundleRlp(votes));
 }
 
@@ -96,11 +96,11 @@ std::vector<std::shared_ptr<PillarVote>> decodePillarVotesBundleRlp(const dev::R
   return votes;
 }
 
-void OptimizedPillarVotesBundle::rlp(::taraxa::util::RLPDecoderRef encoding) {
+void OptimizedPillarVotesBundle::rlp(::ebla::util::RLPDecoderRef encoding) {
   pillar_votes = decodePillarVotesBundleRlp(encoding.value);
 }
-void OptimizedPillarVotesBundle::rlp(::taraxa::util::RLPEncoderRef encoding) const {
+void OptimizedPillarVotesBundle::rlp(::ebla::util::RLPEncoderRef encoding) const {
   encoding.appendRaw(encodePillarVotesBundleRlp(pillar_votes));
 }
 
-}  // namespace taraxa
+}  // namespace ebla

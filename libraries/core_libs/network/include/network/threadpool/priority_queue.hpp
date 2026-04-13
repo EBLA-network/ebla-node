@@ -10,11 +10,11 @@
 #include "network/threadpool/packets_blocking_mask.hpp"
 #include "packets_queue.hpp"
 
-namespace taraxa {
+namespace ebla {
 class PbftManager;
 }
 
-namespace taraxa::network::threadpool {
+namespace ebla::network::threadpool {
 
 class PriorityQueue {
  public:
@@ -111,4 +111,4 @@ class PriorityQueue {
   std::atomic<size_t> act_total_workers_count_;
 };
 
-}  // namespace taraxa::network::threadpool
+}  // namespace ebla::network::threadpool

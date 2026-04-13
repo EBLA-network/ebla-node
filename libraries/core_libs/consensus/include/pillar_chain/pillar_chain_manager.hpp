@@ -8,18 +8,18 @@
 #include "pillar_chain/pillar_block.hpp"
 #include "pillar_chain/pillar_votes.hpp"
 
-namespace taraxa {
+namespace ebla {
 class DbStorage;
 class Network;
 class KeyManager;
 struct FicusHardforkConfig;
-}  // namespace taraxa
+}  // namespace ebla
 
-namespace taraxa::final_chain {
+namespace ebla::final_chain {
 class FinalChain;
 }
 
-namespace taraxa::pillar_chain {
+namespace ebla::pillar_chain {
 
 /** @addtogroup PILLAR_CHAIN
  * @{
@@ -197,4 +197,4 @@ class PillarChainManager {
 
 /** @}*/
 
-}  // namespace taraxa::pillar_chain
+}  // namespace ebla::pillar_chain

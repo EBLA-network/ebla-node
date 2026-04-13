@@ -2,23 +2,23 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "taraxa-consensus-node.fullname" . }}-light
+  name: {{ include "ebla-consensus-node.fullname" . }}-light
   labels:
     app: consensus-node-light
     app.kubernetes.io/name: consensus-node-light
-    helm.sh/chart: {{ include "taraxa-node.chart" . }}
+    helm.sh/chart: {{ include "ebla-node.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     {{ if .Values.kubemonkey.enabled }}
     kube-monkey/enabled: enabled
-    kube-monkey/identifier: {{ include "taraxa-consensus-node.fullname" . }}-light
+    kube-monkey/identifier: {{ include "ebla-consensus-node.fullname" . }}-light
     kube-monkey/mtbf: {{ .Values.kubemonkey.mtbf | quote }}
     kube-monkey/kill-mode: {{ .Values.kubemonkey.killMode | quote }}
     kube-monkey/kill-value: {{ .Values.kubemonkey.killValue | quote }}
     {{ end }}
 spec:
   replicas: {{ .Values.consensusnodeLight.replicaCount }}
-  serviceName: {{ include "taraxa-consensus-node.fullname" . }}-light
+  serviceName: {{ include "ebla-consensus-node.fullname" . }}-light
   # to launch or terminate all Pods in parallel.
   # https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#parallel-pod-management
   podManagementPolicy: Parallel
@@ -38,7 +38,7 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
         {{ if .Values.kubemonkey.enabled }}
         kube-monkey/enabled: enabled
-        kube-monkey/identifier: {{ include "taraxa-consensus-node.fullname" . }}-light
+        kube-monkey/identifier: {{ include "ebla-consensus-node.fullname" . }}-light
         kube-monkey/mtbf: {{ .Values.kubemonkey.mtbf | quote }}
         kube-monkey/kill-mode: {{ .Values.kubemonkey.killMode | quote }}
         kube-monkey/kill-value: {{ .Values.kubemonkey.killValue | quote }}
@@ -87,7 +87,7 @@ spec:
               readOnly: true
               subPath: genconfig.py
             - name: data
-              mountPath: /root/.taraxa
+              mountPath: /root/.ebla
       containers:
         {{- if .Values.slack.enabled }}
         - name: status
@@ -136,7 +136,7 @@ spec:
                 fieldRef:
                   fieldPath: status.podIP
           {{- if not .Values.consensusnodeLight.probes.enabled }}
-            - name: TARAXA_SLEEP_DIAGNOSE
+            - name: EBLA_SLEEP_DIAGNOSE
               value: "true"
           {{- end }}
           ports:
@@ -147,7 +147,7 @@ spec:
               command:
               - /bin/sh
               - -c
-              - "ps -A | grep taraxad"
+              - "ps -A | grep eblad"
             initialDelaySeconds: 10
             periodSeconds: 5
           readinessProbe:
@@ -159,7 +159,7 @@ spec:
               - -H
               - "'Content-Type: application/json'"
               - -d
-              - "'{\"jsonrpc\":\"2.0\",\"method\":\"taraxa_protocolVersion\",\"params\": [],\"id\":1}'"
+              - "'{\"jsonrpc\":\"2.0\",\"method\":\"ebla_protocolVersion\",\"params\": [],\"id\":1}'"
               - http://127.0.0.1:7777
             initialDelaySeconds: 10
             periodSeconds: 5
@@ -168,7 +168,7 @@ spec:
             {{- toYaml .Values.consensusnodeLight.resources | nindent 12 }}
           volumeMounts:
             - name: data
-              mountPath: /root/.taraxa
+              mountPath: /root/.ebla
           securityContext:
             capabilities:
               add:
@@ -194,7 +194,7 @@ spec:
         - name: explorer-check
           configMap:
             defaultMode: 0700
-            name: {{ include "taraxa-node.fullname" . }}-explorer-check
+            name: {{ include "ebla-node.fullname" . }}-explorer-check
         {{- end }}
         {{- if .Values.slack.enabled }}
         - name: status-requirements

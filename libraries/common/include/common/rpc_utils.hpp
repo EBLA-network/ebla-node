@@ -7,7 +7,7 @@
 
 #include "thread_pool.hpp"
 
-namespace taraxa::util {
+namespace ebla::util {
 
 template <class S, class FN>
 Json::Value transformToJsonParallel(const S& source, FN op) {
@@ -36,4 +36,4 @@ Json::Value transformToJsonParallel(const S& source, FN op) {
 
 Json::Value mergeJsons(Json::Value&& o1, Json::Value&& o2);
 
-}  // namespace taraxa::util
+}  // namespace ebla::util

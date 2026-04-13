@@ -14,7 +14,7 @@
 #include "network/network.hpp"
 #include "transaction/transaction_manager.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 DagManager::DagManager(const FullNodeConfig &config, addr_t node_addr, std::shared_ptr<TransactionManager> trx_mgr,
                        std::shared_ptr<PbftChain> pbft_chain, std::shared_ptr<final_chain::FinalChain> final_chain,
@@ -133,7 +133,7 @@ std::pair<bool, std::vector<blk_hash_t>> DagManager::addDagBlock(const std::shar
   {
     // One mutex protects the DagManager internal state, the other mutex ensures that dag blocks are gossiped in
     // correct order since multiple threads can call this method. There is a need for using two mutexes since having
-    // blocks gossip under mutex_ leads to a deadlock with mutex in TaraxaPeer
+    // blocks gossip under mutex_ leads to a deadlock with mutex in EblaPeer
     std::scoped_lock order_lock(order_dag_blocks_mutex_);
     {
       std::scoped_lock lock(mutex_);
@@ -753,4 +753,4 @@ dev::bytes DagManager::getVdfMessage(blk_hash_t const &hash, std::vector<trx_has
   return s.invalidate();
 }
 
-}  // namespace taraxa
+}  // namespace ebla

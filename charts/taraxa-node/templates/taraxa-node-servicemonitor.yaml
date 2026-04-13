@@ -3,17 +3,17 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name:  {{ include "taraxa-node.fullname" . }}
+  name:  {{ include "ebla-node.fullname" . }}
   labels:
-    name: taraxa-node
-    app.kubernetes.io/name: taraxa-node
-    helm.sh/chart: {{ include "taraxa-node.chart" . }}
+    name: ebla-node
+    app.kubernetes.io/name: ebla-node
+    helm.sh/chart: {{ include "ebla-node.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: taraxa-node
+      app.kubernetes.io/name: ebla-node
       app.kubernetes.io/instance: {{ .Release.Name }}
   namespaceSelector:
     matchNames:

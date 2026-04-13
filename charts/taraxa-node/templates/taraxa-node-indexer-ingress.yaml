@@ -2,10 +2,10 @@
 {{ if .Values.node.indexer.enabled }}
 {{- if .Values.node.indexer.ingress.enabled -}}
 
-{{- $fullName := include "taraxa-node.fullname" . -}}
-{{- $apiIsStable := eq (include "taraxa-node.ingress.isStable" .) "true" -}}
-{{- $ingressSupportsPathType := eq (include "taraxa-node.ingress.supportsPathType" .) "true" -}}
-{{- $serviceName := printf "%s-%s" (include "taraxa-node.fullname" .) "head" -}}
+{{- $fullName := include "ebla-node.fullname" . -}}
+{{- $apiIsStable := eq (include "ebla-node.ingress.isStable" .) "true" -}}
+{{- $ingressSupportsPathType := eq (include "ebla-node.ingress.supportsPathType" .) "true" -}}
+{{- $serviceName := printf "%s-%s" (include "ebla-node.fullname" .) "head" -}}
 
 {{- $servicePortHttp := 8080 -}}
 
@@ -15,14 +15,14 @@
 
 {{- $pathType := .Values.node.ingress.pathType | default "ImplementationSpecific" -}}
 ---
-apiVersion: {{ include "taraxa-node.ingress.apiVersion" . }}
+apiVersion: {{ include "ebla-node.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
   name: {{ $fullName }}-indexer
   labels:
-    app: taraxa-node
-    app.kubernetes.io/name: {{ include "taraxa-node.name" . }}
-    helm.sh/chart: {{ include "taraxa-node.chart" . }}
+    app: ebla-node
+    app.kubernetes.io/name: {{ include "ebla-node.name" . }}
+    helm.sh/chart: {{ include "ebla-node.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   {{- with .Values.node.indexer.ingress.annotations }}
@@ -38,11 +38,11 @@ spec:
   {{- if .Values.wildCertDomainSecret }}
   tls:
     - hosts:
-        - {{ include "taraxa-node.indexerName" . | quote }}
+        - {{ include "ebla-node.indexerName" . | quote }}
       secretName: {{ .Values.wildCertDomainSecret }}
   {{- end }}
   rules:
-    - host: {{ include "taraxa-node.indexerName" . | quote }}
+    - host: {{ include "ebla-node.indexerName" . | quote }}
       http:
         paths:
           - path: /

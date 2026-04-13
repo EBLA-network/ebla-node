@@ -5,23 +5,23 @@
 #include "graphqlservice/GraphQLService.h"
 #include "graphqlservice/JSONResponse.h"
 
-namespace taraxa::net {
+namespace ebla::net {
 
 using namespace graphql;
 
-GraphQlHttpProcessor::GraphQlHttpProcessor(std::shared_ptr<::taraxa::final_chain::FinalChain> final_chain,
-                                           std::shared_ptr<::taraxa::DagManager> dag_manager,
-                                           std::shared_ptr<::taraxa::PbftManager> pbft_manager,
-                                           std::shared_ptr<::taraxa::TransactionManager> transaction_manager,
-                                           std::shared_ptr<::taraxa::DbStorage> db,
-                                           std::shared_ptr<::taraxa::GasPricer> gas_pricer,
-                                           std::weak_ptr<::taraxa::Network> network, uint64_t chain_id)
+GraphQlHttpProcessor::GraphQlHttpProcessor(std::shared_ptr<::ebla::final_chain::FinalChain> final_chain,
+                                           std::shared_ptr<::ebla::DagManager> dag_manager,
+                                           std::shared_ptr<::ebla::PbftManager> pbft_manager,
+                                           std::shared_ptr<::ebla::TransactionManager> transaction_manager,
+                                           std::shared_ptr<::ebla::DbStorage> db,
+                                           std::shared_ptr<::ebla::GasPricer> gas_pricer,
+                                           std::weak_ptr<::ebla::Network> network, uint64_t chain_id)
     : HttpProcessor(),
-      query_(std::make_shared<graphql::taraxa::Query>(std::move(final_chain), std::move(dag_manager),
+      query_(std::make_shared<graphql::ebla::Query>(std::move(final_chain), std::move(dag_manager),
                                                       std::move(pbft_manager), transaction_manager, std::move(db),
                                                       std::move(gas_pricer), std::move(network), chain_id)),
-      mutation_(std::make_shared<graphql::taraxa::Mutation>(transaction_manager)),
-      subscription_(std::make_shared<graphql::taraxa::Subscription>()),
+      mutation_(std::make_shared<graphql::ebla::Mutation>(transaction_manager)),
+      subscription_(std::make_shared<graphql::ebla::Subscription>()),
       operations_(query_, mutation_, subscription_) {}
 
 HttpProcessor::Response GraphQlHttpProcessor::process(const Request& request) {
@@ -113,4 +113,4 @@ HttpProcessor::Response GraphQlHttpProcessor::createOkResponse(std::string&& res
   return response;
 }
 
-}  // namespace taraxa::net
+}  // namespace ebla::net

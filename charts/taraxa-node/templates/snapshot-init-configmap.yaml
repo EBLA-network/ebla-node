@@ -8,7 +8,7 @@ data:
     #!/bin/sh
     set -e
     
-    DB_PATH="/root/.taraxa/db"
+    DB_PATH="/root/.ebla/db"
     SNAPSHOT_URL="$1"
     
     echo "Snapshot init container starting..."
@@ -29,7 +29,7 @@ data:
     
     # Download and extract snapshot on the fly
     echo "Downloading and extracting snapshot..."
-    cd /root/.taraxa
+    cd /root/.ebla
     wget -O - "$SNAPSHOT_URL" | pigz -d | tar -xf -
     
     echo "Snapshot extraction completed successfully"

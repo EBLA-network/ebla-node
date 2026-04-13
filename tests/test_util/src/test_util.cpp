@@ -11,7 +11,7 @@
 #include "plugin/rpc.hpp"
 #include "vote_manager/vote_manager.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 auto g_secret = dev::Secret("3800b2875669d9b2053c1aff9224ecfdc411423aac5b5a73d7a45ced1c3b9dcd",
                             dev::Secret::ConstructFromStringType::FromHex);
@@ -225,13 +225,13 @@ std::pair<PbftPeriod, PbftRound> clearAllVotes(const std::vector<std::shared_ptr
 
 NodesTest::NodesTest() {
   for (uint16_t i = 0; i < 5; ++i) {
-    taraxa::FullNodeConfig cfg;
+    ebla::FullNodeConfig cfg;
 
-    cfg.data_path = "/tmp/taraxa" + std::to_string(i);
+    cfg.data_path = "/tmp/ebla" + std::to_string(i);
     cfg.db_path = cfg.data_path / "db";
     cfg.log_path = cfg.data_path / "log";
-    taraxa::logger::Config log_cfg(cfg.log_path);
-    log_cfg.verbosity = taraxa::logger::Verbosity::Error;
+    ebla::logger::Config log_cfg(cfg.log_path);
+    log_cfg.verbosity = ebla::logger::Verbosity::Error;
     cfg.log_configs.emplace_back(log_cfg);
     cfg.network.rpc.emplace();
     cfg.network.rpc->address = boost::asio::ip::make_address("127.0.0.1");
@@ -239,7 +239,7 @@ NodesTest::NodesTest() {
     cfg.network.rpc->ws_port = 8778 + i;
     cfg.wallets.clear();
     auto node_secret = dev::KeyPair::create().secret();
-    cfg.wallets.emplace_back(std::move(node_secret), taraxa::vdf_sortition::getVrfKeyPair().second);
+    cfg.wallets.emplace_back(std::move(node_secret), ebla::vdf_sortition::getVrfKeyPair().second);
     cfg.network.listen_port = 10003 + i;
 
     cfg.genesis.gas_price.minimum_price = 0;
@@ -249,7 +249,7 @@ NodesTest::NodesTest() {
 
     cfg.network.boot_nodes.clear();
     cfg.network.boot_nodes.emplace_back(
-        taraxa::NodeConfig{"7b1fcf0ec1078320117b96e9e9ad9032c06d030cf4024a598347a4623a14a421d4f030cf25ef368ab394a45e9"
+        ebla::NodeConfig{"7b1fcf0ec1078320117b96e9e9ad9032c06d030cf4024a598347a4623a14a421d4f030cf25ef368ab394a45e9"
                            "20e14b57a259a09c41767dd50d1da27b627412a",
                            "127.0.0.1", 10003});
     cfg.validate();
@@ -287,10 +287,10 @@ void NodesTest::CleanupDirs() {
   }
 }
 
-std::vector<taraxa::FullNodeConfig> NodesTest::make_node_cfgs(size_t total_count, size_t validators_count,
+std::vector<ebla::FullNodeConfig> NodesTest::make_node_cfgs(size_t total_count, size_t validators_count,
                                                               uint tests_speed, bool enable_rpc_http,
                                                               bool enable_rpc_ws) {
-  std::vector<taraxa::FullNodeConfig> ret_configs = node_cfgs;
+  std::vector<ebla::FullNodeConfig> ret_configs = node_cfgs;
   assert(total_count <= ret_configs.size());
   assert(validators_count <= total_count);
   ret_configs.erase(ret_configs.begin() + total_count, ret_configs.end());
@@ -301,8 +301,8 @@ std::vector<taraxa::FullNodeConfig> NodesTest::make_node_cfgs(size_t total_count
   }
 
   // Prepare genesis balances & initial validators
-  taraxa::state_api::BalanceMap initial_balances;
-  std::vector<taraxa::state_api::ValidatorInfo> initial_validators;
+  ebla::state_api::BalanceMap initial_balances;
+  std::vector<ebla::state_api::ValidatorInfo> initial_validators;
 
   // Calculate initial balance based on AspenHf.MaxSupply so "Yield = (MaxSupply - Genesis Balances Sum) / Genesis
   // Balances Sum = 20%
@@ -316,12 +316,12 @@ std::vector<taraxa::FullNodeConfig> NodesTest::make_node_cfgs(size_t total_count
   // num_of_nodes * init_balance = 100 * max_supply / (100 + yield)
   // init_balance = 100 * max_supply / ((100 + yield) * num_of_nodes)
 
-  const taraxa::uint256_t yield{7};  // [%]
-  const taraxa::uint256_t hundred{100};
-  const taraxa::uint256_t num_of_nodes{total_count};
-  const taraxa::uint256_t max_supply = ret_configs.back().genesis.state.hardforks.aspen_hf.max_supply;
+  const ebla::uint256_t yield{7};  // [%]
+  const ebla::uint256_t hundred{100};
+  const ebla::uint256_t num_of_nodes{total_count};
+  const ebla::uint256_t max_supply = ret_configs.back().genesis.state.hardforks.aspen_hf.max_supply;
 
-  const taraxa::uint256_t init_balance = (hundred * max_supply) / ((hundred + yield) * num_of_nodes);
+  const ebla::uint256_t init_balance = (hundred * max_supply) / ((hundred + yield) * num_of_nodes);
 
   for (size_t idx = 0; idx < total_count; idx++) {
     const auto& cfg = ret_configs[idx];
@@ -332,10 +332,10 @@ std::vector<taraxa::FullNodeConfig> NodesTest::make_node_cfgs(size_t total_count
       continue;
     }
 
-    taraxa::state_api::BalanceMap delegations;
+    ebla::state_api::BalanceMap delegations;
     delegations.emplace(node_addr, cfg.genesis.state.dpos.eligibility_balance_threshold);
-    initial_validators.emplace_back(taraxa::state_api::ValidatorInfo{
-        node_addr, node_addr, taraxa::vrf_wrapper::getVrfPublicKey(cfg.getFirstWallet().vrf_secret), 100, "", "",
+    initial_validators.emplace_back(ebla::state_api::ValidatorInfo{
+        node_addr, node_addr, ebla::vrf_wrapper::getVrfPublicKey(cfg.getFirstWallet().vrf_secret), 100, "", "",
         delegations});
   }
 
@@ -433,7 +433,7 @@ std::vector<std::shared_ptr<AppBase>> NodesTest::create_nodes(const std::vector<
   return create_nodes(test_cfgs, start);
 }
 
-std::vector<std::shared_ptr<AppBase>> NodesTest::launch_nodes(std::vector<taraxa::TestConfig>& cfgs) {
+std::vector<std::shared_ptr<AppBase>> NodesTest::launch_nodes(std::vector<ebla::TestConfig>& cfgs) {
   constexpr auto RETRY_COUNT = 4;
   auto node_count = cfgs.size();
   for (auto i = RETRY_COUNT;; --i) {
@@ -453,9 +453,9 @@ std::vector<std::shared_ptr<AppBase>> NodesTest::launch_nodes(std::vector<taraxa
   }
 }
 
-std::vector<std::shared_ptr<AppBase>> NodesTest::launch_nodes(const std::vector<taraxa::FullNodeConfig>& cfgs) {
+std::vector<std::shared_ptr<AppBase>> NodesTest::launch_nodes(const std::vector<ebla::FullNodeConfig>& cfgs) {
   auto test_cfgs = make_test_cfgs(cfgs);
   return launch_nodes(test_cfgs);
 }
 
-}  // namespace taraxa
+}  // namespace ebla

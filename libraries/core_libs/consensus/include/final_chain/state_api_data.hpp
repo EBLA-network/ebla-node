@@ -8,19 +8,19 @@
 #include "common/encoding_rlp.hpp"
 #include "common/types.hpp"
 
-namespace taraxa::state_api {
+namespace ebla::state_api {
 
 /** @addtogroup FinalChain
  * @{
  */
 
-struct TaraxaEVMError : std::runtime_error {
+struct EblaEVMError : std::runtime_error {
   std::string const type;
-  TaraxaEVMError(std::string&& type, const std::string& msg);
+  EblaEVMError(std::string&& type, const std::string& msg);
 };
 
-struct ErrFutureBlock : TaraxaEVMError {
-  using TaraxaEVMError::TaraxaEVMError;
+struct ErrFutureBlock : EblaEVMError {
+  using EblaEVMError::EblaEVMError;
 };
 
 struct EVMBlock {
@@ -124,4 +124,4 @@ struct ValidatorVoteCount {
   HAS_RLP_FIELDS
 };
 /** @} */
-}  // namespace taraxa::state_api
+}  // namespace ebla::state_api

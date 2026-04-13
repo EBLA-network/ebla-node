@@ -7,7 +7,7 @@
 #include "config/state_config.hpp"
 #include "dag/dag_block.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 struct GasPriceConfig {
   uint64_t percentile = 60;
@@ -40,4 +40,4 @@ struct GenesisConfig {
 Json::Value enc_json(GenesisConfig const& obj);
 void dec_json(Json::Value const& json, GenesisConfig& obj);
 
-}  // namespace taraxa
+}  // namespace ebla

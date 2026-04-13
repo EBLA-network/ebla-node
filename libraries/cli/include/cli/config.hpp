@@ -5,7 +5,7 @@
 
 #include "config/config.hpp"
 
-namespace taraxa::cli {
+namespace ebla::cli {
 
 namespace bpo = boost::program_options;
 
@@ -84,4 +84,4 @@ class Config {
   std::vector<std::string> wallets;
 };
 
-}  // namespace taraxa::cli
+}  // namespace ebla::cli

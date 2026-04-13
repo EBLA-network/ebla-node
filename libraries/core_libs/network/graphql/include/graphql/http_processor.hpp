@@ -8,15 +8,15 @@
 #include "query.hpp"
 #include "subscription.hpp"
 #include "transaction/gas_pricer.hpp"
-namespace taraxa::net {
+namespace ebla::net {
 class GraphQlHttpProcessor final : public HttpProcessor {
  public:
-  GraphQlHttpProcessor(std::shared_ptr<::taraxa::final_chain::FinalChain> final_chain,
-                       std::shared_ptr<::taraxa::DagManager> dag_manager,
-                       std::shared_ptr<::taraxa::PbftManager> pbft_manager,
-                       std::shared_ptr<::taraxa::TransactionManager> transaction_manager,
-                       std::shared_ptr<::taraxa::DbStorage> db, std::shared_ptr<::taraxa::GasPricer> gas_pricer,
-                       std::weak_ptr<::taraxa::Network> network, uint64_t chain_id);
+  GraphQlHttpProcessor(std::shared_ptr<::ebla::final_chain::FinalChain> final_chain,
+                       std::shared_ptr<::ebla::DagManager> dag_manager,
+                       std::shared_ptr<::ebla::PbftManager> pbft_manager,
+                       std::shared_ptr<::ebla::TransactionManager> transaction_manager,
+                       std::shared_ptr<::ebla::DbStorage> db, std::shared_ptr<::ebla::GasPricer> gas_pricer,
+                       std::weak_ptr<::ebla::Network> network, uint64_t chain_id);
   Response process(const Request& request) override;
 
  private:
@@ -25,10 +25,10 @@ class GraphQlHttpProcessor final : public HttpProcessor {
   Response createOkResponse(std::string&& response_body);
 
  private:
-  std::shared_ptr<graphql::taraxa::Query> query_;
-  std::shared_ptr<graphql::taraxa::Mutation> mutation_;
-  std::shared_ptr<graphql::taraxa::Subscription> subscription_;
-  graphql::taraxa::Operations operations_;
+  std::shared_ptr<graphql::ebla::Query> query_;
+  std::shared_ptr<graphql::ebla::Mutation> mutation_;
+  std::shared_ptr<graphql::ebla::Subscription> subscription_;
+  graphql::ebla::Operations operations_;
 };
 
-}  // namespace taraxa::net
+}  // namespace ebla::net

@@ -5,7 +5,7 @@
 #include "network/tarcap/shared_states/pbft_syncing_state.hpp"
 #include "pbft/pbft_manager.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 PbftBlocksBundlePacketHandler::PbftBlocksBundlePacketHandler(const FullNodeConfig &conf,
                                                              std::shared_ptr<PeersState> peers_state,
@@ -21,7 +21,7 @@ PbftBlocksBundlePacketHandler::PbftBlocksBundlePacketHandler(const FullNodeConfi
       pbft_syncing_state_(syncing_state) {}
 
 void PbftBlocksBundlePacketHandler::process(const threadpool::PacketData &packet_data,
-                                            const std::shared_ptr<TaraxaPeer> &peer) {
+                                            const std::shared_ptr<EblaPeer> &peer) {
   // Decode packet rlp into packet object
   auto packet = decodePacketRlp<PbftBlocksBundlePacket>(packet_data.rlp_);
 
@@ -82,4 +82,4 @@ void PbftBlocksBundlePacketHandler::process(const threadpool::PacketData &packet
   }
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

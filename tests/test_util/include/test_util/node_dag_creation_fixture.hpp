@@ -1,7 +1,7 @@
 #include "dag/dag_block_proposer.hpp"
 #include "test_util.hpp"
 
-namespace taraxa::core_tests {
+namespace ebla::core_tests {
 
 struct NodeDagCreationFixture : NodesTest {
   uint64_t nonce = 1;
@@ -38,4 +38,4 @@ struct NodeDagCreationFixture : NodesTest {
   std::vector<DagBlockWithTxs> generateDagBlocks(uint16_t levels, uint16_t blocks_per_level, uint16_t trx_per_block);
 };
 
-}  // namespace taraxa::core_tests
+}  // namespace ebla::core_tests

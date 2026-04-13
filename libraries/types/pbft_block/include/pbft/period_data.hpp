@@ -10,7 +10,7 @@
 #include "dag/dag_block.hpp"
 #include "transaction/transaction.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 /** @addtogroup PBFT
  * @{
@@ -64,4 +64,4 @@ std::ostream& operator<<(std::ostream& strm, PeriodData const& b);
 
 /** @}*/
 
-}  // namespace taraxa
+}  // namespace ebla

@@ -5,14 +5,14 @@
 #include "libp2p/Common.h"
 #include "network/tarcap/shared_states/pbft_syncing_state.hpp"
 #include "network/tarcap/stats/time_period_packets_stats.hpp"
-#include "network/tarcap/taraxa_peer.hpp"
+#include "network/tarcap/ebla_peer.hpp"
 #include "network/threadpool/tarcap_thread_pool.hpp"
 #include "pbft/pbft_chain.hpp"
 #include "pbft/pbft_manager.hpp"
 #include "transaction/transaction_manager.hpp"
 #include "vote_manager/vote_manager.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 NodeStats::NodeStats(std::shared_ptr<PbftSyncingState> pbft_syncing_state, std::shared_ptr<PbftChain> pbft_chain,
                      std::shared_ptr<PbftManager> pbft_mgr, std::shared_ptr<DagManager> dag_mgr,
@@ -37,7 +37,7 @@ NodeStats::NodeStats(std::shared_ptr<PbftSyncingState> pbft_syncing_state, std::
 
 uint64_t NodeStats::syncTimeSeconds() const { return syncing_duration_seconds; }
 
-void NodeStats::logNodeStats(const std::vector<std::shared_ptr<network::tarcap::TaraxaPeer>> &all_peers,
+void NodeStats::logNodeStats(const std::vector<std::shared_ptr<network::tarcap::EblaPeer>> &all_peers,
                              const std::vector<std::string> &nodes) {
   bool is_pbft_syncing = pbft_syncing_state_->isPbftSyncing();
 
@@ -136,7 +136,7 @@ void NodeStats::logNodeStats(const std::vector<std::shared_ptr<network::tarcap::
   LOG(log_dg_) << "Making DAG progress: " << std::boolalpha << making_dag_progress << " (grew " << dag_level_growh
                << " dag levels)";
 
-  LOG(log_nf_) << "Build version: " << TARAXA_COMMIT_HASH;
+  LOG(log_nf_) << "Build version: " << EBLA_COMMIT_HASH;
   LOG(log_nf_) << "Node addresses: [" << node_addresses_ << "]";
   LOG(log_nf_) << "Connected to " << peers_size << " peers: [ " << connected_peers_str << "]";
   LOG(log_dg_) << "Connected peers: [ " << connected_peers_str_with_ip << "]";
@@ -241,7 +241,7 @@ void NodeStats::logNodeStats(const std::vector<std::shared_ptr<network::tarcap::
 }
 
 Json::Value NodeStats::getStatus(
-    std::map<network::tarcap::TarcapVersion, std::shared_ptr<network::tarcap::TaraxaPeer>> peers) const {
+    std::map<network::tarcap::TarcapVersion, std::shared_ptr<network::tarcap::EblaPeer>> peers) const {
   Json::Value res;
   dev::p2p::NodeID max_pbft_round_nodeID;
   dev::p2p::NodeID max_pbft_chain_nodeID;
@@ -294,4 +294,4 @@ Json::Value NodeStats::getStatus(
   return res;
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

@@ -7,15 +7,15 @@
 #include "pbft/pbft_manager.hpp"
 #include "transaction/transaction_manager.hpp"
 
-namespace graphql::taraxa {
+namespace graphql::ebla {
 
 class DagBlock {
  public:
-  explicit DagBlock(std::shared_ptr<::taraxa::DagBlock> dag_block,
-                    std::shared_ptr<::taraxa::final_chain::FinalChain> final_chain,
-                    std::shared_ptr<::taraxa::PbftManager> pbft_manager,
-                    std::shared_ptr<::taraxa::TransactionManager> transaction_manager,
-                    std::function<std::shared_ptr<object::Block>(::taraxa::EthBlockNumber)> get_block_by_num) noexcept;
+  explicit DagBlock(std::shared_ptr<::ebla::DagBlock> dag_block,
+                    std::shared_ptr<::ebla::final_chain::FinalChain> final_chain,
+                    std::shared_ptr<::ebla::PbftManager> pbft_manager,
+                    std::shared_ptr<::ebla::TransactionManager> transaction_manager,
+                    std::function<std::shared_ptr<object::Block>(::ebla::EthBlockNumber)> get_block_by_num) noexcept;
 
   response::Value getHash() const noexcept;
   response::Value getPivot() const noexcept;
@@ -30,14 +30,14 @@ class DagBlock {
   std::optional<std::vector<std::shared_ptr<object::Transaction>>> getTransactions() const noexcept;
 
  private:
-  std::shared_ptr<::taraxa::DagBlock> dag_block_;
-  std::shared_ptr<::taraxa::final_chain::FinalChain> final_chain_;
-  std::shared_ptr<::taraxa::PbftManager> pbft_manager_;
-  std::shared_ptr<::taraxa::TransactionManager> transaction_manager_;
-  std::function<std::shared_ptr<object::Block>(::taraxa::EthBlockNumber)> get_block_by_num_;
+  std::shared_ptr<::ebla::DagBlock> dag_block_;
+  std::shared_ptr<::ebla::final_chain::FinalChain> final_chain_;
+  std::shared_ptr<::ebla::PbftManager> pbft_manager_;
+  std::shared_ptr<::ebla::TransactionManager> transaction_manager_;
+  std::function<std::shared_ptr<object::Block>(::ebla::EthBlockNumber)> get_block_by_num_;
 
   mutable std::mutex mu_;
   mutable std::optional<uint64_t> period_;
 };
 
-}  // namespace graphql::taraxa
+}  // namespace graphql::ebla

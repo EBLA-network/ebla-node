@@ -16,7 +16,7 @@
 #include "Common.h"
 #include "Peer.h"
 #include "RLPXSocket.h"
-#include "taraxa.hpp"
+#include "ebla.hpp"
 
 namespace dev {
 

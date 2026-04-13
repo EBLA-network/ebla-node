@@ -1,7 +1,7 @@
 #pragma once
 #include "storage/storage.hpp"
 
-namespace taraxa::storage::migration {
+namespace ebla::storage::migration {
 class Base {
  public:
   Base(std::shared_ptr<DbStorage> db) : db_(std::move(db)), batch_(db_->createWriteBatch()) {}
@@ -27,4 +27,4 @@ class Base {
   std::shared_ptr<DbStorage> db_;
   Batch batch_;
 };
-}  // namespace taraxa::storage::migration
+}  // namespace ebla::storage::migration

@@ -7,7 +7,7 @@ from web3.types import TxData, TxReceipt
 # `eth_py` is a python EVM implementation which also contains python classes for every type we need in our scope.
 # `eth_py` provides something that web3 doesn't - utilities to derive ethereum log blooms, construct tries,
 # and in particular to derive receipts and transactions roots for the ethereum block header.
-# TODO use `eth_py` to derive the binary representation of ethereum block headers in Taraxa, and compare that
+# TODO use `eth_py` to derive the binary representation of ethereum block headers in Ebla, and compare that
 # to what we return from our ethereum json-rpc implementation
 
 

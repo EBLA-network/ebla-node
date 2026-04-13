@@ -4,7 +4,7 @@
 #include "transaction/gas_pricer.hpp"
 #include "transaction/transaction_manager.hpp"
 
-namespace taraxa {
+namespace ebla {
 class SlashingManager {
  public:
   SlashingManager(const FullNodeConfig &config, std::shared_ptr<final_chain::FinalChain> final_chain,
@@ -26,4 +26,4 @@ class SlashingManager {
 
   const FullNodeConfig &kConfig;
 };
-}  // namespace taraxa
+}  // namespace ebla

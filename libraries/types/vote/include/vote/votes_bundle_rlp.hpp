@@ -7,7 +7,7 @@
 
 #include "common/encoding_rlp.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 class PbftVote;
 class PillarVote;
@@ -67,4 +67,4 @@ struct OptimizedPillarVotesBundle {
 
 /** @}*/
 
-}  // namespace taraxa
+}  // namespace ebla

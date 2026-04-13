@@ -4,7 +4,7 @@
 #include "config/config.hpp"
 #include "dag/dag_manager.hpp"
 
-namespace taraxa::plugin {
+namespace ebla::plugin {
 
 namespace bpo = boost::program_options;
 constexpr auto HISTORY = "light.history";
@@ -211,4 +211,4 @@ void Light::pruneStateDb() {
   }
 }
 
-}  // namespace taraxa::plugin
+}  // namespace ebla::plugin

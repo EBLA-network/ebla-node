@@ -3,7 +3,7 @@
 #include "network/tarcap/packets_handler.hpp"
 #include "pbft/pbft_manager.hpp"
 
-namespace taraxa::network::threadpool {
+namespace ebla::network::threadpool {
 
 PacketsThreadPool::PacketsThreadPool(size_t workers_num, const std::shared_ptr<PbftManager>& pbft_mgr,
                                      const addr_t& node_addr)
@@ -153,4 +153,4 @@ std::tuple<size_t, size_t, size_t> PacketsThreadPool::getQueueSize() const {
           queue_.getPrirotityQueueSize(PacketData::PacketPriority::Low)};
 }
 
-}  // namespace taraxa::network::threadpool
+}  // namespace ebla::network::threadpool

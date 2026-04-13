@@ -2,7 +2,7 @@
 
 #include "transaction/transaction_manager.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 TransactionQueue::TransactionQueue(std::shared_ptr<final_chain::FinalChain> final_chain, size_t max_size)
     : known_txs_(max_size * 2, max_size / 5),
@@ -52,9 +52,9 @@ bool TransactionQueue::removeTransaction(const SharedTransaction &transaction, b
   return false;
 }
 
-std::unordered_map<taraxa::trx_hash_t, std::pair<uint64_t, taraxa::SharedTransaction>>::iterator
+std::unordered_map<ebla::trx_hash_t, std::pair<uint64_t, ebla::SharedTransaction>>::iterator
 TransactionQueue::removeTransaction(
-    std::unordered_map<taraxa::trx_hash_t, std::pair<uint64_t, taraxa::SharedTransaction>>::iterator it) {
+    std::unordered_map<ebla::trx_hash_t, std::pair<uint64_t, ebla::SharedTransaction>>::iterator it) {
   data_size_ -= it->second.second->getData().size();
   return non_proposable_transactions_.erase(it);
 }
@@ -279,4 +279,4 @@ val_t TransactionQueue::getMinGasPriceForBlockInclusion(uint64_t limit) const {
   return 1;
 }
 
-}  // namespace taraxa
+}  // namespace ebla

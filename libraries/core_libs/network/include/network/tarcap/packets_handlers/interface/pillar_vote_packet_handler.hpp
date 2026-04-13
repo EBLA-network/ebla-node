@@ -2,7 +2,7 @@
 
 #include "network/tarcap/packets_handlers/latest/common/ext_pillar_vote_packet_handler.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 class IPillarVotePacketHandler : public ExtPillarVotePacketHandler {
  public:
@@ -12,7 +12,7 @@ class IPillarVotePacketHandler : public ExtPillarVotePacketHandler {
                            const addr_t& node_addr, const std::string& logs_prefix);
 
   void onNewPillarVote(const std::shared_ptr<PillarVote>& vote, bool rebroadcast = false);
-  virtual void sendPillarVote(const std::shared_ptr<TaraxaPeer>& peer, const std::shared_ptr<PillarVote>& vote) = 0;
+  virtual void sendPillarVote(const std::shared_ptr<EblaPeer>& peer, const std::shared_ptr<PillarVote>& vote) = 0;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

@@ -4,7 +4,7 @@
 #include "vote/votes_bundle_rlp.hpp"
 #include "vote_manager/vote_manager.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 VotesBundlePacketHandler::VotesBundlePacketHandler(const FullNodeConfig &conf, std::shared_ptr<PeersState> peers_state,
                                                    std::shared_ptr<TimePeriodPacketsStats> packets_stats,
@@ -18,7 +18,7 @@ VotesBundlePacketHandler::VotesBundlePacketHandler(const FullNodeConfig &conf, s
                          logs_prefix + "VOTES_BUNDLE_PH") {}
 
 void VotesBundlePacketHandler::process(const threadpool::PacketData &packet_data,
-                                       const std::shared_ptr<TaraxaPeer> &peer) {
+                                       const std::shared_ptr<EblaPeer> &peer) {
   // Decode packet rlp into packet object
   auto packet = decodePacketRlp<VotesBundlePacket>(packet_data.rlp_);
 
@@ -84,4 +84,4 @@ void VotesBundlePacketHandler::process(const threadpool::PacketData &packet_data
   onNewPbftVotesBundle(packet.votes_bundle.votes, false, peer->getId());
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

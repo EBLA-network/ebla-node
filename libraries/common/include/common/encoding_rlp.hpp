@@ -4,7 +4,7 @@
 
 #include <optional>
 
-namespace taraxa::util {
+namespace ebla::util {
 using dev::RLP;
 
 using RLPEncoderRef = dev::RLPStream&;
@@ -203,16 +203,16 @@ dev::bytes rlp_enc(T const& obj) {
   return std::move(s.invalidate());
 }
 
-}  // namespace taraxa::util
+}  // namespace ebla::util
 
 #define HAS_RLP_FIELDS                              \
-  void rlp(::taraxa::util::RLPDecoderRef encoding); \
-  void rlp(::taraxa::util::RLPEncoderRef encoding) const;
+  void rlp(::ebla::util::RLPDecoderRef encoding); \
+  void rlp(::ebla::util::RLPEncoderRef encoding) const;
 
 #define RLP_FIELDS_DEFINE(_class_, ...)                                                                           \
-  void _class_::rlp(::taraxa::util::RLPDecoderRef encoding) { ::taraxa::util::rlp_tuple(encoding, __VA_ARGS__); } \
-  void _class_::rlp(::taraxa::util::RLPEncoderRef encoding) const { ::taraxa::util::rlp_tuple(encoding, __VA_ARGS__); }
+  void _class_::rlp(::ebla::util::RLPDecoderRef encoding) { ::ebla::util::rlp_tuple(encoding, __VA_ARGS__); } \
+  void _class_::rlp(::ebla::util::RLPEncoderRef encoding) const { ::ebla::util::rlp_tuple(encoding, __VA_ARGS__); }
 
 #define RLP_FIELDS_DEFINE_INPLACE(...)                                                                   \
-  void rlp(::taraxa::util::RLPDecoderRef encoding) { ::taraxa::util::rlp_tuple(encoding, __VA_ARGS__); } \
-  void rlp(::taraxa::util::RLPEncoderRef encoding) const { ::taraxa::util::rlp_tuple(encoding, __VA_ARGS__); }
+  void rlp(::ebla::util::RLPDecoderRef encoding) { ::ebla::util::rlp_tuple(encoding, __VA_ARGS__); } \
+  void rlp(::ebla::util::RLPEncoderRef encoding) const { ::ebla::util::rlp_tuple(encoding, __VA_ARGS__); }

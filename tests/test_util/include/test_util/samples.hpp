@@ -10,7 +10,7 @@
 #include "test_util/test_util.hpp"
 #include "transaction/transaction.hpp"
 
-namespace taraxa::core_tests::samples {
+namespace ebla::core_tests::samples {
 
 static std::string const greeter_contract_code =
     // pragma solidity ^0.6.8;
@@ -104,4 +104,4 @@ std::vector<std::shared_ptr<DagBlock>> createMockDag0(const blk_hash_t &genesis)
 
 std::vector<std::shared_ptr<DagBlock>> createMockDag1(const blk_hash_t &genesis);
 
-}  // namespace taraxa::core_tests::samples
+}  // namespace ebla::core_tests::samples

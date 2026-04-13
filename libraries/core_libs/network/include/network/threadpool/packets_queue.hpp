@@ -7,7 +7,7 @@
 #include "network/threadpool/packets_blocking_mask.hpp"
 #include "packet_data.hpp"
 
-namespace taraxa::network::threadpool {
+namespace ebla::network::threadpool {
 
 class PacketsQueue {
  public:
@@ -85,4 +85,4 @@ class PacketsQueue {
   std::atomic<size_t> act_packets_count_{0};
 };
 
-}  // namespace taraxa::network::threadpool
+}  // namespace ebla::network::threadpool

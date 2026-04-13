@@ -3,7 +3,7 @@ Git-flow Guide
 
 ## Branch naming conventions
 
-In Taraxa, we are using git-flow workflow based on this [git-branching-model](https://nvie.com/posts/a-successful-git-branching-model/).
+In Ebla, we are using git-flow workflow based on this [git-branching-model](https://nvie.com/posts/a-successful-git-branching-model/).
 
 ![Git branching model](./images/git_model.png?raw=true "Git branching model")
 
@@ -103,7 +103,7 @@ builds and all kind of tests on all platform. At least 2 approvals are required 
 
 # Commit message conventions
 
-In Taraxa, we are using commit messages based on this [conventions](http://karma-runner.github.io/1.0/dev/git-commit-msg.html).
+In Ebla, we are using commit messages based on this [conventions](http://karma-runner.github.io/1.0/dev/git-commit-msg.html).
 
 A typical git commit message will look like:
 
@@ -130,7 +130,7 @@ don't capitalize first letter
 
 
 # Automatic github issues linking
-We use [github issues](https://github.com/Taraxa-project/taraxa-node/issues) for tasks/tracking. To automatically link your PR to the
+We use [github issues](https://github.com/EBLA-network/ebla-node/issues) for tasks/tracking. To automatically link your PR to the
 github issue (and vice versa), use branch naming convention:
 
 `issue-<NUMBER>/*`
@@ -145,7 +145,7 @@ Let's take this doc change as an example.
 
 - According to our conventions, it is a `standard feature` branch, so `no prefix` for branch name should be used
 - As it is feature branch, it can be branched off only from `develop`
-- There is an existing [github issue #760](https://github.com/Taraxa-project/taraxa-node/issues/760) for this feature,
+- There is an existing [github issue #760](https://github.com/EBLA-network/ebla-node/issues/760) for this feature,
   so `issue-<NUMBER>/*` branch naming convention should be used
 - Documentation related changes are being added, so `docs` commit type is used
 - Commit scope is optional, but we can use `git-flow` in this example, code-related scopes might be for examples: `consensus`, `dag`, etc...

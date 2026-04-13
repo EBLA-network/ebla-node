@@ -16,7 +16,7 @@
 #include "vdf/sortition.hpp"
 #include "vote/vrf_sortition.hpp"
 
-namespace taraxa::core_tests {
+namespace ebla::core_tests {
 using namespace vdf;
 using namespace vrf_wrapper;
 using namespace vdf_sortition;
@@ -540,11 +540,11 @@ TEST_F(CryptoTest, leader_selection) {
   EXPECT_LE(diff, 5);
 }
 
-}  // namespace taraxa::core_tests
+}  // namespace ebla::core_tests
 
-using namespace taraxa;
+using namespace ebla;
 int main(int argc, char** argv) {
-  taraxa::static_init();
+  ebla::static_init();
 
   auto logging = logger::createDefaultLoggingConfig();
   logging.verbosity = logger::Verbosity::Error;

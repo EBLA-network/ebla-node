@@ -8,7 +8,7 @@ The main goal of fair rewards distribution is to motivate validators to particip
 * PBFT block is finalizing part of ordered DAG blocks from DAG structure and transactions from them. 
 * Reward votes is finalized votes from PBFT block. Block `N` is finalizing votes from block `N - 1`.
 
-More info could be found in this [series of medium articles](https://medium.com/taraxa-project/tagged/taraxa-tech)
+More info could be found in this [series of medium articles](https://medium.com/ebla-network/tagged/ebla-tech)
 
 ## Rewards sources
 
@@ -34,7 +34,7 @@ There are 3 types of beneficial work that result in stable network functioning:
 
 ### Included transactions fees:
 
-Each transaction has a different fee. Simple "token send tx" has different fee than "smart contract write tx". These fees are calculated in taraxa-evm. 
+Each transaction has a different fee. Simple "token send tx" has different fee than "smart contract write tx". These fees are calculated in ebla-evm. 
 
 * **100%** goes to the **DAG blocks proposers**
 

@@ -19,7 +19,7 @@ enum class SubscriptionType {
   LOGS,
 };
 
-namespace taraxa::net {
+namespace ebla::net {
 
 class Subscription {
  public:
@@ -119,4 +119,4 @@ class Subscriptions {
   std::map<SubscriptionType, std::list<uint64_t>> subscriptions_by_type_;
   std::mutex subscriptions_mutex_;
 };
-}  // namespace taraxa::net
+}  // namespace ebla::net

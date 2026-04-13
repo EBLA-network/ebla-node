@@ -12,9 +12,9 @@ using namespace dev;
 using namespace std;
 using namespace jsonrpc;
 
-namespace taraxa::net {
+namespace ebla::net {
 
-Net::Net(std::shared_ptr<taraxa::AppBase> const& app) : app_(app) {}
+Net::Net(std::shared_ptr<ebla::AppBase> const& app) : app_(app) {}
 
 std::string Net::net_version() {
   if (auto app = app_.lock()) {
@@ -37,4 +37,4 @@ bool Net::net_listening() {
   BOOST_THROW_EXCEPTION(JsonRpcException(Errors::ERROR_RPC_INTERNAL_ERROR));
 }
 
-}  // namespace taraxa::net
+}  // namespace ebla::net

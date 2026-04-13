@@ -5,7 +5,7 @@
 
 #include "network/tarcap/packets_handlers/latest/common/base_packet_handler.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 /**
  * @brief Generic PacketsHandler that contains all specific packet handlers
@@ -44,4 +44,4 @@ void PacketsHandler::registerHandler(Args&&... args) {
                             std::make_shared<PacketHandlerType>(std::forward<Args>(args)...));
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

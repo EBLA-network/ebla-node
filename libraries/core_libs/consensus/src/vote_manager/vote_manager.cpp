@@ -9,7 +9,7 @@
 #include "network/network.hpp"
 #include "pbft/pbft_manager.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 VoteManager::VoteManager(const FullNodeConfig& config, std::shared_ptr<DbStorage> db,
                          std::shared_ptr<PbftChain> pbft_chain, std::shared_ptr<final_chain::FinalChain> final_chain,
@@ -825,7 +825,7 @@ uint64_t VoteManager::getPbftSortitionThreshold(uint64_t total_dpos_votes_count,
   }
 }
 
-std::shared_ptr<PbftVote> VoteManager::generateVoteWithWeight(const taraxa::blk_hash_t& blockhash,
+std::shared_ptr<PbftVote> VoteManager::generateVoteWithWeight(const ebla::blk_hash_t& blockhash,
                                                               PbftVoteTypes vote_type, PbftPeriod period,
                                                               PbftRound round, PbftStep step,
                                                               const WalletConfig& wallet) {
@@ -1076,4 +1076,4 @@ VerifiedVotes::StepVotes VoteManager::getStepVotes(PbftPeriod period, PbftRound 
   return found_step_it->second;
 }
 
-}  // namespace taraxa
+}  // namespace ebla

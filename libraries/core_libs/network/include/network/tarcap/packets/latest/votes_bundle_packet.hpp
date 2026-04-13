@@ -4,7 +4,7 @@
 #include "vote/pbft_vote.hpp"
 #include "vote/votes_bundle_rlp.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 struct VotesBundlePacket {
   OptimizedPbftVotesBundle votes_bundle;
@@ -12,4 +12,4 @@ struct VotesBundlePacket {
   RLP_FIELDS_DEFINE_INPLACE(votes_bundle)
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

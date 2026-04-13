@@ -3,7 +3,7 @@
 #include "data.hpp"
 #include "final_chain/final_chain.hpp"
 
-namespace taraxa::net::rpc::eth {
+namespace ebla::net::rpc::eth {
 
 struct LogFilter {
   using Topics = std::array<std::unordered_set<h256>, 4>;
@@ -30,4 +30,4 @@ struct LogFilter {
 AddressSet parse_addresses(const Json::Value& json);
 LogFilter::Topics parse_topics(const Json::Value& json);
 
-}  // namespace taraxa::net::rpc::eth
+}  // namespace ebla::net::rpc::eth

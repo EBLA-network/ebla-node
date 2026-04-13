@@ -2,7 +2,7 @@
 
 #include "pillar_chain/pillar_chain_manager.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 ExtPillarVotePacketHandler::ExtPillarVotePacketHandler(
     const FullNodeConfig &conf, std::shared_ptr<PeersState> peers_state,
@@ -13,7 +13,7 @@ ExtPillarVotePacketHandler::ExtPillarVotePacketHandler(
       pillar_chain_manager_{std::move(pillar_chain_manager)} {}
 
 bool ExtPillarVotePacketHandler::processPillarVote(const std::shared_ptr<PillarVote> &vote,
-                                                   const std::shared_ptr<TaraxaPeer> &peer) {
+                                                   const std::shared_ptr<EblaPeer> &peer) {
   if (!pillar_chain_manager_->isRelevantPillarVote(vote)) {
     LOG(this->log_dg_) << "Drop irrelevant pillar vote " << vote->getHash() << ", period " << vote->getPeriod()
                        << " from peer " << peer->getId();
@@ -35,4 +35,4 @@ bool ExtPillarVotePacketHandler::processPillarVote(const std::shared_ptr<PillarV
   return true;
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

@@ -4,7 +4,7 @@
 
 #include "Eth.h"
 
-namespace taraxa::net::rpc::eth {
+namespace ebla::net::rpc::eth {
 
 LogFilter::LogFilter(EthBlockNumber from_block, std::optional<EthBlockNumber> to_block, AddressSet addresses,
                      LogFilter::Topics topics)
@@ -215,4 +215,4 @@ LogFilter::Topics parse_topics(const Json::Value& json) {
   return topics;
 }
 
-}  // namespace taraxa::net::rpc::eth
+}  // namespace ebla::net::rpc::eth

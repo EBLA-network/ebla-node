@@ -26,7 +26,7 @@
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
         "commission": 1000,
         "endpoint": "",
-        "description": "Taraxa mainnet validator 1",
+        "description": "Ebla mainnet validator 1",
         "delegations": {
           "10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238": "0x422CA8B0A00A4250000000"
         },
@@ -37,7 +37,7 @@
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
         "commission": 1000,
         "endpoint": "",
-        "description": "Taraxa mainnet validator 2",
+        "description": "Ebla mainnet validator 2",
         "delegations": {
           "10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238": "0x422CA8B0A00A4250000000"
         },
@@ -48,7 +48,7 @@
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
         "commission": 1000,
         "endpoint": "",
-        "description": "Taraxa mainnet validator 3",
+        "description": "Ebla mainnet validator 3",
         "delegations": {
           "10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238": "0x422CA8B0A00A4250000000"
         },
@@ -59,7 +59,7 @@
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
         "commission": 1000,
         "endpoint": "",
-        "description": "Taraxa mainnet validator 4",
+        "description": "Ebla mainnet validator 4",
         "delegations": {
           "10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238": "0x422CA8B0A00A4250000000"
         },
@@ -70,7 +70,7 @@
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
         "commission": 1000,
         "endpoint": "",
-        "description": "Taraxa mainnet validator 5",
+        "description": "Ebla mainnet validator 5",
         "delegations": {
           "10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238": "0x422CA8B0A00A4250000000"
         },
@@ -81,7 +81,7 @@
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
         "commission": 1000,
         "endpoint": "",
-        "description": "Taraxa mainnet validator 6",
+        "description": "Ebla mainnet validator 6",
         "delegations": {
           "10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238": "0x422CA8B0A00A4250000000"
         },
@@ -92,7 +92,7 @@
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
         "commission": 1000,
         "endpoint": "",
-        "description": "Taraxa mainnet validator 7",
+        "description": "Ebla mainnet validator 7",
         "delegations": {
           "10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238": "0x422CA8B0A00A4250000000"
         },
@@ -103,7 +103,7 @@
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
         "commission": 1000,
         "endpoint": "",
-        "description": "Taraxa mainnet validator 8",
+        "description": "Ebla mainnet validator 8",
         "delegations": {
           "10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238": "0x422CA8B0A00A4250000000"
         },
@@ -114,7 +114,7 @@
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
         "commission": 1000,
         "endpoint": "",
-        "description": "Taraxa mainnet validator 9",
+        "description": "Ebla mainnet validator 9",
         "delegations": {
           "10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238": "0x422CA8B0A00A4250000000"
         },
@@ -125,7 +125,7 @@
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
         "commission": 1000,
         "endpoint": "",
-        "description": "Taraxa mainnet validator 10",
+        "description": "Ebla mainnet validator 10",
         "delegations": {
           "10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238": "0x422CA8B0A00A4250000000"
         },
@@ -136,7 +136,7 @@
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
         "commission": 1000,
         "endpoint": "",
-        "description": "Taraxa mainnet validator 11",
+        "description": "Ebla mainnet validator 11",
         "delegations": {
           "10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238": "0x422CA8B0A00A4250000000"
         },
@@ -147,7 +147,7 @@
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
         "commission": 1000,
         "endpoint": "",
-        "description": "Taraxa mainnet validator 12",
+        "description": "Ebla mainnet validator 12",
         "delegations": {
           "10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238": "0x422CA8B0A00A4250000000"
         },
@@ -158,7 +158,7 @@
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
         "commission": 1000,
         "endpoint": "",
-        "description": "Taraxa mainnet validator 13",
+        "description": "Ebla mainnet validator 13",
         "delegations": {
           "10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238": "0x422CA8B0A00A4250000000"
         },
@@ -169,7 +169,7 @@
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
         "commission": 1000,
         "endpoint": "",
-        "description": "Taraxa mainnet validator 14",
+        "description": "Ebla mainnet validator 14",
         "delegations": {
           "10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238": "0x422CA8B0A00A4250000000"
         },
@@ -180,7 +180,7 @@
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
         "commission": 1000,
         "endpoint": "",
-        "description": "Taraxa mainnet validator 15",
+        "description": "Ebla mainnet validator 15",
         "delegations": {
           "10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238": "0x422CA8B0A00A4250000000"
         },
@@ -191,7 +191,7 @@
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
         "commission": 1000,
         "endpoint": "",
-        "description": "Taraxa mainnet validator 16",
+        "description": "Ebla mainnet validator 16",
         "delegations": {
           "10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238": "0x69E10DE76676D0800000"
         },
@@ -202,7 +202,7 @@
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
         "commission": 1000,
         "endpoint": "",
-        "description": "Taraxa mainnet validator 17",
+        "description": "Ebla mainnet validator 17",
         "delegations": {
           "10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238": "0x69E10DE76676D0800000"
         },
@@ -213,7 +213,7 @@
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
         "commission": 1000,
         "endpoint": "",
-        "description": "Taraxa mainnet validator 18",
+        "description": "Ebla mainnet validator 18",
         "delegations": {
           "10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238": "0x69E10DE76676D0800000"
         },
@@ -224,7 +224,7 @@
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
         "commission": 1000,
         "endpoint": "",
-        "description": "Taraxa mainnet validator 19",
+        "description": "Ebla mainnet validator 19",
         "delegations": {
           "10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238": "0x69E10DE76676D0800000"
         },
@@ -235,7 +235,7 @@
         "owner": "0x10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238",
         "commission": 1000,
         "endpoint": "",
-        "description": "Taraxa mainnet validator 20",
+        "description": "Ebla mainnet validator 20",
         "delegations": {
           "10f4fD4D9856EFd5700F0Cb70B90Bf519A3cd238": "0x69E10DE76676D0800000"
         },

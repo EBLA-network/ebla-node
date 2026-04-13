@@ -10,7 +10,7 @@
 #include "pillar_chain/pillar_block.hpp"
 #include "transaction/transaction.hpp"
 
-namespace taraxa::net {
+namespace ebla::net {
 class WsServer : public std::enable_shared_from_this<WsServer>, public jsonrpc::AbstractServerConnector {
  public:
   WsServer(boost::asio::io_context& ioc, tcp::endpoint endpoint, addr_t node_addr,
@@ -24,8 +24,8 @@ class WsServer : public std::enable_shared_from_this<WsServer>, public jsonrpc::
 
   // Start accepting incoming connections
   void run();
-  void newEthBlock(const ::taraxa::final_chain::BlockHeader& payload, const TransactionHashes& trx_hashes);
-  void newLogs(const ::taraxa::final_chain::BlockHeader& payload, TransactionHashes trx_hashes,
+  void newEthBlock(const ::ebla::final_chain::BlockHeader& payload, const TransactionHashes& trx_hashes);
+  void newLogs(const ::ebla::final_chain::BlockHeader& payload, TransactionHashes trx_hashes,
                const TransactionReceipts& receipts);
   void newDagBlock(const std::shared_ptr<DagBlock>& blk);
   void newDagBlockFinalized(const blk_hash_t& blk, uint64_t period);
@@ -55,4 +55,4 @@ class WsServer : public std::enable_shared_from_this<WsServer>, public jsonrpc::
   friend WsSession;
 };
 
-}  // namespace taraxa::net
+}  // namespace ebla::net

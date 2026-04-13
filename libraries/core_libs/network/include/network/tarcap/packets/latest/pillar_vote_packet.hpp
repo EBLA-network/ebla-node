@@ -4,7 +4,7 @@
 #include "network/tarcap/packets_handlers/latest/common/exceptions.hpp"
 #include "vote/pillar_vote.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 struct PillarVotePacket {
   std::shared_ptr<PillarVote> pillar_vote;
@@ -12,4 +12,4 @@ struct PillarVotePacket {
   RLP_FIELDS_DEFINE_INPLACE(pillar_vote)
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

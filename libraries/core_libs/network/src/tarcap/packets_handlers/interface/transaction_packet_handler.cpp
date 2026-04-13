@@ -1,6 +1,6 @@
 #include "network/tarcap/packets_handlers/interface/transaction_packet_handler.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 ITransactionPacketHandler::ITransactionPacketHandler(const FullNodeConfig &conf,
                                                      std::shared_ptr<PeersState> peers_state,
@@ -21,7 +21,7 @@ void ITransactionPacketHandler::periodicSendTransactions(std::vector<SharedTrans
   }
 }
 
-std::vector<std::pair<std::shared_ptr<TaraxaPeer>, std::pair<SharedTransactions, std::vector<trx_hash_t>>>>
+std::vector<std::pair<std::shared_ptr<EblaPeer>, std::pair<SharedTransactions, std::vector<trx_hash_t>>>>
 ITransactionPacketHandler::transactionsToSendToPeers(std::vector<SharedTransactions> &&transactions) {
   // Main goal of the algorithm below is to send different transactions and hashes to different peers but still follow
   // nonce ordering for single account and not send higher nonces without sending low nonces first
@@ -29,7 +29,7 @@ ITransactionPacketHandler::transactionsToSendToPeers(std::vector<SharedTransacti
   if (!accounts_size) {
     return {};
   }
-  std::vector<std::pair<std::shared_ptr<TaraxaPeer>, std::pair<SharedTransactions, std::vector<trx_hash_t>>>>
+  std::vector<std::pair<std::shared_ptr<EblaPeer>, std::pair<SharedTransactions, std::vector<trx_hash_t>>>>
       peers_with_transactions_to_send;
   auto peers = peers_state_->getAllPeers();
 
@@ -53,7 +53,7 @@ ITransactionPacketHandler::transactionsToSendToPeers(std::vector<SharedTransacti
 }
 
 std::pair<uint32_t, std::pair<SharedTransactions, std::vector<trx_hash_t>>>
-ITransactionPacketHandler::transactionsToSendToPeer(std::shared_ptr<TaraxaPeer> peer,
+ITransactionPacketHandler::transactionsToSendToPeer(std::shared_ptr<EblaPeer> peer,
                                                     const std::vector<SharedTransactions> &transactions,
                                                     uint32_t account_start_index) {
   const auto accounts_size = transactions.size();
@@ -96,4 +96,4 @@ ITransactionPacketHandler::transactionsToSendToPeer(std::shared_ptr<TaraxaPeer> 
   }
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

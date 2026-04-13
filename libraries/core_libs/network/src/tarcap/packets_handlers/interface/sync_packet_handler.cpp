@@ -4,7 +4,7 @@
 #include "network/tarcap/packets/latest/get_pbft_sync_packet.hpp"
 #include "network/tarcap/packets/latest/status_packet.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 ISyncPacketHandler::ISyncPacketHandler(const FullNodeConfig& conf, std::shared_ptr<PeersState> peers_state,
                                        std::shared_ptr<TimePeriodPacketsStats> packets_stats,
@@ -23,7 +23,7 @@ void ISyncPacketHandler::startSyncingPbft() {
     return;
   }
 
-  std::shared_ptr<TaraxaPeer> peer = peers_state_->getMaxChainPeer(pbft_mgr_);
+  std::shared_ptr<EblaPeer> peer = peers_state_->getMaxChainPeer(pbft_mgr_);
   if (!peer) {
     LOG(this->log_nf_) << "Restarting syncing PBFT not possible since no connected peers";
     return;
@@ -91,8 +91,8 @@ bool ISyncPacketHandler::sendStatus(const dev::p2p::NodeID& node_id, bool initia
   std::string status_packet_type = initial ? "initial" : "standard";
 
   LOG(log_dg_) << "Sending " << status_packet_type << " status message to " << node_id << ", protocol version "
-               << TARAXA_NET_VERSION << ", network id " << kConf.genesis.chain_id << ", genesis " << kGenesisHash
-               << ", node version " << TARAXA_VERSION;
+               << EBLA_NET_VERSION << ", network id " << kConf.genesis.chain_id << ", genesis " << kGenesisHash
+               << ", node version " << EBLA_VERSION;
 
   auto dag_max_level = dag_mgr_->getMaxLevel();
   auto pbft_chain_size = pbft_chain_->getPbftChainSize();
@@ -103,8 +103,8 @@ bool ISyncPacketHandler::sendStatus(const dev::p2p::NodeID& node_id, bool initia
         node_id, SubprotocolPacketType::kStatusPacket,
         encodePacketRlp(StatusPacket(
             pbft_chain_size, pbft_round, dag_max_level, pbft_syncing_state_->isPbftSyncing(),
-            StatusPacket::InitialData{kConf.genesis.chain_id, kGenesisHash, TARAXA_MAJOR_VERSION, TARAXA_MINOR_VERSION,
-                                      TARAXA_PATCH_VERSION, kConf.is_light_node, kConf.light_node_history})));
+            StatusPacket::InitialData{kConf.genesis.chain_id, kGenesisHash, EBLA_MAJOR_VERSION, EBLA_MINOR_VERSION,
+                                      EBLA_PATCH_VERSION, kConf.is_light_node, kConf.light_node_history})));
   } else {
     success = sealAndSend(node_id, SubprotocolPacketType::kStatusPacket,
                           encodePacketRlp(StatusPacket(pbft_chain_size, pbft_round, dag_max_level,
@@ -114,4 +114,4 @@ bool ISyncPacketHandler::sendStatus(const dev::p2p::NodeID& node_id, bool initia
   return success;
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

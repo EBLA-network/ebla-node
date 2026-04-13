@@ -9,7 +9,7 @@ from eth_utils.curried import keccak
 
 @click.group()
 def cli():
-    """Taraxa Sign Utility"""
+    """Ebla Sign Utility"""
     pass
 
 

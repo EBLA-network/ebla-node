@@ -7,7 +7,7 @@
 
 #include "common/types.hpp"
 
-namespace taraxa::util {
+namespace ebla::util {
 class EncodingSolidity {
  public:
   static constexpr uint8_t kStartPrefix = 32;
@@ -115,4 +115,4 @@ class EncodingSolidity {
   const static size_t kWordSize = 32;
 };
 
-}  // namespace taraxa::util
+}  // namespace ebla::util

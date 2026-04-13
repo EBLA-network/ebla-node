@@ -5,7 +5,7 @@
 #include "vote/pillar_vote.hpp"
 #include "vote/votes_bundle_rlp.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 struct PillarVotesBundlePacket {
   OptimizedPillarVotesBundle pillar_votes_bundle;
@@ -13,4 +13,4 @@ struct PillarVotesBundlePacket {
   RLP_FIELDS_DEFINE_INPLACE(pillar_votes_bundle)
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

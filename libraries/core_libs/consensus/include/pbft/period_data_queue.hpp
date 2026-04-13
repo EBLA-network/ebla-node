@@ -6,7 +6,7 @@
 
 #include "pbft/period_data.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 /** @addtogroup PBFT
  * @{
@@ -84,4 +84,4 @@ class PeriodDataQueue {
 
 /** @}*/
 
-}  // namespace taraxa
+}  // namespace ebla

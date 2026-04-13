@@ -1,6 +1,6 @@
 # Bytes32 is a 32 byte binary string, represented as 0x-prefixed hexadecimal.
 scalar Bytes32
-# Address is a 20 byte Taraxa address, represented as 0x-prefixed hexadecimal.
+# Address is a 20 byte Ebla address, represented as 0x-prefixed hexadecimal.
 scalar Address
 # Bytes is an arbitrary length binary string, represented as 0x-prefixed hexadecimal.
 # An empty byte string is represented as '0x'. Byte strings must have an even number of hexadecimal nybbles.
@@ -18,7 +18,7 @@ schema {
     subscription: Subscription
 }
 
-# Account is an Taraxa account at a particular block.
+# Account is an Ebla account at a particular block.
 type Account {
     # Address is the address owning the account.
     address: Address!
@@ -36,7 +36,7 @@ type Account {
     storage(slot: Bytes32!): Bytes32!
 }
 
-# Log is an Taraxa event log.
+# Log is an Ebla event log.
 type Log {
     # Index is the index of this log in the block.
     index: Int!
@@ -51,7 +51,7 @@ type Log {
     transaction: Transaction!
 }
 
-# Transaction is an Taraxa transaction.
+# Transaction is an Ebla transaction.
 type Transaction {
     # Hash is the hash of this transaction.
     hash: Bytes32!
@@ -122,7 +122,7 @@ input BlockFilterCriteria {
     topics: [[Bytes32!]!]
 }
 
- # Taraxa Dag Block
+ # Ebla Dag Block
  # TODO: vdf and signature are not included - is it needed ?
  type DagBlock {
     # Hash is the block hash of this block.
@@ -153,7 +153,7 @@ input BlockFilterCriteria {
     transactions: [Transaction!]
  }
 
-# Taraxa Final block
+# Ebla Final block
 type Block {
     # Number is the number of this block, starting at 0 for the genesis block.
     number: Long!
@@ -217,7 +217,7 @@ type Block {
     transactionAt(index: Int!): Transaction
     # Logs returns a filtered set of logs from this block.
     logs(filter: BlockFilterCriteria!): [Log!]!
-    # Account fetches an Taraxa account at the current block's state.
+    # Account fetches an Ebla account at the current block's state.
     account(address: Address!): Account!
     # Call executes a local call operation at the current block's state.
     call(data: CallData!): CallResult
@@ -300,7 +300,7 @@ type Pending {
   transactionCount: Int!
   # Transactions is a list of transactions in the current pending state.
   transactions: [Transaction!]
-  # Account fetches an Taraxa account for the pending state.
+  # Account fetches an Ebla account for the pending state.
   account(address: Address!): Account!
   # Call executes a local call operation for the pending state.
   call(data: CallData!): CallResult
@@ -317,7 +317,7 @@ type CurrentState {
 }
 
 type Query {
-    # Block fetches an Taraxa block by number or by hash. If neither is
+    # Block fetches an Ebla block by number or by hash. If neither is
     # supplied, the most recent known block is returned.
     block(number: Long, hash: Bytes32): Block
     # Blocks returns all the blocks between two numbers, inclusive. If
@@ -339,7 +339,7 @@ type Query {
     # ChainID returns the current chain ID for transaction replay protection.
     chainID: BigInt!
 
-    # DagBlock fetches an Taraxa Dag block by hash. If not
+    # DagBlock fetches an Ebla Dag block by hash. If not
     # supplied, the most recent known dag block is returned.
     dagBlock(hash: Bytes32): DagBlock
 

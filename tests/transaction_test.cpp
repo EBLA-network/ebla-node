@@ -16,7 +16,7 @@
 #include "transaction/transaction_manager.hpp"
 #include "transaction/transaction_queue.hpp"
 
-namespace taraxa::core_tests {
+namespace ebla::core_tests {
 
 const unsigned NUM_TRX = 40;
 auto g_secret = Lazy([] {
@@ -723,9 +723,9 @@ TEST_F(TransactionTest, intrinsic_gas) {
   EXPECT_EQ(IntrinsicGas(data2, true), kTxGasContractCreation + 100000 * kTxDataZeroGas);
 }
 
-}  // namespace taraxa::core_tests
+}  // namespace ebla::core_tests
 
-using namespace taraxa;
+using namespace ebla;
 int main(int argc, char** argv) {
   static_init();
   auto logging = logger::createDefaultLoggingConfig();

@@ -1,6 +1,6 @@
 #include "network/tarcap/packets_handlers/interface/dag_block_packet_handler.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 IDagBlockPacketHandler::IDagBlockPacketHandler(const FullNodeConfig &conf, std::shared_ptr<PeersState> peers_state,
                                                std::shared_ptr<TimePeriodPacketsStats> packets_stats,
@@ -67,6 +67,6 @@ void IDagBlockPacketHandler::onNewBlockVerified(const std::shared_ptr<DagBlock> 
   LOG(log_tr_) << "Sent block to " << peers_to_send.size() << " peers";
 }
 
-void IDagBlockPacketHandler::requestDagBlocks(std::shared_ptr<TaraxaPeer> peer) { requestPendingDagBlocks(peer); }
+void IDagBlockPacketHandler::requestDagBlocks(std::shared_ptr<EblaPeer> peer) { requestPendingDagBlocks(peer); }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

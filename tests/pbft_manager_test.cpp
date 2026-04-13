@@ -6,14 +6,14 @@
 #include "network/tarcap/packets_handlers/latest/vote_packet_handler.hpp"
 #include "test_util/node_dag_creation_fixture.hpp"
 
-namespace taraxa::core_tests {
+namespace ebla::core_tests {
 
 struct PbftManagerTest : NodesTest {
   val_t gas_price = 1000000000;
   std::vector<std::shared_ptr<AppBase>> nodes;
   std::vector<uint64_t> nonces;
 
-  void makeNodesWithNonces(const std::vector<taraxa::FullNodeConfig> &cfgs) {
+  void makeNodesWithNonces(const std::vector<ebla::FullNodeConfig> &cfgs) {
     nodes = launch_nodes(cfgs);
     nonces = std::vector<uint64_t>(cfgs.size(), 1);
   }
@@ -757,11 +757,11 @@ TEST_F(PbftManagerWithDagCreation, state_root_hash) {
   }
 }
 
-}  // namespace taraxa::core_tests
+}  // namespace ebla::core_tests
 
-using namespace taraxa;
+using namespace ebla;
 int main(int argc, char **argv) {
-  taraxa::static_init();
+  ebla::static_init();
   auto logging = logger::createDefaultLoggingConfig();
   logging.verbosity = logger::Verbosity::Error;
 

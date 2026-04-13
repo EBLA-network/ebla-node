@@ -13,11 +13,11 @@
 
 using namespace std;
 using namespace dev;
-using namespace ::taraxa::final_chain;
+using namespace ::ebla::final_chain;
 using namespace jsonrpc;
-using namespace taraxa;
+using namespace ebla;
 
-namespace taraxa::net {
+namespace ebla::net {
 
 Json::Value Test::get_sortition_change(const Json::Value &param1) {
   Json::Value res;
@@ -154,4 +154,4 @@ Json::Value Test::get_all_nodes() {
   return res;
 }
 
-}  // namespace taraxa::net
+}  // namespace ebla::net

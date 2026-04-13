@@ -5,7 +5,7 @@
 #include "common/encoding_rlp.hpp"
 #include "common/encoding_solidity.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 PillarVote::PillarVote(const secret_t& node_sk, PbftPeriod period, const blk_hash_t& block_hash)
     : Vote(block_hash), period_(period) {
@@ -54,4 +54,4 @@ vote_hash_t PillarVote::sha3(bool inc_sig) const { return dev::sha3(encodeSolidi
 
 RLP_FIELDS_DEFINE(PillarVote, period_, block_hash_, vote_signature_)
 
-}  // namespace taraxa
+}  // namespace ebla

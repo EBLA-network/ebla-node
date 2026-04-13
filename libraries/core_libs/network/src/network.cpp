@@ -16,10 +16,10 @@
 #include "network/tarcap/shared_states/pbft_syncing_state.hpp"
 #include "network/tarcap/stats/node_stats.hpp"
 #include "network/tarcap/stats/time_period_packets_stats.hpp"
-#include "network/tarcap/taraxa_capability.hpp"
+#include "network/tarcap/ebla_capability.hpp"
 #include "pbft/pbft_manager.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 Network::Network(const FullNodeConfig &config, const h256 &genesis_hash, const std::filesystem::path &network_file_path,
                  std::shared_ptr<DbStorage> db, std::shared_ptr<PbftManager> pbft_mgr,
@@ -58,44 +58,44 @@ Network::Network(const FullNodeConfig &config, const h256 &genesis_hash, const s
   net_conf.pin = false;
   net_conf.trustedNodes = config.network.trusted_nodes;
 
-  dev::p2p::TaraxaNetworkConfig taraxa_net_conf;
-  taraxa_net_conf.ideal_peer_count = config.network.ideal_peer_count;
+  dev::p2p::EblaNetworkConfig ebla_net_conf;
+  ebla_net_conf.ideal_peer_count = config.network.ideal_peer_count;
 
   // TODO config.network.max_peer_count -> config.network.peer_count_stretch
-  taraxa_net_conf.peer_stretch = config.network.max_peer_count / config.network.ideal_peer_count;
-  taraxa_net_conf.chain_id = config.genesis.chain_id;
-  taraxa_net_conf.expected_parallelism = tp_.capacity();
+  ebla_net_conf.peer_stretch = config.network.max_peer_count / config.network.ideal_peer_count;
+  ebla_net_conf.chain_id = config.genesis.chain_id;
+  ebla_net_conf.expected_parallelism = tp_.capacity();
 
-  const std::string net_version = "TaraxaNode";
+  const std::string net_version = "EblaNode";
 
-  // Create taraxa capabilities
+  // Create ebla capabilities
   dev::p2p::Host::CapabilitiesFactory constructCapabilities = [&](std::weak_ptr<dev::p2p::Host> host) {
     assert(!host.expired());
 
     dev::p2p::Host::CapabilityList capabilities;
 
-    // Register latest version of taraxa capability
-    auto latest_tarcap = std::make_shared<network::tarcap::TaraxaCapability>(
-        TARAXA_NET_VERSION, config, genesis_hash, host, packets_tp_, all_packets_stats_, pbft_syncing_state_, db,
+    // Register latest version of ebla capability
+    auto latest_tarcap = std::make_shared<network::tarcap::EblaCapability>(
+        EBLA_NET_VERSION, config, genesis_hash, host, packets_tp_, all_packets_stats_, pbft_syncing_state_, db,
         pbft_mgr, pbft_chain, vote_mgr, dag_mgr, trx_mgr, slashing_manager, pillar_chain_mgr, final_chain);
     capabilities.emplace_back(latest_tarcap);
 
-    // Register previous (v5) version of taraxa capability
-    assert(TARAXA_NET_VERSION - 1 == 5);
-    auto v5_tarcap = std::make_shared<network::tarcap::TaraxaCapability>(
-        TARAXA_NET_VERSION - 1, config, genesis_hash, host, packets_tp_, all_packets_stats_, pbft_syncing_state_, db,
+    // Register previous (v5) version of ebla capability
+    assert(EBLA_NET_VERSION - 1 == 5);
+    auto v5_tarcap = std::make_shared<network::tarcap::EblaCapability>(
+        EBLA_NET_VERSION - 1, config, genesis_hash, host, packets_tp_, all_packets_stats_, pbft_syncing_state_, db,
         pbft_mgr, pbft_chain, vote_mgr, dag_mgr, trx_mgr, slashing_manager, pillar_chain_mgr, final_chain,
-        network::tarcap::TaraxaCapability::kInitV5VersionHandlers);
+        network::tarcap::EblaCapability::kInitV5VersionHandlers);
     capabilities.emplace_back(v5_tarcap);
 
     return capabilities;
   };
 
   host_ = dev::p2p::Host::make(net_version, constructCapabilities, dev::KeyPair(kConf.getFirstWallet().node_secret),
-                               net_conf, taraxa_net_conf, network_file_path);
+                               net_conf, ebla_net_conf, network_file_path);
   for (const auto &cap : host_->getSupportedCapabilities()) {
     const auto tarcap_version = cap.second.ref->version();
-    auto tarcap = std::static_pointer_cast<network::tarcap::TaraxaCapability>(cap.second.ref);
+    auto tarcap = std::static_pointer_cast<network::tarcap::EblaCapability>(cap.second.ref);
     tarcaps_[tarcap_version] = std::move(tarcap);
   }
 
@@ -141,7 +141,7 @@ size_t Network::getPeerCount() { return host_->peer_count(); }
 unsigned Network::getNodeCount() { return host_->getNodeCount(); }
 
 Json::Value Network::getStatus() {
-  std::map<network::tarcap::TarcapVersion, std::shared_ptr<network::tarcap::TaraxaPeer>> peers;
+  std::map<network::tarcap::TarcapVersion, std::shared_ptr<network::tarcap::EblaPeer>> peers;
   for (auto &tarcap : tarcaps_) {
     for (const auto &peer : tarcap.second->getPeersState()->getAllPeers()) {
       peers.emplace(tarcap.second->version(), std::move(peer.second));
@@ -163,7 +163,7 @@ void Network::setSyncStatePeriod(PbftPeriod period) { pbft_syncing_state_->setSy
 void Network::registerPeriodicEvents(const std::shared_ptr<PbftManager> &pbft_mgr,
                                      std::shared_ptr<TransactionManager> trx_mgr) {
   auto getAllPeers = [this]() {
-    std::vector<std::shared_ptr<network::tarcap::TaraxaPeer>> all_peers;
+    std::vector<std::shared_ptr<network::tarcap::EblaPeer>> all_peers;
     for (auto &tarcap : tarcaps_) {
       for (const auto &peer : tarcap.second->getPeersState()->getAllPeers()) {
         all_peers.push_back(std::move(peer.second));
@@ -326,7 +326,7 @@ void Network::gossipPillarBlockVote(const std::shared_ptr<PillarVote> &vote, boo
 void Network::handleMaliciousSyncPeer(const dev::p2p::NodeID &node_id) {
   for (const auto &tarcap : tarcaps_) {
     auto peers_state = tarcap.second->getPeersState();
-    // Peer is present only in one taraxa capability depending on his network version
+    // Peer is present only in one ebla capability depending on his network version
     if (auto peer = peers_state->getPeer(node_id); !peer) {
       continue;
     }
@@ -335,8 +335,8 @@ void Network::handleMaliciousSyncPeer(const dev::p2p::NodeID &node_id) {
   }
 }
 
-std::shared_ptr<network::tarcap::TaraxaPeer> Network::getMaxChainPeer() const {
-  std::shared_ptr<network::tarcap::TaraxaPeer> max_chain_peer{nullptr};
+std::shared_ptr<network::tarcap::EblaPeer> Network::getMaxChainPeer() const {
+  std::shared_ptr<network::tarcap::EblaPeer> max_chain_peer{nullptr};
 
   for (const auto &tarcap : tarcaps_) {
     const auto peer = tarcap.second->getPeersState()->getMaxChainPeer(pbft_mgr_);
@@ -354,7 +354,7 @@ std::shared_ptr<network::tarcap::TaraxaPeer> Network::getMaxChainPeer() const {
   return max_chain_peer;
 }
 
-void Network::requestPillarBlockVotesBundle(taraxa::PbftPeriod period, const taraxa::blk_hash_t &pillar_block_hash) {
+void Network::requestPillarBlockVotesBundle(ebla::PbftPeriod period, const ebla::blk_hash_t &pillar_block_hash) {
   // Max peer among all tarcaps
   const auto max_peer = getMaxChainPeer();
 
@@ -381,9 +381,9 @@ void Network::requestPillarBlockVotesBundle(taraxa::PbftPeriod period, const tar
 //       other functions must use all tarcaps
 dev::p2p::NodeID Network::getNodeId() const { return host_->id(); }
 
-std::shared_ptr<network::tarcap::TaraxaPeer> Network::getPeer(dev::p2p::NodeID const &id) const {
+std::shared_ptr<network::tarcap::EblaPeer> Network::getPeer(dev::p2p::NodeID const &id) const {
   return tarcaps_.begin()->second->getPeersState()->getPeer(id);
 }
 // METHODS USED IN TESTS ONLY
 
-}  // namespace taraxa
+}  // namespace ebla

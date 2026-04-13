@@ -1,4 +1,4 @@
-### Multiple taraxa capabilities support
+### Multiple ebla capabilities support
 - Derive new packet handlers with different logic than the original ones.
 -
 `!!! Important:` These handlers must be

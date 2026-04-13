@@ -1,4 +1,4 @@
-# Taraxa RPC
+# Ebla RPC
 
 ## Ethereum compatibility
 
@@ -10,7 +10,7 @@
 
 ### Not implemented
 
-Taraxa protocol supports all Ethereum methods described on [this page](https://ethereum.org/en/developers/docs/apis/json-rpc/) except:
+Ebla protocol supports all Ethereum methods described on [this page](https://ethereum.org/en/developers/docs/apis/json-rpc/) except:
 
 - web3_clientVersion
 - web3_sha3
@@ -269,11 +269,11 @@ Fires a notification when Pillar block is added
 }
 ```
 
-## Taraxa specific methods
+## Ebla specific methods
 
-### taraxa_protocolVersion
+### ebla_protocolVersion
 
-Returns current taraxa network protocol version
+Returns current ebla network protocol version
 
 #### Parameters
 
@@ -287,7 +287,7 @@ none
 
 ```json
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_protocolVersion","params":[],"id":1}'
+curl -X POST --data '{"jsonrpc":"2.0","method":"ebla_protocolVersion","params":[],"id":1}'
 
 // Result
 {
@@ -297,9 +297,9 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_protocolVersion","params"
 }
 ```
 
-### taraxa_getVersion
+### ebla_getVersion
 
-Returns extended description of Taraxa node version.
+Returns extended description of Ebla node version.
 
 #### Parameters
 
@@ -318,7 +318,7 @@ none
 
 ```json
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_getVersion","params":[],"id":1}'
+curl -X POST --data '{"jsonrpc":"2.0","method":"ebla_getVersion","params":[],"id":1}'
 
 // Result
 {
@@ -334,7 +334,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_getVersion","params":[],"
 }
 ```
 
-### taraxa_getDagBlockByHash
+### ebla_getDagBlockByHash
 
 Returns information about DAG block by hash
 
@@ -368,7 +368,7 @@ Returns information about DAG block by hash
 
 ```json
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_getDagBlockByHash","params": ["0x73fabc5e2ff3863b8c8a313ee0200b915ef2f3606d24f3ff817a4655c04852a6", false],"id":1}'
+curl -X POST --data '{"jsonrpc":"2.0","method":"ebla_getDagBlockByHash","params": ["0x73fabc5e2ff3863b8c8a313ee0200b915ef2f3606d24f3ff817a4655c04852a6", false],"id":1}'
 
 // Result
 {
@@ -402,7 +402,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_getDagBlockByHash","param
 }
 ```
 
-### taraxa_getDagBlockByLevel
+### ebla_getDagBlockByLevel
 
 Returns information about DAG blocks for specified level
 
@@ -435,7 +435,7 @@ Returns information about DAG blocks for specified level
 
 ```json
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_getDagBlockByLevel","params":["0xEA1C6A", false],"id":1}'
+curl -X POST --data '{"jsonrpc":"2.0","method":"ebla_getDagBlockByLevel","params":["0xEA1C6A", false],"id":1}'
 
 // Result
 {
@@ -469,7 +469,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_getDagBlockByLevel","para
 }
 ```
 
-### taraxa_dagBlockLevel
+### ebla_dagBlockLevel
 
 Returns current maximum level of DAG
 
@@ -485,7 +485,7 @@ none
 
 ```json
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_dagBlockLevel","params":[],"id":1}'
+curl -X POST --data '{"jsonrpc":"2.0","method":"ebla_dagBlockLevel","params":[],"id":1}'
 
 // Result
 {
@@ -495,7 +495,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_dagBlockLevel","params":[
 }
 ```
 
-### taraxa_dagBlockPeriod
+### ebla_dagBlockPeriod
 
 Returns last period
 
@@ -511,7 +511,7 @@ none
 
 ```json
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_dagBlockPeriod","params":[],"id":1}'
+curl -X POST --data '{"jsonrpc":"2.0","method":"ebla_dagBlockPeriod","params":[],"id":1}'
 
 // Result
 {
@@ -521,7 +521,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_dagBlockPeriod","params":
 }
 ```
 
-### taraxa_getScheduleBlockByPeriod
+### ebla_getScheduleBlockByPeriod
 
 Returns PBFT block info with DAG block schedule for period
 
@@ -547,7 +547,7 @@ Returns PBFT block info with DAG block schedule for period
 
 ```json
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_getScheduleBlockByPeriod","params":["0x1D533B"],"id":1}'
+curl -X POST --data '{"jsonrpc":"2.0","method":"ebla_getScheduleBlockByPeriod","params":["0x1D533B"],"id":1}'
 
 // Result
 {
@@ -590,7 +590,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_getScheduleBlockByPeriod"
 }
 ```
 
-### taraxa_pbftBlockHashByPeriod
+### ebla_pbftBlockHashByPeriod
 
 Returns hash of PBFT block for specified period
 
@@ -606,7 +606,7 @@ Returns hash of PBFT block for specified period
 
 ```json
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_pbftBlockHashByPeriod","params":["0x1D533B"],"id":1}'
+curl -X POST --data '{"jsonrpc":"2.0","method":"ebla_pbftBlockHashByPeriod","params":["0x1D533B"],"id":1}'
 
 // Result
 {
@@ -616,7 +616,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_pbftBlockHashByPeriod","p
 }
 ```
 
-### taraxa_getConfig
+### ebla_getConfig
 
 Returns current node configuration
 
@@ -637,7 +637,7 @@ none
 
 ```json
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_getConfig","params":[],"id":1}'
+curl -X POST --data '{"jsonrpc":"2.0","method":"ebla_getConfig","params":[],"id":1}'
 
 // Result
 {
@@ -707,7 +707,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_getConfig","params":[],"i
 }
 ```
 
-### taraxa_getChainStats
+### ebla_getChainStats
 
 Returns current chain stats with count of transactions, PBFT blocks and DAG blocks
 
@@ -726,7 +726,7 @@ none
 
 ```json
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_getChainStats","params":[],"id":1}'
+curl -X POST --data '{"jsonrpc":"2.0","method":"ebla_getChainStats","params":[],"id":1}'
 
 // Result
 {
@@ -740,7 +740,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_getChainStats","params":[
 }
 ```
 
-### taraxa_yield
+### ebla_yield
 
 Returns yield for specified period
 
@@ -759,7 +759,7 @@ To transform returned yield to fraction -> ```decimal(yield) / 1e6```
 
 ```json
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_yield","params":["0x1D533B"],"id":1}'
+curl -X POST --data '{"jsonrpc":"2.0","method":"ebla_yield","params":["0x1D533B"],"id":1}'
 
 // Result
 {
@@ -769,7 +769,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_yield","params":["0x1D533
 }
 ```
 
-### taraxa_totalSupply
+### ebla_totalSupply
 
 Returns total supply for specified period
 
@@ -785,7 +785,7 @@ Returns total supply for specified period
 
 ```json
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_totalSupply","params":["0x1D533B"],"id":1}'
+curl -X POST --data '{"jsonrpc":"2.0","method":"ebla_totalSupply","params":["0x1D533B"],"id":1}'
 
 // Result
 {
@@ -795,7 +795,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_totalSupply","params":["0
 }
 ```
 
-### taraxa_getPillarBlockData
+### ebla_getPillarBlockData
 
 Returns finalized pillar block + pillar votes for specified bock number
 
@@ -826,7 +826,7 @@ Returns finalized pillar block + pillar votes for specified bock number
 
 ```json
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"taraxa_getPillarBlockData","params":[100, true],"id":1}'
+curl -X POST --data '{"jsonrpc":"2.0","method":"ebla_getPillarBlockData","params":[100, true],"id":1}'
 
 // Result
 {
@@ -1020,7 +1020,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"get_peer_count","params":[],"id"
 
 ### get_node_status
 
-Returns current taraxa network protocol version
+Returns current ebla network protocol version
 
 #### Parameters
 

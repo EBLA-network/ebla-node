@@ -3,7 +3,7 @@
 #include "packet_handler.hpp"
 #include "pillar_chain/pillar_chain_manager.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 class ExtPillarVotePacketHandler : public PacketHandler {
  public:
@@ -13,10 +13,10 @@ class ExtPillarVotePacketHandler : public PacketHandler {
                              const addr_t& node_addr, const std::string& log_channel);
 
  protected:
-  bool processPillarVote(const std::shared_ptr<PillarVote>& vote, const std::shared_ptr<TaraxaPeer>& peer);
+  bool processPillarVote(const std::shared_ptr<PillarVote>& vote, const std::shared_ptr<EblaPeer>& peer);
 
  protected:
   std::shared_ptr<pillar_chain::PillarChainManager> pillar_chain_manager_;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

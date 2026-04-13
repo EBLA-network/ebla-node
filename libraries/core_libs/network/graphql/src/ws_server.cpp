@@ -15,13 +15,13 @@
 #include "graphqlservice/GraphQLService.h"
 #include "graphqlservice/JSONResponse.h"
 
-namespace taraxa::net {
+namespace ebla::net {
 
 std::string GraphQlWsSession::processRequest(const std::string_view& /*request*/) {
-  //  static auto q = std::make_shared<graphql::taraxa::Query>(ws_server_.lock()->getFinalChain(), nullptr, 0);
-  //  static auto mutation = std::make_shared<graphql::taraxa::Mutation>();
-  //  static auto subscription = std::make_shared<graphql::taraxa::Subscription>();
-  //  static auto _service = std::make_shared<graphql::taraxa::Operations>(q, mutation, subscription);
+  //  static auto q = std::make_shared<graphql::ebla::Query>(ws_server_.lock()->getFinalChain(), nullptr, 0);
+  //  static auto mutation = std::make_shared<graphql::ebla::Mutation>();
+  //  static auto subscription = std::make_shared<graphql::ebla::Subscription>();
+  //  static auto _service = std::make_shared<graphql::ebla::Operations>(q, mutation, subscription);
   //
   //  using namespace graphql;
   //
@@ -88,4 +88,4 @@ std::shared_ptr<WsSession> GraphQlWsServer::createSession(tcp::socket&& socket) 
   return std::make_shared<GraphQlWsSession>(std::move(socket), node_addr_, shared_from_this());
 }
 
-}  // namespace taraxa::net
+}  // namespace ebla::net

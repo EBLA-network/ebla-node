@@ -6,7 +6,7 @@
 
 using namespace std;
 
-namespace taraxa {
+namespace ebla {
 
 PbftChain::PbftChain(addr_t node_addr, std::shared_ptr<DbStorage> db)
     : size_(0), non_empty_size_(0), db_(std::move(db)) {
@@ -69,11 +69,11 @@ blk_hash_t PbftChain::getLastNonNullPbftBlockAnchor() const {
   return last_non_null_pbft_dag_anchor_hash_;
 }
 
-bool PbftChain::findPbftBlockInChain(taraxa::blk_hash_t const& pbft_block_hash) {
+bool PbftChain::findPbftBlockInChain(ebla::blk_hash_t const& pbft_block_hash) {
   return db_->pbftBlockInDb(pbft_block_hash);
 }
 
-PbftBlock PbftChain::getPbftBlockInChain(const taraxa::blk_hash_t& pbft_block_hash) {
+PbftBlock PbftChain::getPbftBlockInChain(const ebla::blk_hash_t& pbft_block_hash) {
   auto pbft_block = db_->getPbftBlock(pbft_block_hash);
   if (!pbft_block.has_value()) {
     LOG(log_er_) << "Cannot find PBFT block hash " << pbft_block_hash << " in DB";
@@ -138,4 +138,4 @@ std::ostream& operator<<(std::ostream& strm, PbftChain const& pbft_chain) {
   return strm;
 }
 
-}  // namespace taraxa
+}  // namespace ebla

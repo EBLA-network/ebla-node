@@ -11,7 +11,7 @@
 #include "pbft/pbft_manager.hpp"
 #include "test_util/test_util.hpp"
 
-namespace taraxa::core_tests {
+namespace ebla::core_tests {
 
 struct PbftChainTest : NodesTest {};
 
@@ -83,11 +83,11 @@ TEST_F(PbftChainTest, pbft_db_test) {
   EXPECT_EQ(pbft_head_from_db, pbft_chain->getJsonStr());
 }
 
-}  // namespace taraxa::core_tests
+}  // namespace ebla::core_tests
 
-using namespace taraxa;
+using namespace ebla;
 int main(int argc, char **argv) {
-  taraxa::static_init();
+  ebla::static_init();
   auto logging = logger::createDefaultLoggingConfig();
   logging.verbosity = logger::Verbosity::Error;
   logging.channels["PBFT_CHAIN"] = logger::Verbosity::Error;

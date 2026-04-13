@@ -6,7 +6,7 @@
 #include "common/constants.hpp"
 #include "pbft/pbft_block.hpp"
 
-namespace taraxa::final_chain {
+namespace ebla::final_chain {
 
 dev::bytes BlockHeaderData::serializeForDB() const { return util::rlp_enc(*this); }
 
@@ -63,4 +63,4 @@ dev::bytes BlockHeader::ethereumRlp() const {
 RLP_FIELDS_DEFINE(BlockHeader, hash, parent_hash, author, state_root, transactions_root, receipts_root, log_bloom,
                   number, gas_limit, gas_used, timestamp, total_reward, extra_data)
 
-}  // namespace taraxa::final_chain
+}  // namespace ebla::final_chain

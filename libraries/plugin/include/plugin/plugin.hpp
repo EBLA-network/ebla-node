@@ -4,7 +4,7 @@
 
 #include "common/app_base.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 class Plugin {
  public:
@@ -29,4 +29,4 @@ class Plugin {
   std::weak_ptr<AppBase> _app;
 };
 
-}  // namespace taraxa
+}  // namespace ebla

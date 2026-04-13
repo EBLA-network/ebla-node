@@ -5,7 +5,7 @@
 #include "common/config_exception.hpp"
 #include "libdevcore/SHA3.h"
 
-namespace taraxa {
+namespace ebla {
 
 Json::Value enc_json(GasPriceConfig const& obj) {
   Json::Value json(Json::objectValue);
@@ -136,4 +136,4 @@ std::pair<uint64_t, uint64_t> GenesisConfig::getGasLimits(uint64_t block_number)
   return {dag.gas_limit, pbft.gas_limit};
 }
 
-}  // namespace taraxa
+}  // namespace ebla

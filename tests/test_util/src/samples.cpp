@@ -1,6 +1,6 @@
 #include "test_util/samples.hpp"
 
-namespace taraxa::core_tests::samples {
+namespace ebla::core_tests::samples {
 SharedTransactions createSignedTrxSamples(unsigned start, unsigned num, secret_t const& sk, bytes data) {
   assert(start + num < std::numeric_limits<unsigned>::max());
   SharedTransactions trxs;
@@ -272,4 +272,4 @@ std::vector<std::shared_ptr<DagBlock>> createMockDag1(const blk_hash_t& genesis)
   return blks;
 }
 
-}  // namespace taraxa::core_tests::samples
+}  // namespace ebla::core_tests::samples

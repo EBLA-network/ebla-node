@@ -2,10 +2,10 @@
 
 #include "network/threadpool/packet_data.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
-// Taraxa capability name
-constexpr char TARAXA_CAPABILITY_NAME[] = "taraxa";
+// Ebla capability name
+constexpr char EBLA_CAPABILITY_NAME[] = "ebla";
 
 /**
  * @brief Base Packet handler base class that consists processPacket function
@@ -28,4 +28,4 @@ class BasePacketHandler {
   virtual void processPacket(const threadpool::PacketData& packet_data) = 0;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

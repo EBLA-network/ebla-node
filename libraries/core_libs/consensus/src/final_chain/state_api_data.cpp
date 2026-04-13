@@ -4,9 +4,9 @@
 
 #include "common/constants.hpp"
 
-namespace taraxa::state_api {
+namespace ebla::state_api {
 
-TaraxaEVMError::TaraxaEVMError(std::string&& type, const std::string& msg)
+EblaEVMError::EblaEVMError(std::string&& type, const std::string& msg)
     : runtime_error(msg), type(std::move(type)) {}
 
 h256 const& Account::storage_root_eth() const { return storage_root_hash ? storage_root_hash : EmptyRLPListSHA3(); }
@@ -24,4 +24,4 @@ RLP_FIELDS_DEFINE(Tracing, vmTrace, trace, stateDiff)
 RLP_FIELDS_DEFINE(ValidatorStake, addr, stake)
 RLP_FIELDS_DEFINE(ValidatorVoteCount, addr, vote_count)
 
-}  // namespace taraxa::state_api
+}  // namespace ebla::state_api

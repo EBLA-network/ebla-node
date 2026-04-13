@@ -2,8 +2,8 @@
 
 #include "common/types.hpp"
 
-namespace taraxa::final_chain {
+namespace ebla::final_chain {
 
 h256 hash256(dev::BytesMap const& _s);
 
-}  // namespace taraxa::final_chain
+}  // namespace ebla::final_chain

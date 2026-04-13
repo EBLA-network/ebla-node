@@ -9,15 +9,15 @@
 #include "network/tarcap/tarcap_version.hpp"
 #include "priority_queue.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 class PacketsHandler;
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap
 
-namespace taraxa {
+namespace ebla {
 class PbftManager;
 }
 
-namespace taraxa::network::threadpool {
+namespace ebla::network::threadpool {
 
 /**
  * @brief PacketsThreadPool for concurrent packets processing
@@ -81,7 +81,7 @@ class PacketsThreadPool {
   // Number of workers(threads)
   const size_t workers_num_;
 
-  // Common packets handler - each taraxa capability haits own packets handler
+  // Common packets handler - each ebla capability haits own packets handler
   std::unordered_map<tarcap::TarcapVersion, std::shared_ptr<tarcap::PacketsHandler>> packets_handlers_;
 
   // If true, stop processing packets and join all workers threads
@@ -103,4 +103,4 @@ class PacketsThreadPool {
   std::vector<std::thread> workers_;
 };
 
-}  // namespace taraxa::network::threadpool
+}  // namespace ebla::network::threadpool

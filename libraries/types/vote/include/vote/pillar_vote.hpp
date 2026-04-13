@@ -5,7 +5,7 @@
 #include "common/encoding_rlp.hpp"
 #include "vote.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 /** @addtogroup Vote
  * @{
@@ -69,4 +69,4 @@ class PillarVote : public Vote {
 
 /** @}*/
 
-}  // namespace taraxa
+}  // namespace ebla

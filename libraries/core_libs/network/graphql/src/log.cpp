@@ -7,11 +7,11 @@
 
 using namespace std::literals;
 
-namespace graphql::taraxa {
+namespace graphql::ebla {
 
-Log::Log(std::shared_ptr<::taraxa::final_chain::FinalChain> final_chain,
-         std::shared_ptr<::taraxa::TransactionManager> trx_manager, std::shared_ptr<const Transaction> transaction,
-         ::taraxa::LogEntry log, int index) noexcept
+Log::Log(std::shared_ptr<::ebla::final_chain::FinalChain> final_chain,
+         std::shared_ptr<::ebla::TransactionManager> trx_manager, std::shared_ptr<const Transaction> transaction,
+         ::ebla::LogEntry log, int index) noexcept
     : final_chain_(std::move(final_chain)),
       trx_manager_(std::move(trx_manager)),
       kTransaction(std::move(transaction)),
@@ -37,4 +37,4 @@ std::shared_ptr<object::Transaction> Log::getTransaction() const noexcept {
   return std::make_shared<object::Transaction>(kTransaction);
 }
 
-}  // namespace graphql::taraxa
+}  // namespace graphql::ebla

@@ -16,7 +16,7 @@
 #include "test_util/test_util.hpp"
 #include "vdf/sortition.hpp"
 
-namespace taraxa::core_tests {
+namespace ebla::core_tests {
 using namespace vdf_sortition;
 
 struct DagBlockTest : NodesTest {};
@@ -458,9 +458,9 @@ TEST_F(DagBlockMgrTest, estimation_cache_test) {
   }
 }
 
-}  // namespace taraxa::core_tests
+}  // namespace ebla::core_tests
 
-using namespace taraxa;
+using namespace ebla;
 int main(int argc, char** argv) {
   static_init();
   auto logging = logger::createDefaultLoggingConfig();

@@ -4,7 +4,7 @@
 
 #include "network/tarcap/stats/packet_stats.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 /**
  * @brief MAx stats data holder class
@@ -30,4 +30,4 @@ class MaxStats {
   PacketStats max_tp_wait_time_stats_;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

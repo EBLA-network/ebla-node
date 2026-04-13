@@ -11,10 +11,10 @@
 #include "common/types.hpp"
 using namespace std;
 using namespace dev;
-using namespace taraxa::final_chain;
-using namespace taraxa::state_api;
+using namespace ebla::final_chain;
+using namespace ebla::state_api;
 
-namespace taraxa::net::rpc::eth {
+namespace ebla::net::rpc::eth {
 void add(Json::Value& obj, const optional<TransactionLocationWithBlockHash>& info) {
   obj["blockNumber"] = info ? toJS(info->period) : Json::Value();
   obj["blockHash"] = info ? toJS(info->blk_h) : Json::Value();
@@ -545,4 +545,4 @@ class EthImpl : public Eth, EthParams {
 
 shared_ptr<Eth> NewEth(EthParams&& prerequisites) { return make_shared<EthImpl>(std::move(prerequisites)); }
 
-}  // namespace taraxa::net::rpc::eth
+}  // namespace ebla::net::rpc::eth

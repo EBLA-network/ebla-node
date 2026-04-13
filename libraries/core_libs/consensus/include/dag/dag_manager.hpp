@@ -8,7 +8,7 @@
 #include "storage/storage.hpp"
 #include "transaction/transaction_manager.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 /** @addtogroup DAG
  * @{
@@ -289,4 +289,4 @@ class DagManager : public std::enable_shared_from_this<DagManager> {
 
 /** @}*/
 
-}  // namespace taraxa
+}  // namespace ebla

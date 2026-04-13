@@ -3,7 +3,7 @@
 #include "pbft/pbft_block.hpp"
 #include "vote/pbft_vote.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 bool ProposedBlocks::pushProposedPbftBlock(const std::shared_ptr<PbftBlock>& proposed_block, bool save_to_db) {
   std::unique_lock lock(proposed_blocks_mutex_);
@@ -96,4 +96,4 @@ std::map<PbftPeriod, std::vector<std::shared_ptr<PbftBlock>>> ProposedBlocks::ge
   return result;
 }
 
-}  // namespace taraxa
+}  // namespace ebla

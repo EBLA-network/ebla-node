@@ -6,7 +6,7 @@
 
 #include "common/jsoncpp.hpp"
 
-namespace taraxa::net {
+namespace ebla::net {
 
 int Subscriptions::addSubscription(std::shared_ptr<Subscription> subscription) {
   std::lock_guard<std::mutex> lock(subscriptions_mutex_);
@@ -104,4 +104,4 @@ std::string LogsSubscription::processPayload(Json::Value payload) const {
   return makeEthSubscriptionResponse(id_, payload);
 }
 
-}  // namespace taraxa::net
+}  // namespace ebla::net

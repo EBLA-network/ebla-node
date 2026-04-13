@@ -4,7 +4,7 @@
 
 namespace dev::p2p {
 
-struct TaraxaNetworkConfig {
+struct EblaNetworkConfig {
   unsigned ideal_peer_count = 11;
   unsigned peer_stretch = 7;
   bool is_boot_node = false;

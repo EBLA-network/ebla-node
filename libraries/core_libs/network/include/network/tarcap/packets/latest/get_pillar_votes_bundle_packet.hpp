@@ -3,7 +3,7 @@
 #include "common/encoding_rlp.hpp"
 #include "common/types.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 struct GetPillarVotesBundlePacket {
   PbftPeriod period;
@@ -12,4 +12,4 @@ struct GetPillarVotesBundlePacket {
   RLP_FIELDS_DEFINE_INPLACE(period, pillar_block_hash)
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

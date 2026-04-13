@@ -5,7 +5,7 @@
 
 #include "vote/pillar_vote.hpp"
 
-namespace taraxa::pillar_chain {
+namespace ebla::pillar_chain {
 
 class PillarVotes {
  public:
@@ -91,4 +91,4 @@ class PillarVotes {
   mutable std::shared_mutex mutex_;
 };
 
-}  // namespace taraxa::pillar_chain
+}  // namespace ebla::pillar_chain

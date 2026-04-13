@@ -5,10 +5,10 @@
 #include "network/tarcap/stats/max_stats.hpp"
 #include "network/tarcap/stats/packets_stats.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 class PeersState;
-class TaraxaPeer;
+class EblaPeer;
 
 /**
  * @brief Stats for all received and sent packets of all types
@@ -23,7 +23,7 @@ class TimePeriodPacketsStats {
   /**
    * @brief Logs both received as well as sent packets stats + updates max count/size and reset stats
    */
-  void processStats(const std::vector<std::shared_ptr<TaraxaPeer>>& all_peers);
+  void processStats(const std::vector<std::shared_ptr<EblaPeer>>& all_peers);
 
  private:
   /**
@@ -52,4 +52,4 @@ class TimePeriodPacketsStats {
   LOG_OBJECTS_DEFINE
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

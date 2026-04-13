@@ -3,7 +3,7 @@
 #include "pbft/pbft_manager.hpp"
 #include "vote_manager/vote_manager.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 GetNextVotesBundlePacketHandler::GetNextVotesBundlePacketHandler(
     const FullNodeConfig &conf, std::shared_ptr<PeersState> peers_state,
@@ -15,7 +15,7 @@ GetNextVotesBundlePacketHandler::GetNextVotesBundlePacketHandler(
                          logs_prefix + "GET_NEXT_VOTES_BUNDLE_PH") {}
 
 void GetNextVotesBundlePacketHandler::process(const threadpool::PacketData &packet_data,
-                                              const std::shared_ptr<TaraxaPeer> &peer) {
+                                              const std::shared_ptr<EblaPeer> &peer) {
   // Decode packet rlp into packet object
   auto packet = decodePacketRlp<GetNextVotesBundlePacket>(packet_data.rlp_);
 
@@ -73,4 +73,4 @@ void GetNextVotesBundlePacketHandler::process(const threadpool::PacketData &pack
   }
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

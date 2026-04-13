@@ -7,13 +7,13 @@
 #include "final_chain/final_chain.hpp"
 #include "final_chain/state_api.hpp"
 
-namespace graphql::taraxa {
+namespace graphql::ebla {
 
 class Account {
  public:
-  explicit Account(std::shared_ptr<::taraxa::final_chain::FinalChain> final_chain, dev::Address address,
-                   ::taraxa::EthBlockNumber blk_n);
-  explicit Account(std::shared_ptr<::taraxa::final_chain::FinalChain> final_chain, dev::Address address);
+  explicit Account(std::shared_ptr<::ebla::final_chain::FinalChain> final_chain, dev::Address address,
+                   ::ebla::EthBlockNumber blk_n);
+  explicit Account(std::shared_ptr<::ebla::final_chain::FinalChain> final_chain, dev::Address address);
 
   response::Value getAddress() const noexcept;
   response::Value getBalance() const noexcept;
@@ -23,7 +23,7 @@ class Account {
 
  private:
   const dev::Address kAddress;
-  std::optional<::taraxa::state_api::Account> account_;
-  std::shared_ptr<::taraxa::final_chain::FinalChain> final_chain_;
+  std::optional<::ebla::state_api::Account> account_;
+  std::shared_ptr<::ebla::final_chain::FinalChain> final_chain_;
 };
-}  // namespace graphql::taraxa
+}  // namespace graphql::ebla

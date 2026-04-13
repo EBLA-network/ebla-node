@@ -3,7 +3,7 @@
 #include "storage/storage.hpp"
 #include "transaction/transaction_manager.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 GasPricer::GasPricer(const GenesisConfig& config, bool is_light_node, bool is_blocks_gas_pricer,
                      std::shared_ptr<TransactionManager> trx_mgr, std::shared_ptr<DbStorage> db)
@@ -99,4 +99,4 @@ void GasPricer::update(const SharedTransactions& trxs) {
   }
 }
 
-}  // namespace taraxa
+}  // namespace ebla

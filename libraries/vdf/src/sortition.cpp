@@ -6,7 +6,7 @@
 #include "ProverWesolowski.h"
 #include "common/encoding_rlp.hpp"
 #include "common/util.hpp"
-namespace taraxa::vdf_sortition {
+namespace ebla::vdf_sortition {
 using namespace vdf;
 
 VdfSortition::VdfSortition(const SortitionParams& config, const vrf_sk_t& sk, const bytes& vrf_input,
@@ -110,4 +110,4 @@ bool VdfSortition::verifyVrf(const vrf_pk_t& pk, const bytes& vrf_input, uint16_
 
 uint16_t VdfSortition::getDifficulty() const { return difficulty_; }
 
-}  // namespace taraxa::vdf_sortition
+}  // namespace ebla::vdf_sortition

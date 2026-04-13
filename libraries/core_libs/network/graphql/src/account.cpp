@@ -4,15 +4,15 @@
 
 using namespace std::literals;
 
-namespace graphql::taraxa {
+namespace graphql::ebla {
 
-Account::Account(std::shared_ptr<::taraxa::final_chain::FinalChain> final_chain, dev::Address address,
-                 ::taraxa::EthBlockNumber blk_n)
+Account::Account(std::shared_ptr<::ebla::final_chain::FinalChain> final_chain, dev::Address address,
+                 ::ebla::EthBlockNumber blk_n)
     : kAddress(std::move(address)), final_chain_(std::move(final_chain)) {
   account_ = final_chain_->getAccount(kAddress, blk_n);
 }
 
-Account::Account(std::shared_ptr<::taraxa::final_chain::FinalChain> final_chain, dev::Address address)
+Account::Account(std::shared_ptr<::ebla::final_chain::FinalChain> final_chain, dev::Address address)
     : kAddress(std::move(address)), final_chain_(std::move(final_chain)) {
   account_ = final_chain_->getAccount(kAddress);
 }
@@ -41,4 +41,4 @@ response::Value Account::getStorage(response::Value&& slotArg) const {
   return response::Value(dev::toJS(final_chain_->getAccountStorage(kAddress, dev::u256(slotArg.get<std::string>()))));
 }
 
-}  // namespace graphql::taraxa
+}  // namespace graphql::ebla

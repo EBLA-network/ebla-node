@@ -2,7 +2,7 @@
 
 #include "network/tarcap/packets_handlers/latest/common/packet_handler.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 class IGetPillarVotesBundlePacketHandler : public PacketHandler {
  public:
@@ -11,7 +11,7 @@ class IGetPillarVotesBundlePacketHandler : public PacketHandler {
                                      const std::string& logs_prefix);
 
   virtual void requestPillarVotesBundle(PbftPeriod period, const blk_hash_t& pillar_block_hash,
-                                        const std::shared_ptr<TaraxaPeer>& peer) = 0;
+                                        const std::shared_ptr<EblaPeer>& peer) = 0;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

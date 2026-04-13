@@ -5,7 +5,7 @@
 #include "network/tarcap/shared_states/pbft_syncing_state.hpp"
 #include "transaction/transaction_manager.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 DagBlockPacketHandler::DagBlockPacketHandler(const FullNodeConfig &conf, std::shared_ptr<PeersState> peers_state,
                                              std::shared_ptr<TimePeriodPacketsStats> packets_stats,
@@ -20,7 +20,7 @@ DagBlockPacketHandler::DagBlockPacketHandler(const FullNodeConfig &conf, std::sh
       trx_mgr_(std::move(trx_mgr)) {}
 
 void DagBlockPacketHandler::process(const threadpool::PacketData &packet_data,
-                                    const std::shared_ptr<TaraxaPeer> &peer) {
+                                    const std::shared_ptr<EblaPeer> &peer) {
   // Decode packet rlp into packet object
   auto packet = decodePacketRlp<DagBlockPacket>(packet_data.rlp_);
 
@@ -50,7 +50,7 @@ void DagBlockPacketHandler::process(const threadpool::PacketData &packet_data,
   onNewBlockReceived(std::move(packet.dag_block), peer, txs_map);
 }
 
-void DagBlockPacketHandler::sendBlockWithTransactions(const std::shared_ptr<TaraxaPeer> &peer,
+void DagBlockPacketHandler::sendBlockWithTransactions(const std::shared_ptr<EblaPeer> &peer,
                                                       const std::shared_ptr<DagBlock> &block,
                                                       SharedTransactions &&trxs) {
   // This lock prevents race condition between syncing and gossiping dag blocks
@@ -67,7 +67,7 @@ void DagBlockPacketHandler::sendBlockWithTransactions(const std::shared_ptr<Tara
 }
 
 void DagBlockPacketHandler::onNewBlockReceived(
-    std::shared_ptr<DagBlock> &&block, const std::shared_ptr<TaraxaPeer> &peer,
+    std::shared_ptr<DagBlock> &&block, const std::shared_ptr<EblaPeer> &peer,
     const std::unordered_map<trx_hash_t, std::shared_ptr<Transaction>> &trxs) {
   const auto block_hash = block->getHash();
   auto verified = dag_mgr_->verifyBlock(block, trxs);
@@ -160,4 +160,4 @@ void DagBlockPacketHandler::onNewBlockReceived(
   }
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

@@ -3,7 +3,7 @@
 #include "dag/dag_block.hpp"
 #include "transaction/system_transaction.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 struct DagBlockPacket {
   std::vector<std::shared_ptr<Transaction>> transactions;
@@ -12,4 +12,4 @@ struct DagBlockPacket {
   RLP_FIELDS_DEFINE_INPLACE(transactions, dag_block)
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

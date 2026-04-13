@@ -11,7 +11,7 @@
 #include "transaction/transaction.hpp"
 #include "transaction_queue.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 /** @addtogroup Transaction
  * @{
@@ -291,4 +291,4 @@ class TransactionManager : public std::enable_shared_from_this<TransactionManage
 
 /** @}*/
 
-}  // namespace taraxa
+}  // namespace ebla

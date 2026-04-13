@@ -4,7 +4,7 @@
 #include "network/tarcap/packets/latest/votes_bundle_packet.hpp"
 #include "network/tarcap/packets_handlers/interface/vote_packet_handler.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 class VotesBundlePacketHandler : public IVotePacketHandler {
  public:
@@ -18,7 +18,7 @@ class VotesBundlePacketHandler : public IVotePacketHandler {
   static constexpr SubprotocolPacketType kPacketType_ = SubprotocolPacketType::kVotesBundlePacket;
 
  private:
-  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<TaraxaPeer>& peer) override;
+  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<EblaPeer>& peer) override;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

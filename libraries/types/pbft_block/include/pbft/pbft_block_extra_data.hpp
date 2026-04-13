@@ -8,7 +8,7 @@
 
 #include "common/types.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 /** @addtogroup PBFT
  * @{
@@ -52,4 +52,4 @@ class PbftBlockExtraData {
 
 /** @}*/
 
-}  // namespace taraxa
+}  // namespace ebla

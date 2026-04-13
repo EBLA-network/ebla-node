@@ -1,6 +1,6 @@
 #include "dag/sortition_params_manager.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 SortitionParamsChange::SortitionParamsChange(PbftPeriod period, uint16_t efficiency, const VrfParams& vrf)
     : period(period), vrf_params(vrf), interval_efficiency(efficiency) {}
@@ -235,4 +235,4 @@ SortitionParamsChange SortitionParamsManager::calculateChange(PbftPeriod period)
   return SortitionParamsChange{period, average_dag_efficiency, config_.vrf};
 }
 
-}  // namespace taraxa
+}  // namespace ebla

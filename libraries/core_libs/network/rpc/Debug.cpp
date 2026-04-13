@@ -13,9 +13,9 @@
 using namespace std;
 using namespace dev;
 using namespace jsonrpc;
-using namespace taraxa;
+using namespace ebla;
 
-namespace taraxa::net {
+namespace ebla::net {
 
 Json::Value Debug::debug_traceCall(const Json::Value& call_params, const std::string& blk_num) {
   Json::Value res;
@@ -334,4 +334,4 @@ Address Debug::to_address(const std::string& s) const {
   throw InvalidAddress();
 }
 
-}  // namespace taraxa::net
+}  // namespace ebla::net

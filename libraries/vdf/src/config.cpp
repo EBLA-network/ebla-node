@@ -4,7 +4,7 @@
 
 #include "libdevcore/RLP.h"
 
-namespace taraxa {
+namespace ebla {
 
 int32_t fixFromOverflow(uint16_t value, int32_t change, uint16_t limit) {
   int32_t diff = limit - value;
@@ -100,4 +100,4 @@ bytes SortitionConfig::rlp() const {
   return s.out();
 }
 
-}  // namespace taraxa
+}  // namespace ebla

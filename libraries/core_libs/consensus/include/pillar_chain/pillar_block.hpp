@@ -9,11 +9,11 @@
 #include "common/types.hpp"
 #include "final_chain/state_api_data.hpp"
 
-namespace taraxa {
+namespace ebla {
 class PillarVote;
 }
 
-namespace taraxa::pillar_chain {
+namespace ebla::pillar_chain {
 
 /** @addtogroup PILLAR_CHAIN
  * @{
@@ -161,4 +161,4 @@ struct CurrentPillarBlockDataDb {
 
 /** @}*/
 
-}  // namespace taraxa::pillar_chain
+}  // namespace ebla::pillar_chain

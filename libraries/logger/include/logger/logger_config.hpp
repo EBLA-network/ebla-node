@@ -10,7 +10,7 @@
 
 namespace fs = std::filesystem;
 
-namespace taraxa::logger {
+namespace ebla::logger {
 
 // Logger verbosity
 // this enum must match enum in aleth logs to correctly support aleth's library
@@ -77,4 +77,4 @@ class Config {
   bool logging_initialized_{false};
 };
 
-}  // namespace taraxa::logger
+}  // namespace ebla::logger

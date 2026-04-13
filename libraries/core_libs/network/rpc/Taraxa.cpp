@@ -1,4 +1,4 @@
-#include "Taraxa.h"
+#include "Ebla.h"
 
 #include <json/reader.h>
 #include <jsonrpccpp/common/exception.h>
@@ -14,12 +14,12 @@
 using namespace std;
 using namespace jsonrpc;
 using namespace dev;
-using namespace taraxa;
-using namespace ::taraxa::final_chain;
+using namespace ebla;
+using namespace ::ebla::final_chain;
 
-namespace taraxa::net {
+namespace ebla::net {
 
-Taraxa::Taraxa(std::shared_ptr<AppBase> app) : app_(app) {
+Ebla::Ebla(std::shared_ptr<AppBase> app) : app_(app) {
   Json::CharReaderBuilder builder;
   auto reader = std::unique_ptr<Json::CharReader>(builder.newCharReader());
 
@@ -27,11 +27,11 @@ Taraxa::Taraxa(std::shared_ptr<AppBase> app) : app_(app) {
   assert(parsingSuccessful);
 }
 
-string Taraxa::taraxa_protocolVersion() { return toJS(TARAXA_NET_VERSION); }
+string Ebla::ebla_protocolVersion() { return toJS(EBLA_NET_VERSION); }
 
-Json::Value Taraxa::taraxa_getVersion() { return version; }
+Json::Value Ebla::ebla_getVersion() { return version; }
 
-string Taraxa::taraxa_dagBlockLevel() {
+string Ebla::ebla_dagBlockLevel() {
   try {
     auto app = tryGetApp();
     return toJS(app->getDagManager()->getMaxLevel());
@@ -40,7 +40,7 @@ string Taraxa::taraxa_dagBlockLevel() {
   }
 }
 
-string Taraxa::taraxa_dagBlockPeriod() {
+string Ebla::ebla_dagBlockPeriod() {
   try {
     auto app = tryGetApp();
     return toJS(app->getDagManager()->getLatestPeriod());
@@ -49,14 +49,14 @@ string Taraxa::taraxa_dagBlockPeriod() {
   }
 }
 
-std::shared_ptr<AppBase> Taraxa::tryGetApp() {
+std::shared_ptr<AppBase> Ebla::tryGetApp() {
   if (auto app = app_.lock()) {
     return app;
   }
   BOOST_THROW_EXCEPTION(jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_RPC_INTERNAL_ERROR));
 }
 
-Json::Value Taraxa::taraxa_getDagBlockByHash(const string& _blockHash, bool _includeTransactions) {
+Json::Value Ebla::ebla_getDagBlockByHash(const string& _blockHash, bool _includeTransactions) {
   try {
     auto app = tryGetApp();
     auto block = app->getDagManager()->getDagBlock(blk_hash_t(_blockHash));
@@ -82,7 +82,7 @@ Json::Value Taraxa::taraxa_getDagBlockByHash(const string& _blockHash, bool _inc
   return Json::Value();
 }
 
-std::string Taraxa::taraxa_pbftBlockHashByPeriod(const std::string& _period) {
+std::string Ebla::ebla_pbftBlockHashByPeriod(const std::string& _period) {
   try {
     auto app = tryGetApp();
     auto db = app->getDB();
@@ -96,7 +96,7 @@ std::string Taraxa::taraxa_pbftBlockHashByPeriod(const std::string& _period) {
   }
 }
 
-Json::Value Taraxa::taraxa_getScheduleBlockByPeriod(const std::string& _period) {
+Json::Value Ebla::ebla_getScheduleBlockByPeriod(const std::string& _period) {
   try {
     auto app = tryGetApp();
     auto period = dev::jsToInt(_period);
@@ -111,7 +111,7 @@ Json::Value Taraxa::taraxa_getScheduleBlockByPeriod(const std::string& _period) 
   }
 }
 
-Json::Value Taraxa::taraxa_getNodeVersions() {
+Json::Value Ebla::ebla_getNodeVersions() {
   try {
     auto app = tryGetApp();
     auto db = app->getDB();
@@ -163,7 +163,7 @@ Json::Value Taraxa::taraxa_getNodeVersions() {
   }
 }
 
-Json::Value Taraxa::taraxa_getDagBlockByLevel(const string& _blockLevel, bool _includeTransactions) {
+Json::Value Ebla::ebla_getDagBlockByLevel(const string& _blockLevel, bool _includeTransactions) {
   try {
     auto app = tryGetApp();
     auto blocks = app->getDB()->getDagBlocksAtLevel(dev::jsToInt(_blockLevel), 1);
@@ -190,9 +190,9 @@ Json::Value Taraxa::taraxa_getDagBlockByLevel(const string& _blockLevel, bool _i
   }
 }
 
-Json::Value Taraxa::taraxa_getConfig() { return enc_json(tryGetApp()->getConfig().genesis); }
+Json::Value Ebla::ebla_getConfig() { return enc_json(tryGetApp()->getConfig().genesis); }
 
-Json::Value Taraxa::taraxa_getChainStats() {
+Json::Value Ebla::ebla_getChainStats() {
   Json::Value res;
   if (auto app = app_.lock()) {
     res["pbft_period"] = Json::UInt64(app->getFinalChain()->lastBlockNumber());
@@ -203,7 +203,7 @@ Json::Value Taraxa::taraxa_getChainStats() {
   return res;
 }
 
-std::string Taraxa::taraxa_yield(const std::string& _period) {
+std::string Ebla::ebla_yield(const std::string& _period) {
   try {
     auto app = app_.lock();
     if (!app) {
@@ -217,7 +217,7 @@ std::string Taraxa::taraxa_yield(const std::string& _period) {
   }
 }
 
-std::string Taraxa::taraxa_totalSupply(const std::string& _period) {
+std::string Ebla::ebla_totalSupply(const std::string& _period) {
   try {
     auto app = app_.lock();
     if (!app) {
@@ -231,7 +231,7 @@ std::string Taraxa::taraxa_totalSupply(const std::string& _period) {
   }
 }
 
-Json::Value Taraxa::taraxa_getPillarBlockData(const std::string& pillar_block_period, bool include_signatures) {
+Json::Value Ebla::ebla_getPillarBlockData(const std::string& pillar_block_period, bool include_signatures) {
   try {
     auto app = app_.lock();
     if (!app) {
@@ -259,4 +259,4 @@ Json::Value Taraxa::taraxa_getPillarBlockData(const std::string& pillar_block_pe
   }
 }
 
-}  // namespace taraxa::net
+}  // namespace ebla::net

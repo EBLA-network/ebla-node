@@ -1,6 +1,6 @@
 #include "network/tarcap/stats/packets_stats.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 PacketsStats::PacketsStats() : start_time_(std::chrono::system_clock::now()) {}
 
@@ -68,4 +68,4 @@ Json::Value PacketsStats::getStatsJson() const {
   return ret;
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

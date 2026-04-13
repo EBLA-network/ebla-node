@@ -1,18 +1,18 @@
 [
   {
-    "name": "taraxa_protocolVersion",
+    "name": "ebla_protocolVersion",
     "params": [],
     "order": [],
     "returns": ""
   },
   {
-    "name": "taraxa_getVersion",
+    "name": "ebla_getVersion",
     "params": [],
     "order": [],
     "returns": {}
   },
   {
-    "name": "taraxa_getDagBlockByHash",
+    "name": "ebla_getDagBlockByHash",
     "params": [
       "",
       false
@@ -21,7 +21,7 @@
     "returns": {}
   },
   {
-    "name": "taraxa_getDagBlockByLevel",
+    "name": "ebla_getDagBlockByLevel",
     "params": [
       "",
       false
@@ -30,61 +30,61 @@
     "returns": {}
   },
   {
-    "name": "taraxa_dagBlockLevel",
+    "name": "ebla_dagBlockLevel",
     "params": [],
     "order": [],
     "returns": ""
   },
   {
-    "name": "taraxa_dagBlockPeriod",
+    "name": "ebla_dagBlockPeriod",
     "params": [],
     "order": [],
     "returns": ""
   },
   {
-    "name": "taraxa_getScheduleBlockByPeriod",
+    "name": "ebla_getScheduleBlockByPeriod",
     "params": [""],
     "order": [],
     "returns": {}
   },
   {
-    "name": "taraxa_getNodeVersions",
+    "name": "ebla_getNodeVersions",
     "params": [],
     "order": [],
     "returns": {}
   },
   {
-    "name": "taraxa_getConfig",
+    "name": "ebla_getConfig",
     "params": [],
     "order": [],
     "returns": {}
   },
   {
-    "name": "taraxa_getChainStats",
+    "name": "ebla_getChainStats",
     "params": [],
     "order": [],
     "returns": {}
   },
   {
-    "name": "taraxa_pbftBlockHashByPeriod",
+    "name": "ebla_pbftBlockHashByPeriod",
     "params": [""],
     "order": [],
     "returns": ""
   },
   {
-    "name": "taraxa_yield",
+    "name": "ebla_yield",
     "params": [""],
     "order": [],
     "returns": ""
   },
   {
-    "name": "taraxa_totalSupply",
+    "name": "ebla_totalSupply",
     "params": [""],
     "order": [],
     "returns": ""
   },
   {
-    "name": "taraxa_getPillarBlockData",
+    "name": "ebla_getPillarBlockData",
     "params": [""],
     "order": [],
     "returns": ""

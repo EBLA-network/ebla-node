@@ -7,7 +7,7 @@
 
 #include "config/config.hpp"
 
-namespace taraxa {
+namespace ebla {
 struct FullNodeConfig;
 class Network;
 class TransactionManager;
@@ -72,4 +72,4 @@ class AppBase {
   std::atomic_bool stopped_ = true;
 };
 
-}  // namespace taraxa
+}  // namespace ebla

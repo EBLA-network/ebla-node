@@ -3,7 +3,7 @@
 #include "common/config_exception.hpp"
 #include "config/config_utils.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 void dec_json(const Json::Value &json, PrometheusConfig &config) {
   config.listen_port = getConfigData(json, {"listen_port"}).asUInt();
@@ -181,4 +181,4 @@ void dec_json(const Json::Value &json, NetworkConfig &network) {
   }
 }
 
-}  // namespace taraxa
+}  // namespace ebla

@@ -7,21 +7,21 @@
 #include "logger/logger.hpp"
 #include "network/tarcap/tarcap_version.hpp"
 
-namespace taraxa {
+namespace ebla {
 class PbftChain;
 class PbftManager;
 class VoteManager;
 class DagManager;
 class TransactionManager;
-}  // namespace taraxa
+}  // namespace ebla
 
-namespace taraxa::network::threadpool {
+namespace ebla::network::threadpool {
 class PacketsThreadPool;
 }
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
-class TaraxaPeer;
+class EblaPeer;
 class PbftSyncingState;
 class TimePeriodPacketsStats;
 
@@ -33,11 +33,11 @@ class NodeStats {
             std::shared_ptr<TimePeriodPacketsStats> packets_stats,
             std::shared_ptr<const threadpool::PacketsThreadPool> thread_pool, const FullNodeConfig& config);
 
-  void logNodeStats(const std::vector<std::shared_ptr<network::tarcap::TaraxaPeer>>& all_peers,
+  void logNodeStats(const std::vector<std::shared_ptr<network::tarcap::EblaPeer>>& all_peers,
                     const std::vector<std::string>& nodes);
   uint64_t syncTimeSeconds() const;
   Json::Value getStatus(
-      std::map<network::tarcap::TarcapVersion, std::shared_ptr<network::tarcap::TaraxaPeer>> peers) const;
+      std::map<network::tarcap::TarcapVersion, std::shared_ptr<network::tarcap::EblaPeer>> peers) const;
 
  private:
   std::shared_ptr<PbftSyncingState> pbft_syncing_state_;
@@ -64,4 +64,4 @@ class NodeStats {
   LOG_OBJECTS_DEFINE
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

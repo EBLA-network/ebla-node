@@ -4,7 +4,7 @@
 #include "dag/sortition_params_manager.hpp"
 #include "test_util/test_util.hpp"
 
-namespace taraxa::core_tests {
+namespace ebla::core_tests {
 
 struct SortitionTest : NodesTest {
   std::vector<FullNodeConfig> node_cfgs = make_node_cfgs(1);
@@ -535,4 +535,4 @@ TEST_F(SortitionTest, params_restart) {
   }
 }
 
-}  // namespace taraxa::core_tests
+}  // namespace ebla::core_tests

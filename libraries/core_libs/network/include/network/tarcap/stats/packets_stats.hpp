@@ -5,7 +5,7 @@
 #include "max_stats.hpp"
 #include "packets_stats.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 /**
  * @brief Stats for all packet types
@@ -45,4 +45,4 @@ class PacketsStats {
   mutable std::shared_mutex mutex_;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

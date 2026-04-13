@@ -8,7 +8,7 @@
 #include "logger/logger.hpp"
 #include "network/network.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 /** @addtogroup DAG
  * @{
@@ -176,4 +176,4 @@ class DagBlockProposer {
  * @}
  */
 
-}  // namespace taraxa
+}  // namespace ebla

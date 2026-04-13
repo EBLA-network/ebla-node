@@ -9,10 +9,10 @@
 #include "vote/votes_bundle_rlp.hpp"
 #include "vote_manager/vote_manager.hpp"
 
-namespace taraxa::network::tarcap::v4 {
+namespace ebla::network::tarcap::v4 {
 
 void GetPbftSyncPacketHandler::process(const threadpool::PacketData& packet_data,
-                                       const std::shared_ptr<TaraxaPeer>& peer) {
+                                       const std::shared_ptr<EblaPeer>& peer) {
   // Decode packet rlp into packet object
   auto packet = decodePacketRlp<GetPbftSyncPacket>(packet_data.rlp_);
 
@@ -49,4 +49,4 @@ void GetPbftSyncPacketHandler::process(const threadpool::PacketData& packet_data
   sendPbftBlocks(peer, packet.height_to_sync, blocks_to_transfer, pbft_chain_synced);
 }
 
-}  // namespace taraxa::network::tarcap::v4
+}  // namespace ebla::network::tarcap::v4

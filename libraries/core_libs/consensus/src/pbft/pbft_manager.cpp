@@ -14,7 +14,7 @@
 #include "pillar_chain/pillar_chain_manager.hpp"
 #include "vote_manager/vote_manager.hpp"
 
-namespace taraxa {
+namespace ebla {
 using namespace std::chrono_literals;
 
 constexpr std::chrono::milliseconds kPollingIntervalMs{100};
@@ -1514,7 +1514,7 @@ std::optional<PbftBlockExtraData> PbftManager::createPbftBlockExtraData(PbftPeri
     pillar_block_hash = pillar_block->getHash();
   }
 
-  return PbftBlockExtraData{TARAXA_MAJOR_VERSION, TARAXA_MINOR_VERSION, TARAXA_PATCH_VERSION, TARAXA_NET_VERSION, "E",
+  return PbftBlockExtraData{EBLA_MAJOR_VERSION, EBLA_MINOR_VERSION, EBLA_PATCH_VERSION, EBLA_NET_VERSION, "E",
                             pillar_block_hash};
 }
 
@@ -2413,4 +2413,4 @@ const std::vector<std::pair<bool, WalletConfig>> &PbftManager::EligibleWallets::
 
 PbftPeriod PbftManager::EligibleWallets::getWalletsEligiblePeriod() const { return period_; }
 
-}  // namespace taraxa
+}  // namespace ebla

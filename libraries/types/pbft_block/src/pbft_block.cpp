@@ -7,7 +7,7 @@
 #include "common/encoding_rlp.hpp"
 #include "common/util.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 PbftBlock::PbftBlock(bytes const& b) : PbftBlock(dev::RLP(b)) {}
 
@@ -130,13 +130,13 @@ bytes PbftBlock::rlp(bool include_sig) const {
   return strm.invalidate();
 }
 
-void PbftBlock::rlp(::taraxa::util::RLPDecoderRef encoding) { *this = PbftBlock(encoding.value); }
+void PbftBlock::rlp(::ebla::util::RLPDecoderRef encoding) { *this = PbftBlock(encoding.value); }
 
-void PbftBlock::rlp(::taraxa::util::RLPEncoderRef encoding) const { encoding.appendRaw(rlp(true)); }
+void PbftBlock::rlp(::ebla::util::RLPEncoderRef encoding) const { encoding.appendRaw(rlp(true)); }
 
 std::ostream& operator<<(std::ostream& strm, PbftBlock const& pbft_blk) {
   strm << pbft_blk.getJsonStr();
   return strm;
 }
 
-}  // namespace taraxa
+}  // namespace ebla

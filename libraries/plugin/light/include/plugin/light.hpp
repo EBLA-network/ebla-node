@@ -2,9 +2,9 @@
 #include "logger/logger.hpp"
 #include "plugin/plugin.hpp"
 
-namespace taraxa::net {}  // namespace taraxa::net
+namespace ebla::net {}  // namespace ebla::net
 
-namespace taraxa::plugin {
+namespace ebla::plugin {
 
 class Light : public Plugin {
  public:
@@ -42,4 +42,4 @@ class Light : public Plugin {
   LOG_OBJECTS_DEFINE
 };
 
-}  // namespace taraxa::plugin
+}  // namespace ebla::plugin

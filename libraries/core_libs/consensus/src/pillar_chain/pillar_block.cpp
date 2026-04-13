@@ -8,7 +8,7 @@
 #include "vote/pillar_vote.hpp"
 #include "vote/votes_bundle_rlp.hpp"
 
-namespace taraxa::pillar_chain {
+namespace ebla::pillar_chain {
 
 PillarBlock::ValidatorVoteCountChange::ValidatorVoteCountChange(addr_t addr, int32_t vote_count_change)
     : addr_(addr), vote_count_change_(vote_count_change) {}
@@ -183,4 +183,4 @@ Json::Value PillarBlockData::getJson(bool include_signatures) const {
 
 RLP_FIELDS_DEFINE(CurrentPillarBlockDataDb, pillar_block, vote_counts)
 
-}  // namespace taraxa::pillar_chain
+}  // namespace ebla::pillar_chain

@@ -7,7 +7,7 @@
 #include "logger/logger.hpp"
 #include "pbft/pbft_block.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 /** @addtogroup PBFT
  * @{
@@ -115,4 +115,4 @@ std::ostream& operator<<(std::ostream& strm, PbftChain const& pbft_chain);
 
 /** @}*/
 
-}  // namespace taraxa
+}  // namespace ebla

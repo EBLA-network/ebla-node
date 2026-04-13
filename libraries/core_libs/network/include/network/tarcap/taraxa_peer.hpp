@@ -9,12 +9,12 @@
 #include "common/util.hpp"
 #include "network/tarcap/stats/packets_stats.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
-class TaraxaPeer : public boost::noncopyable {
+class EblaPeer : public boost::noncopyable {
  public:
-  TaraxaPeer();
-  TaraxaPeer(const dev::p2p::NodeID& id, size_t transaction_pool_size, std::string address);
+  EblaPeer();
+  EblaPeer(const dev::p2p::NodeID& id, size_t transaction_pool_size, std::string address);
 
   /**
    * @brief Mark dag block as known
@@ -146,8 +146,8 @@ class TaraxaPeer : public boost::noncopyable {
   // Performance extensive dag syncing is only allowed to be requested once each kDagSyncingLimit seconds
   const uint64_t kDagSyncingLimit = 60;
 
-  // Packets stats for packets sent by *this TaraxaPeer
+  // Packets stats for packets sent by *this EblaPeer
   PacketsStats sent_packets_stats_;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

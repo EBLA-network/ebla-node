@@ -3,7 +3,7 @@
 #include <libdevcore/CommonJS.h>
 #include <libdevcore/RLP.h>
 
-namespace taraxa {
+namespace ebla {
 
 bytes DagBlockProposerConfig::rlp() const {
   dev::RLPStream s;
@@ -42,4 +42,4 @@ void dec_json(const Json::Value& json, DagConfig& obj) {
   obj.gas_limit = dev::getUInt(json["gas_limit"]);
 }
 
-}  // namespace taraxa
+}  // namespace ebla

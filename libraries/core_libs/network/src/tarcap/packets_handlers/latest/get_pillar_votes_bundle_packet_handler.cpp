@@ -3,7 +3,7 @@
 #include "network/tarcap/packets/latest/pillar_votes_bundle_packet.hpp"
 #include "network/tarcap/packets_handlers/latest/pillar_votes_bundle_packet_handler.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 GetPillarVotesBundlePacketHandler::GetPillarVotesBundlePacketHandler(
     const FullNodeConfig &conf, std::shared_ptr<PeersState> peers_state,
@@ -15,7 +15,7 @@ GetPillarVotesBundlePacketHandler::GetPillarVotesBundlePacketHandler(
       pillar_chain_manager_(std::move(pillar_chain_manager)) {}
 
 void GetPillarVotesBundlePacketHandler::process(const threadpool::PacketData &packet_data,
-                                                const std::shared_ptr<TaraxaPeer> &peer) {
+                                                const std::shared_ptr<EblaPeer> &peer) {
   // Decode packet rlp into packet object
   auto packet = decodePacketRlp<GetPillarVotesBundlePacket>(packet_data.rlp_);
 
@@ -79,7 +79,7 @@ void GetPillarVotesBundlePacketHandler::process(const threadpool::PacketData &pa
 }
 
 void GetPillarVotesBundlePacketHandler::requestPillarVotesBundle(PbftPeriod period, const blk_hash_t &pillar_block_hash,
-                                                                 const std::shared_ptr<TaraxaPeer> &peer) {
+                                                                 const std::shared_ptr<EblaPeer> &peer) {
   if (sealAndSend(peer->getId(), SubprotocolPacketType::kGetPillarVotesBundlePacket,
                   encodePacketRlp(GetPillarVotesBundlePacket(period, pillar_block_hash)))) {
     LOG(log_nf_) << "Requested pillar votes bundle for period " << period << " and pillar block " << pillar_block_hash
@@ -90,4 +90,4 @@ void GetPillarVotesBundlePacketHandler::requestPillarVotesBundle(PbftPeriod peri
   }
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

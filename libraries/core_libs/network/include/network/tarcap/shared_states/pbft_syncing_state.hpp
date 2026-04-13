@@ -6,9 +6,9 @@
 
 #include "common/types.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
-class TaraxaPeer;
+class EblaPeer;
 
 /**
  * @brief PbftSyncingState contains common members and functions related to syncing that are shared among multiple
@@ -25,7 +25,7 @@ class PbftSyncingState {
    * @param current_period
    * @param peer used in case syncing flag == true to set which peer is the node syncing with
    */
-  bool setPbftSyncing(bool syncing, PbftPeriod current_period = 0, std::shared_ptr<TaraxaPeer> peer = nullptr);
+  bool setPbftSyncing(bool syncing, PbftPeriod current_period = 0, std::shared_ptr<EblaPeer> peer = nullptr);
 
   /**
    * @brief Set current pbft period
@@ -51,12 +51,12 @@ class PbftSyncingState {
    *
    * @return syncing peer, in case there is none - nullptr is returned
    */
-  std::shared_ptr<TaraxaPeer> syncingPeer() const;
+  std::shared_ptr<EblaPeer> syncingPeer() const;
 
   /**
    * @return last syncing peer, node might not be actively syncing from this peer anymore
    */
-  std::shared_ptr<TaraxaPeer> lastSyncingPeer() const;
+  std::shared_ptr<EblaPeer> lastSyncingPeer() const;
 
   /**
    * @brief Set current time as last received sync packet time
@@ -84,10 +84,10 @@ class PbftSyncingState {
   mutable std::shared_mutex time_mutex_;
 
   // Peer that the node is syncing with
-  std::shared_ptr<TaraxaPeer> peer_;
+  std::shared_ptr<EblaPeer> peer_;
   // Last syncing peer - it is not reset to null, it is only replaced when new syncing starts
-  std::shared_ptr<TaraxaPeer> last_syncing_peer_;
+  std::shared_ptr<EblaPeer> last_syncing_peer_;
   mutable std::shared_mutex peer_mutex_;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

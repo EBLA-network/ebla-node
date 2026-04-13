@@ -5,7 +5,7 @@
 
 #include "libp2p/Common.h"
 
-namespace taraxa {
+namespace ebla {
 
 class PacketProcessingException : public std::runtime_error {
  public:
@@ -50,4 +50,4 @@ class MaliciousPeerException : public PacketProcessingException {
   std::optional<dev::p2p::NodeID> peer_;
 };
 
-}  // namespace taraxa
+}  // namespace ebla

@@ -4,7 +4,7 @@
 #include "pbft/pbft_manager.hpp"
 #include "vote_manager/vote_manager.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 VotePacketHandler::VotePacketHandler(const FullNodeConfig &conf, std::shared_ptr<PeersState> peers_state,
                                      std::shared_ptr<TimePeriodPacketsStats> packets_stats,
@@ -16,7 +16,7 @@ VotePacketHandler::VotePacketHandler(const FullNodeConfig &conf, std::shared_ptr
                          std::move(pbft_chain), std::move(vote_mgr), std::move(slashing_manager), node_addr,
                          logs_prefix + "PBFT_VOTE_PH") {}
 
-void VotePacketHandler::process(const threadpool::PacketData &packet_data, const std::shared_ptr<TaraxaPeer> &peer) {
+void VotePacketHandler::process(const threadpool::PacketData &packet_data, const std::shared_ptr<EblaPeer> &peer) {
   // Decode packet rlp into packet object
   auto packet = decodePacketRlp<VotePacket>(packet_data.rlp_);
 
@@ -78,4 +78,4 @@ void VotePacketHandler::process(const threadpool::PacketData &packet_data, const
   pbft_mgr_->gossipVote(packet.vote, pbft_block);
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

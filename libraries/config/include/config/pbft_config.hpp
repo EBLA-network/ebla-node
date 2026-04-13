@@ -4,7 +4,7 @@
 
 #include "common/types.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 struct PbftConfig {
   uint32_t lambda_ms = 0;
@@ -19,4 +19,4 @@ struct PbftConfig {
 Json::Value enc_json(PbftConfig const& obj);
 void dec_json(Json::Value const& json, PbftConfig& obj);
 
-}  // namespace taraxa
+}  // namespace ebla

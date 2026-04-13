@@ -1,6 +1,6 @@
 #include "network/tarcap/stats/max_stats.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 Json::Value MaxStats::getMaxStatsJson() const {
   Json::Value ret;
@@ -30,4 +30,4 @@ void MaxStats::updateMaxStats(const PacketStats& packet_stats) {
   }
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

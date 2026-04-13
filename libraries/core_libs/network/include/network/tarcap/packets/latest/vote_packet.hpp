@@ -3,7 +3,7 @@
 #include "pbft/pbft_block.hpp"
 #include "vote/pbft_vote.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 struct VotePacket {
   struct OptionalData {
@@ -19,4 +19,4 @@ struct VotePacket {
   RLP_FIELDS_DEFINE_INPLACE(vote, optional_data)
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

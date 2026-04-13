@@ -7,14 +7,14 @@
 #include "metrics/metrics_service.hpp"
 #include "network/rpc/Debug.h"
 #include "network/rpc/Net.h"
-#include "network/rpc/Taraxa.h"
+#include "network/rpc/Ebla.h"
 #include "network/rpc/Test.h"
 #include "network/rpc/eth/Eth.h"
 #include "network/rpc/jsonrpc_http_processor.hpp"
 #include "network/rpc/jsonrpc_ws_server.hpp"
 #include "pillar_chain/pillar_chain_manager.hpp"
 
-namespace taraxa::plugin {
+namespace ebla::plugin {
 
 namespace bpo = boost::program_options;
 constexpr auto THREADS = "rpc.threads";
@@ -75,7 +75,7 @@ void Rpc::start() {
         return ret;
       }
       auto &status = ret.emplace();
-      // TODO clearly define Ethereum json-rpc "syncing" in Taraxa
+      // TODO clearly define Ethereum json-rpc "syncing" in Ebla
       status.current_block = pbft_chain->getPbftChainSize();
       status.starting_block = status.current_block;
       status.highest_block = pbft_mgr->pbftSyncingPeriod();
@@ -96,7 +96,7 @@ void Rpc::start() {
     }
 
     jsonrpc_api_ = std::make_unique<JsonRpcServer>(
-        std::make_shared<net::Taraxa>(app()),  // TODO Because this object refers to App, the
+        std::make_shared<net::Ebla>(app()),  // TODO Because this object refers to App, the
                                                // lifecycle/dependency management is more complicated
         std::make_shared<net::Net>(app()),     // TODO Because this object refers to App, the
                                                // lifecycle/dependency management is more complicated
@@ -199,4 +199,4 @@ void Rpc::shutdown() {
                            // self-reference from App to App).
 }
 
-}  // namespace taraxa::plugin
+}  // namespace ebla::plugin

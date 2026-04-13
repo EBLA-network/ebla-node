@@ -19,7 +19,7 @@
 
 #include "char_traits.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 /**
  * @param value
@@ -191,14 +191,14 @@ class StatusTable {
   mutable std::shared_mutex shared_mutex_;
   std::unordered_map<K, typename std::list<std::pair<K, V>>::iterator> status_;
   std::list<std::pair<K, V>> lru_;
-};  // namespace taraxa
+};  // namespace ebla
 
 template <typename... TS>
 std::string fmt(const std::string &pattern, const TS &...args) {
   return (boost::format(pattern) % ... % args).str();
 }
 
-}  // namespace taraxa
+}  // namespace ebla
 
 template <class Key>
 class ExpirationCache {

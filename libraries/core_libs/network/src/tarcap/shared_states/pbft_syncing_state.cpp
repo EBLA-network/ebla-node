@@ -3,16 +3,16 @@
 #include "network/tarcap/packet_types.hpp"
 #include "network/tarcap/shared_states/peers_state.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 PbftSyncingState::PbftSyncingState(uint16_t deep_syncing_threshold) : kDeepSyncingThreshold(deep_syncing_threshold) {}
 
-std::shared_ptr<TaraxaPeer> PbftSyncingState::syncingPeer() const {
+std::shared_ptr<EblaPeer> PbftSyncingState::syncingPeer() const {
   std::shared_lock lock(peer_mutex_);
   return peer_;
 }
 
-std::shared_ptr<TaraxaPeer> PbftSyncingState::lastSyncingPeer() const {
+std::shared_ptr<EblaPeer> PbftSyncingState::lastSyncingPeer() const {
   std::shared_lock lock(peer_mutex_);
   return last_syncing_peer_;
 }
@@ -27,7 +27,7 @@ void PbftSyncingState::setSyncStatePeriod(PbftPeriod period) {
 }
 
 bool PbftSyncingState::setPbftSyncing(bool syncing, PbftPeriod current_period,
-                                      std::shared_ptr<TaraxaPeer> peer /*=nullptr*/) {
+                                      std::shared_ptr<EblaPeer> peer /*=nullptr*/) {
   assert((syncing && peer) || !syncing);
 
   // Flag was changed meanwhile we should not be updating it again
@@ -76,4 +76,4 @@ bool PbftSyncingState::isPbftSyncing() {
   return pbft_syncing_;
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

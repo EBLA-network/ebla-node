@@ -10,7 +10,7 @@
 #include "network/threadpool/tarcap_thread_pool.hpp"
 #include "test_util/test_util.hpp"
 
-namespace taraxa::core_tests {
+namespace ebla::core_tests {
 
 using namespace std::literals;
 
@@ -30,7 +30,7 @@ struct NodesTest : virtual testing::Test {
 
 struct TarcapTpTest : NodesTest {};
 
-using namespace taraxa::network;
+using namespace ebla::network;
 
 class PacketsProcessingInfo {
  public:
@@ -113,7 +113,7 @@ class DummyPacketHandler : public network::tarcap::BasePacketHandler {
   }
 
  private:
-  void process(DummyPacket&& packet, [[maybe_unused]] const std::shared_ptr<tarcap::TaraxaPeer>& peer) {
+  void process(DummyPacket&& packet, [[maybe_unused]] const std::shared_ptr<tarcap::EblaPeer>& peer) {
     // Note do not use LOG() before saving start & finish time as it is internally synchronized and can
     // cause delays, which result in tests fails
     auto start_time = std::chrono::steady_clock::now();
@@ -256,12 +256,12 @@ std::pair<tarcap::TarcapVersion, threadpool::PacketData> createPacket(
     std::optional<std::vector<unsigned char>> packet_rlp_bytes = {}) {
   if (packet_rlp_bytes.has_value()) {
     threadpool::PacketData packet_data(packet_type, sender_node_id, std::move(packet_rlp_bytes.value()));
-    return {TARAXA_NET_VERSION, std::move(packet_data)};
+    return {EBLA_NET_VERSION, std::move(packet_data)};
   }
 
   dev::RLPStream s(0);
   threadpool::PacketData packet_data(packet_type, sender_node_id, s.invalidate());
-  return {TARAXA_NET_VERSION, std::move(packet_data)};
+  return {EBLA_NET_VERSION, std::move(packet_data)};
 }
 
 bytes createDagBlockRlp(level_t level, uint32_t sig = 777) {
@@ -346,7 +346,7 @@ TEST_F(TarcapTpTest, block_free_packets) {
   // Note: make num of threads >= num of packets to check if they are processed concurrently without blocks, otherwise
   //       some blocks would be blocked for processing due to max threads limit
   threadpool::PacketsThreadPool tp(18);
-  tp.setPacketsHandlers(TARAXA_NET_VERSION, packets_handler);
+  tp.setPacketsHandlers(EBLA_NET_VERSION, packets_handler);
 
   // Pushes packets to the tp
   auto packet = createPacket(init_data.copySender(), SubprotocolPacketType::kTransactionPacket, {});
@@ -492,7 +492,7 @@ TEST_F(TarcapTpTest, hard_blocking_deps) {
 
   // Creates threadpool
   threadpool::PacketsThreadPool tp(10);
-  tp.setPacketsHandlers(TARAXA_NET_VERSION, packets_handler);
+  tp.setPacketsHandlers(EBLA_NET_VERSION, packets_handler);
 
   // Pushes packets to the tp
   const auto packet0_dag_sync_id =
@@ -614,7 +614,7 @@ TEST_F(TarcapTpTest, peer_order_blocking_deps) {
 
   // Creates threadpool
   threadpool::PacketsThreadPool tp(10);
-  tp.setPacketsHandlers(TARAXA_NET_VERSION, packets_handler);
+  tp.setPacketsHandlers(EBLA_NET_VERSION, packets_handler);
 
   // Pushes packets to the tp
   const auto packet0_tx_id =
@@ -700,7 +700,7 @@ TEST_F(TarcapTpTest, same_dag_blks_ordering) {
 
   // Creates threadpool
   threadpool::PacketsThreadPool tp(10);
-  tp.setPacketsHandlers(TARAXA_NET_VERSION, packets_handler);
+  tp.setPacketsHandlers(EBLA_NET_VERSION, packets_handler);
 
   auto dag_block = createDagBlockRlp(0);
 
@@ -765,7 +765,7 @@ TEST_F(TarcapTpTest, dag_blks_lvls_ordering) {
 
   // Creates threadpool
   threadpool::PacketsThreadPool tp(10);
-  tp.setPacketsHandlers(TARAXA_NET_VERSION, packets_handler);
+  tp.setPacketsHandlers(EBLA_NET_VERSION, packets_handler);
 
   // Pushes packets to the tp
   const auto blk0_lvl1_id =
@@ -867,7 +867,7 @@ TEST_F(TarcapTpTest, threads_borrowing) {
   // Creates threadpool
   const size_t threads_num = 10;
   threadpool::PacketsThreadPool tp(threads_num);
-  tp.setPacketsHandlers(TARAXA_NET_VERSION, packets_handler);
+  tp.setPacketsHandlers(EBLA_NET_VERSION, packets_handler);
 
   // Pushes packets to the tp
   std::vector<uint64_t> pushed_packets_ids;
@@ -958,7 +958,7 @@ TEST_F(TarcapTpTest, low_priotity_queue_starvation) {
   // Creates threadpool
   size_t threads_num = 10;
   threadpool::PacketsThreadPool tp(threads_num);
-  tp.setPacketsHandlers(TARAXA_NET_VERSION, packets_handler);
+  tp.setPacketsHandlers(EBLA_NET_VERSION, packets_handler);
 
   // Push 10x more packets for each prioriy queue than max tp capacity to make sure that tp wont be able to process all
   // packets from each queue concurrently -> many packets will be waiting due to max threads num reached for specific
@@ -1038,10 +1038,10 @@ TEST_F(TarcapTpTest, low_priotity_queue_starvation) {
   EXPECT_EQ(low_priority_queue_size, 0);
 }
 
-}  // namespace taraxa::core_tests
+}  // namespace ebla::core_tests
 
 int main(int argc, char** argv) {
-  using namespace taraxa;
+  using namespace ebla;
 
   auto logging = logger::createDefaultLoggingConfig();
 

@@ -1,5 +1,5 @@
 ARG BUILD_OUTPUT_DIR=cmake-docker-build
-ARG WORKDIR=/opt/taraxa
+ARG WORKDIR=/opt/ebla
 ARG BUILD_TYPE=RelWithDebInfo
 
 #############################################
@@ -85,7 +85,7 @@ ARG BUILD_TYPE
 RUN conan install . -s "build_type=Release" -s "&:build_type=$BUILD_TYPE" --profile:host=clang --profile:build=clang --build=missing --output-folder=$BUILD_OUTPUT_DIR
 
 ###################################################################
-# Build stage - use builder image for actual build of taraxa node #
+# Build stage - use builder image for actual build of ebla node #
 ###################################################################
 FROM builder AS build
 
@@ -100,9 +100,9 @@ COPY . .
 # Remove the duplicate mkdir and combine commands
 RUN cd $BUILD_OUTPUT_DIR \
     && cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
-    -DTARAXA_ENABLE_LTO=OFF \
-    -DTARAXA_STATIC_BUILD=OFF \
-    -DTARAXA_GPERF=ON \
+    -DEBLA_ENABLE_LTO=OFF \
+    -DEBLA_STATIC_BUILD=OFF \
+    -DEBLA_GPERF=ON \
     ../
 
 RUN cd $BUILD_OUTPUT_DIR && make -j$(nproc) all \
@@ -112,11 +112,11 @@ RUN cd $BUILD_OUTPUT_DIR && make -j$(nproc) all \
     # keep only required shared libraries and final binaries
     # && find . -maxdepth 1 ! -name "lib" ! -name "bin" -exec rm -rfv {} \;
 
-# Set LD_LIBRARY_PATH so taraxad binary finds shared libs
+# Set LD_LIBRARY_PATH so eblad binary finds shared libs
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
 ###############################################################################
-##### Taraxa image containing taraxad binary + dynamic libraries + config #####
+##### Ebla image containing eblad binary + dynamic libraries + config #####
 ###############################################################################
 FROM ubuntu:24.04@sha256:e3f92abc0967a6c19d0dfa2d55838833e947b9d74edbcb0113e48535ad4be12a
 
@@ -136,17 +136,17 @@ RUN pip3 install click eth-account eth-utils typing-extensions --break-system-pa
 
 ARG BUILD_OUTPUT_DIR
 ARG WORKDIR
-WORKDIR /root/.taraxa
+WORKDIR /root/.ebla
 
 # Copy required binaries
-COPY --from=build $WORKDIR/$BUILD_OUTPUT_DIR/bin/taraxad /usr/local/bin/taraxad
-COPY --from=build $WORKDIR/$BUILD_OUTPUT_DIR/bin/taraxa-bootnode /usr/local/bin/taraxa-bootnode
+COPY --from=build $WORKDIR/$BUILD_OUTPUT_DIR/bin/eblad /usr/local/bin/eblad
+COPY --from=build $WORKDIR/$BUILD_OUTPUT_DIR/bin/ebla-bootnode /usr/local/bin/ebla-bootnode
 COPY --from=build $WORKDIR/$BUILD_OUTPUT_DIR/lib/*.so* /usr/local/lib/
 
 # Copy scripts
-COPY scripts/taraxa-sign.py /usr/local/bin/taraxa-sign
+COPY scripts/ebla-sign.py /usr/local/bin/ebla-sign
 
-# Set LD_LIBRARY_PATH so taraxad binary finds shared libs
+# Set LD_LIBRARY_PATH so eblad binary finds shared libs
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
 COPY docker-entrypoint.sh /entrypoint.sh

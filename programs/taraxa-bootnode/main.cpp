@@ -24,7 +24,7 @@ namespace po = boost::program_options;
 namespace bi = boost::asio::ip;
 
 namespace {
-std::string const kProgramName = "taraxa-bootnode";
+std::string const kProgramName = "ebla-bootnode";
 std::string const kNetworkConfigFileName = kProgramName + "-network.rlp";
 static constexpr unsigned kLineWidth = 160;
 
@@ -75,7 +75,7 @@ dev::KeyPair getKey(std::string const& path) {
     throw std::runtime_error("Wallet file does not exist at: " + path);
   }
 
-  auto wallet_json = taraxa::util::readJsonFromFile(path);
+  auto wallet_json = ebla::util::readJsonFromFile(path);
   if (wallet_json["node_secret"].isNull()) {
     throw std::runtime_error("Wallet file does not contain node_secret field");
   }
@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
   po::options_description general_options("GENERAL OPTIONS", kLineWidth);
   auto addGeneralOption = general_options.add_options();
   addGeneralOption("help,h", "Show this help message and exit\n");
-  addGeneralOption("version", "Print version of taraxad");
+  addGeneralOption("version", "Print version of eblad");
 
   dev::LoggingOptions logging_options;
   po::options_description logging_program_options(createLoggingProgramOptions(logging_options));
@@ -141,7 +141,7 @@ int main(int argc, char** argv) {
   }
 
   /// Networking params.
-  uint32_t chain_id = static_cast<uint32_t>(taraxa::cli::Config::DEFAULT_CHAIN_ID);
+  uint32_t chain_id = static_cast<uint32_t>(ebla::cli::Config::DEFAULT_CHAIN_ID);
   if (vm.count("chain-id")) chain_id = vm["chain-id"].as<uint32_t>();
 
   std::string listen_ip = "0.0.0.0";
@@ -156,7 +156,7 @@ int main(int argc, char** argv) {
 
   setupLogging(logging_options);
   if (logging_options.verbosity > 0)
-    std::cout << EthGrayBold << kProgramName << ", a Taraxa bootnode implementation" EthReset << std::endl;
+    std::cout << EthGrayBold << kProgramName << ", a Ebla bootnode implementation" EthReset << std::endl;
 
   auto key = dev::KeyPair(dev::Secret::random());
   if (!wallet.empty()) {
@@ -172,26 +172,26 @@ int main(int argc, char** argv) {
                                     : dev::p2p::NetworkConfig(public_ip, listen_ip, listen_port, false, false);
   net_conf.allowLocalDiscovery = !denyLocalDiscovery;
 
-  dev::p2p::TaraxaNetworkConfig taraxa_net_conf;
-  taraxa_net_conf.is_boot_node = true;
-  taraxa_net_conf.chain_id = chain_id;
-  auto network_file_path = taraxa::cli::tools::getTaraxaDefaultDir() / std::filesystem::path(kNetworkConfigFileName);
+  dev::p2p::EblaNetworkConfig ebla_net_conf;
+  ebla_net_conf.is_boot_node = true;
+  ebla_net_conf.chain_id = chain_id;
+  auto network_file_path = ebla::cli::tools::getEblaDefaultDir() / std::filesystem::path(kNetworkConfigFileName);
 
   auto boot_host = dev::p2p::Host::make(
-      kProgramName, [](auto /*host*/) { return dev::p2p::Host::CapabilityList{}; }, key, net_conf, taraxa_net_conf,
+      kProgramName, [](auto /*host*/) { return dev::p2p::Host::CapabilityList{}; }, key, net_conf, ebla_net_conf,
       network_file_path);
 
-  taraxa::util::ThreadPool tp{num_of_threads};
+  ebla::util::ThreadPool tp{num_of_threads};
   for (uint i = 0; i < tp.capacity(); ++i) {
     tp.post_loop({i * 20}, [boot_host] {
-      if (!boot_host->do_discov()) taraxa::thisThreadSleepForMilliSeconds(500);
+      if (!boot_host->do_discov()) ebla::thisThreadSleepForMilliSeconds(500);
     });
   }
 
   if (boot_host->isRunning()) {
     std::cout << "Node ID: " << boot_host->enode() << std::endl;
-    if (static_cast<taraxa::cli::Config::ChainIdType>(chain_id) < taraxa::cli::Config::ChainIdType::LastNetworkId) {
-      const auto conf = taraxa::cli::tools::getConfig(static_cast<taraxa::cli::Config::ChainIdType>(chain_id));
+    if (static_cast<ebla::cli::Config::ChainIdType>(chain_id) < ebla::cli::Config::ChainIdType::LastNetworkId) {
+      const auto conf = ebla::cli::tools::getConfig(static_cast<ebla::cli::Config::ChainIdType>(chain_id));
       for (auto const& bn : conf["network"]["boot_nodes"]) {
         bi::tcp::endpoint ep = dev::p2p::Network::resolveHost(bn["ip"].asString() + ":" + bn["port"].asString());
         boot_host->addNode(

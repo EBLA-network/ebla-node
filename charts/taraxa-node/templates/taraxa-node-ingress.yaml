@@ -1,10 +1,10 @@
 {{ if .Values.node.enabled }}
 {{- if .Values.node.ingress.enabled -}}
 
-{{- $fullName := include "taraxa-node.fullname" . -}}
-{{- $apiIsStable := eq (include "taraxa-node.ingress.isStable" .) "true" -}}
-{{- $ingressSupportsPathType := eq (include "taraxa-node.ingress.supportsPathType" .) "true" -}}
-{{- $serviceName := printf "%s-%s" (include "taraxa-node.fullname" .) "head" -}}
+{{- $fullName := include "ebla-node.fullname" . -}}
+{{- $apiIsStable := eq (include "ebla-node.ingress.isStable" .) "true" -}}
+{{- $ingressSupportsPathType := eq (include "ebla-node.ingress.supportsPathType" .) "true" -}}
+{{- $serviceName := printf "%s-%s" (include "ebla-node.fullname" .) "head" -}}
 {{- $cacheServiceName := .Values.node.ingress.cache.serviceName -}}
 {{- $cacheServicePort := .Values.node.ingress.cache.servicePort -}}
 
@@ -22,14 +22,14 @@
 
 {{- $pathType := .Values.node.ingress.pathType | default "ImplementationSpecific" -}}
 ---
-apiVersion: {{ include "taraxa-node.ingress.apiVersion" . }}
+apiVersion: {{ include "ebla-node.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
   name: {{ $fullName }}-rpc
   labels:
-    app: taraxa-node
-    app.kubernetes.io/name: {{ include "taraxa-node.name" . }}
-    helm.sh/chart: {{ include "taraxa-node.chart" . }}
+    app: ebla-node
+    app.kubernetes.io/name: {{ include "ebla-node.name" . }}
+    helm.sh/chart: {{ include "ebla-node.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   {{- with .Values.node.ingress.annotationsRpc }}
@@ -45,11 +45,11 @@ spec:
   {{- if .Values.wildCertDomainSecret }}
   tls:
     - hosts:
-        - {{ include "taraxa-node.rpcName" . | quote }}
+        - {{ include "ebla-node.rpcName" . | quote }}
       secretName: {{ .Values.wildCertDomainSecret }}
   {{- end }}
   rules:
-    - host: {{ include "taraxa-node.rpcName" . | quote }}
+    - host: {{ include "ebla-node.rpcName" . | quote }}
       http:
         paths:
           - path: /
@@ -78,14 +78,14 @@ spec:
               {{- end }}
               {{- end }}
 ---
-apiVersion: {{ include "taraxa-node.ingress.apiVersion" . }}
+apiVersion: {{ include "ebla-node.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
   name: {{ $fullName }}-ws
   labels:
-    app: taraxa-node
-    app.kubernetes.io/name: {{ include "taraxa-node.name" . }}
-    helm.sh/chart: {{ include "taraxa-node.chart" . }}
+    app: ebla-node
+    app.kubernetes.io/name: {{ include "ebla-node.name" . }}
+    helm.sh/chart: {{ include "ebla-node.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   {{- with .Values.node.ingress.annotationsRpcWS }}
@@ -101,11 +101,11 @@ spec:
   {{- if .Values.wildCertDomainSecret }}
   tls:
     - hosts:
-        - {{ include "taraxa-node.wsName" . | quote }}
+        - {{ include "ebla-node.wsName" . | quote }}
       secretName: {{ .Values.wildCertDomainSecret }}
   {{- end }}
   rules:
-    - host: {{ include "taraxa-node.wsName" . | quote }}
+    - host: {{ include "ebla-node.wsName" . | quote }}
       http:
         paths:
           - path: /
@@ -123,14 +123,14 @@ spec:
               servicePort: {{ $servicePortRpcWs }}
               {{- end }}
 ---
-apiVersion: {{ include "taraxa-node.ingress.apiVersion" . }}
+apiVersion: {{ include "ebla-node.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
   name: {{ $fullName }}-graphql
   labels:
-    app: taraxa-node
-    app.kubernetes.io/name: {{ include "taraxa-node.name" . }}
-    helm.sh/chart: {{ include "taraxa-node.chart" . }}
+    app: ebla-node
+    app.kubernetes.io/name: {{ include "ebla-node.name" . }}
+    helm.sh/chart: {{ include "ebla-node.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   {{- with .Values.node.ingress.annotationsGraphQl }}
@@ -146,11 +146,11 @@ spec:
   {{- if .Values.wildCertDomainSecret }}
   tls:
     - hosts:
-        - {{ include "taraxa-node.graphQlName" . | quote }}
+        - {{ include "ebla-node.graphQlName" . | quote }}
       secretName: {{ .Values.wildCertDomainSecret }}
   {{- end }}
   rules:
-    - host: {{ include "taraxa-node.graphQlName" . | quote }}
+    - host: {{ include "ebla-node.graphQlName" . | quote }}
       http:
         paths:
           - path: /
@@ -168,14 +168,14 @@ spec:
               servicePort: {{ $servicePortGraphQl }}
               {{- end }}
 ---
-apiVersion: {{ include "taraxa-node.ingress.apiVersion" . }}
+apiVersion: {{ include "ebla-node.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
   name: {{ $fullName }}-graphql-ws
   labels:
-    app: taraxa-node
-    app.kubernetes.io/name: {{ include "taraxa-node.name" . }}
-    helm.sh/chart: {{ include "taraxa-node.chart" . }}
+    app: ebla-node
+    app.kubernetes.io/name: {{ include "ebla-node.name" . }}
+    helm.sh/chart: {{ include "ebla-node.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   {{- with .Values.node.ingress.annotationsGraphQlWS }}
@@ -191,11 +191,11 @@ spec:
   {{- if .Values.wildCertDomainSecret }}
   tls:
     - hosts:
-        - {{ include "taraxa-node.graphQlWsName" . | quote }}
+        - {{ include "ebla-node.graphQlWsName" . | quote }}
       secretName: {{ .Values.wildCertDomainSecret }}
   {{- end }}
   rules:
-    - host: {{ include "taraxa-node.graphQlWsName" . | quote }}
+    - host: {{ include "ebla-node.graphQlWsName" . | quote }}
       http:
         paths:
           - path: /

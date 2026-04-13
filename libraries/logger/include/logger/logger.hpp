@@ -5,7 +5,7 @@
 
 #include "logger/logger_config.hpp"
 
-namespace taraxa::logger {
+namespace ebla::logger {
 
 // Concurrent (Thread-safe) logger type
 using Logger = boost::log::sources::severity_channel_logger_mt<>;
@@ -53,22 +53,22 @@ Config createDefaultLoggingConfig();
  */
 void InitLogging(Config& logging_config, const addr_t& node_id);
 
-}  // namespace taraxa::logger
+}  // namespace ebla::logger
 
 #define LOG BOOST_LOG
 
 #define LOG_OBJECTS_DEFINE                \
-  mutable taraxa::logger::Logger log_si_; \
-  mutable taraxa::logger::Logger log_er_; \
-  mutable taraxa::logger::Logger log_wr_; \
-  mutable taraxa::logger::Logger log_nf_; \
-  mutable taraxa::logger::Logger log_dg_; \
-  mutable taraxa::logger::Logger log_tr_;
+  mutable ebla::logger::Logger log_si_; \
+  mutable ebla::logger::Logger log_er_; \
+  mutable ebla::logger::Logger log_wr_; \
+  mutable ebla::logger::Logger log_nf_; \
+  mutable ebla::logger::Logger log_dg_; \
+  mutable ebla::logger::Logger log_tr_;
 
 #define LOG_OBJECTS_CREATE(channel)                                                               \
-  log_si_ = taraxa::logger::createLogger(taraxa::logger::Verbosity::Silent, channel, node_addr);  \
-  log_er_ = taraxa::logger::createLogger(taraxa::logger::Verbosity::Error, channel, node_addr);   \
-  log_wr_ = taraxa::logger::createLogger(taraxa::logger::Verbosity::Warning, channel, node_addr); \
-  log_nf_ = taraxa::logger::createLogger(taraxa::logger::Verbosity::Info, channel, node_addr);    \
-  log_tr_ = taraxa::logger::createLogger(taraxa::logger::Verbosity::Trace, channel, node_addr);   \
-  log_dg_ = taraxa::logger::createLogger(taraxa::logger::Verbosity::Debug, channel, node_addr);
+  log_si_ = ebla::logger::createLogger(ebla::logger::Verbosity::Silent, channel, node_addr);  \
+  log_er_ = ebla::logger::createLogger(ebla::logger::Verbosity::Error, channel, node_addr);   \
+  log_wr_ = ebla::logger::createLogger(ebla::logger::Verbosity::Warning, channel, node_addr); \
+  log_nf_ = ebla::logger::createLogger(ebla::logger::Verbosity::Info, channel, node_addr);    \
+  log_tr_ = ebla::logger::createLogger(ebla::logger::Verbosity::Trace, channel, node_addr);   \
+  log_dg_ = ebla::logger::createLogger(ebla::logger::Verbosity::Debug, channel, node_addr);

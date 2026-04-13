@@ -1,6 +1,6 @@
 # Change Log
 
-This file documents all notable changes to `taraxa-node` Helm Chart. The release
+This file documents all notable changes to `ebla-node` Helm Chart. The release
 numbering uses [semantic versioning](http://semver.org).
 
 ## v0.3.11
@@ -24,7 +24,7 @@ numbering uses [semantic versioning](http://semver.org).
 
 ### Minor changes
 
-* Added port for scrapping metrics from sidecar of rpc-nodes ([taraxa-indexer](https://github.com/Taraxa-project/taraxa-indexer))
+* Added port for scrapping metrics from sidecar of rpc-nodes ([ebla-indexer](https://github.com/EBLA-network/ebla-indexer))
 
 ## v0.3.7
 
@@ -42,7 +42,7 @@ numbering uses [semantic versioning](http://semver.org).
 
 ### Minor changes
 
-* Changed `db_path` to `data_dir` for taraxa-indexer
+* Changed `db_path` to `data_dir` for ebla-indexer
 
 ## v0.3.4
 
@@ -54,7 +54,7 @@ numbering uses [semantic versioning](http://semver.org).
 
 ### Major changes
 
-* Added sidecar container to RPC nodes with [taraxa-indexer](https://github.com/Taraxa-project/taraxa-indexer)
+* Added sidecar container to RPC nodes with [ebla-indexer](https://github.com/EBLA-network/ebla-indexer)
 
 ## v0.3.2
 

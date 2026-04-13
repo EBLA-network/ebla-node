@@ -1,6 +1,6 @@
 #include "key_manager/key_manager.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 static const vrf_wrapper::vrf_pk_t kEmptyVrfKey;
 
@@ -26,4 +26,4 @@ std::shared_ptr<vrf_wrapper::vrf_pk_t> KeyManager::getVrfKey(EthBlockNumber blk_
   return nullptr;
 }
 
-}  // namespace taraxa
+}  // namespace ebla

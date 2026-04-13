@@ -13,8 +13,8 @@
 #include "transaction/receipt.hpp"
 #include "transaction/system_transaction.hpp"
 
-namespace taraxa::final_chain {
-FinalChain::FinalChain(const std::shared_ptr<DbStorage>& db, const taraxa::FullNodeConfig& config,
+namespace ebla::final_chain {
+FinalChain::FinalChain(const std::shared_ptr<DbStorage>& db, const ebla::FullNodeConfig& config,
                        const addr_t& node_addr)
     : db_(db),
       kBlockGasLimit(config.genesis.pbft.gas_limit),
@@ -46,8 +46,8 @@ FinalChain::FinalChain(const std::shared_ptr<DbStorage>& db, const taraxa::FullN
       block_receipts_cache_(config.final_chain_cache_in_blocks, [this](uint64_t blk) { return getBlockReceipts(blk); }),
       kConfig(config) {
   LOG_OBJECTS_CREATE("EXECUTOR");
-  num_executed_dag_blk_ = db_->getStatusField(taraxa::StatusDbField::ExecutedBlkCount);
-  num_executed_trx_ = db_->getStatusField(taraxa::StatusDbField::ExecutedTrxCount);
+  num_executed_dag_blk_ = db_->getStatusField(ebla::StatusDbField::ExecutedBlkCount);
+  num_executed_trx_ = db_->getStatusField(ebla::StatusDbField::ExecutedTrxCount);
   auto state_db_descriptor = state_api_.get_last_committed_state_descriptor();
   auto last_blk_num = db_->lookup_int<EthBlockNumber>(DBMetaKeys::LAST_NUMBER, DbStorage::Columns::final_chain_meta);
   // If we don't have genesis block in db then create and push it
@@ -112,7 +112,7 @@ EthBlockNumber FinalChain::delegationDelay() const { return delegation_delay_; }
 
 SharedTransaction FinalChain::makeBridgeFinalizationTransaction() {
   const static auto finalize_method = util::EncodingSolidity::packFunctionCall("finalizeEpoch()");
-  auto account = getAccount(kTaraxaSystemAccount).value_or(state_api::ZeroAccount);
+  auto account = getAccount(kEblaSystemAccount).value_or(state_api::ZeroAccount);
 
   auto trx = std::make_shared<SystemTransaction>(account.nonce, 0, 0, kBlockGasLimit, finalize_method,
                                                  kConfig.genesis.state.hardforks.ficus_hf.bridge_contract_address);
@@ -687,4 +687,4 @@ std::vector<EthBlockNumber> FinalChain::withBlockBloom(const LogBloom& b, EthBlo
   return ret;
 }
 
-}  // namespace taraxa::final_chain
+}  // namespace ebla::final_chain

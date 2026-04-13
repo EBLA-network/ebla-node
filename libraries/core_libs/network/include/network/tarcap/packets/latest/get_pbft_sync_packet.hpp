@@ -2,7 +2,7 @@
 
 #include "common/encoding_rlp.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 struct GetPbftSyncPacket {
   size_t height_to_sync;
@@ -10,4 +10,4 @@ struct GetPbftSyncPacket {
   RLP_FIELDS_DEFINE_INPLACE(height_to_sync)
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

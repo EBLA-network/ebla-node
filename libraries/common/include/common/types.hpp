@@ -7,7 +7,7 @@
 #include <boost/asio.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 
-namespace taraxa {
+namespace ebla {
 
 using dev::Address;
 using dev::AddressSet;
@@ -52,4 +52,4 @@ using vec_trx_t = std::vector<trx_hash_t>;
 using byte = uint8_t;
 using bytes = std::vector<byte>;
 using trx_nonce_t = val_t;
-}  // namespace taraxa
+}  // namespace ebla

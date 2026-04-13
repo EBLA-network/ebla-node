@@ -7,7 +7,7 @@
 #include "common/encoding_rlp.hpp"
 #include "common/types.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 struct Transaction {
   struct InvalidTransaction : std::runtime_error {
@@ -89,4 +89,4 @@ using TransactionHashes = std::vector<trx_hash_t>;
 uint64_t IntrinsicGas(const std::vector<uint8_t> &data, bool is_contract_creation);
 TransactionHashes hashes_from_transactions(const SharedTransactions &transactions);
 
-}  // namespace taraxa
+}  // namespace ebla

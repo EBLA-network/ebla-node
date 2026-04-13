@@ -18,8 +18,8 @@
 #include "test_util/test_util.hpp"
 #include "vote/pbft_vote.hpp"
 
-namespace taraxa::final_chain {
-using namespace taraxa::core_tests;
+namespace ebla::final_chain {
+using namespace ebla::core_tests;
 
 struct advance_check_opts {
   bool dont_assume_no_logs = 0;
@@ -42,7 +42,7 @@ struct FinalChainTest : WithDataDir {
     cfg.genesis.state.initial_balances[validator_owner_keys.address()] =
         10 * cfg.genesis.state.dpos.validator_maximum_stake;
     for (const auto& keys : {dag_proposer_keys, pbft_proposer_keys}) {
-      const auto vrf_pub_key = taraxa::vrf_wrapper::getVrfKeyPair().first;
+      const auto vrf_pub_key = ebla::vrf_wrapper::getVrfKeyPair().first;
       state_api::ValidatorInfo validator{keys.address(), validator_owner_keys.address(), vrf_pub_key, 0, "", "", {}};
       validator.delegations.emplace(validator_owner_keys.address(), cfg.genesis.state.dpos.validator_maximum_stake);
       cfg.genesis.state.dpos.initial_validators.emplace_back(validator);
@@ -191,10 +191,10 @@ struct FinalChainTest : WithDataDir {
 
 TEST_F(FinalChainTest, initial_balances) {
   cfg.genesis.state.initial_balances = {};
-  cfg.genesis.state.initial_balances[addr_t::random()] = taraxa::uint256_t("0x16345785D8A0000");    // 1
-  cfg.genesis.state.initial_balances[addr_t::random()] = taraxa::uint256_t("0x56BC75E2D63100000");  // 1k
+  cfg.genesis.state.initial_balances[addr_t::random()] = ebla::uint256_t("0x16345785D8A0000");    // 1
+  cfg.genesis.state.initial_balances[addr_t::random()] = ebla::uint256_t("0x56BC75E2D63100000");  // 1k
   cfg.genesis.state.initial_balances[addr_t::random()] =
-      taraxa::uint256_t("0x204FCE5E3E25026110000000");  //  10 Billion
+      ebla::uint256_t("0x204FCE5E3E25026110000000");  //  10 Billion
   init();
 }
 
@@ -203,7 +203,7 @@ TEST_F(FinalChainTest, contract) {
   const auto& addr = sender_keys.address();
   const auto& sk = sender_keys.secret();
   cfg.genesis.state.initial_balances = {};
-  cfg.genesis.state.initial_balances[addr] = taraxa::uint256_t("0x204FCE5E3E25026110000000");  //  10 Billion
+  cfg.genesis.state.initial_balances[addr] = ebla::uint256_t("0x204FCE5E3E25026110000000");  //  10 Billion
   init();
   auto nonce = 0;
   auto trx =
@@ -256,7 +256,7 @@ TEST_F(FinalChainTest, coin_transfers) {
   for (size_t i = 0; i < NUM_ACCS; ++i) {
     const auto& k = keys.emplace_back(dev::KeyPair::create());
     cfg.genesis.state.initial_balances[k.address()] =
-        taraxa::uint256_t("0x204FCE5E3E25026110000000") /* 10 Billion */ / NUM_ACCS;
+        ebla::uint256_t("0x204FCE5E3E25026110000000") /* 10 Billion */ / NUM_ACCS;
   }
 
   init();
@@ -297,7 +297,7 @@ TEST_F(FinalChainTest, initial_validators) {
   fillConfigForGenesisTests(key.address());
 
   for (const auto& vk : validator_keys) {
-    const auto vrf_pub_key = taraxa::vrf_wrapper::getVrfKeyPair().first;
+    const auto vrf_pub_key = ebla::vrf_wrapper::getVrfKeyPair().first;
     state_api::ValidatorInfo validator{vk.address(), key.address(), vrf_pub_key, 0, "", "", {}};
     validator.delegations.emplace(key.address(), cfg.genesis.state.dpos.validator_maximum_stake);
     cfg.genesis.state.dpos.initial_validators.emplace_back(validator);
@@ -320,7 +320,7 @@ TEST_F(FinalChainTest, nonce_test) {
   const auto& sk = sender_keys.secret();
   const auto receiver_addr = dev::KeyPair::create().address();
   cfg.genesis.state.initial_balances = {};
-  cfg.genesis.state.initial_balances[addr] = taraxa::uint256_t("0x204FCE5E3E25026110000000");  //  10 Billion
+  cfg.genesis.state.initial_balances[addr] = ebla::uint256_t("0x204FCE5E3E25026110000000");  //  10 Billion
   init();
 
   auto trx1 = std::make_shared<Transaction>(0, 100, 1000000000, 100000, dev::bytes(), sk, receiver_addr);
@@ -352,7 +352,7 @@ TEST_F(FinalChainTest, nonce_skipping) {
   const auto& sk = sender_keys.secret();
   const auto receiver_addr = dev::KeyPair::create().address();
   cfg.genesis.state.initial_balances = {};
-  cfg.genesis.state.initial_balances[addr] = taraxa::uint256_t("0x204FCE5E3E25026110000000");  //  10 Billion
+  cfg.genesis.state.initial_balances[addr] = ebla::uint256_t("0x204FCE5E3E25026110000000");  //  10 Billion
   init();
 
   auto trx1 = std::make_shared<Transaction>(0, 100, 1000000000, 100000, dev::bytes(), sk, receiver_addr);
@@ -383,7 +383,7 @@ TEST_F(FinalChainTest, exec_trx_with_nonce_from_api) {
   const auto& addr = sender_keys.address();
   const auto& sk = sender_keys.secret();
   cfg.genesis.state.initial_balances = {};
-  cfg.genesis.state.initial_balances[addr] = taraxa::uint256_t("0x204FCE5E3E25026110000000");  //  10 Billion
+  cfg.genesis.state.initial_balances[addr] = ebla::uint256_t("0x204FCE5E3E25026110000000");  //  10 Billion
   init();
 
   // exec trx with nonce 5 to skip some
@@ -433,7 +433,7 @@ TEST_F(FinalChainTest, new_contract_address) {
   const auto& addr = sender_keys.address();
   const auto& sk = sender_keys.secret();
   cfg.genesis.state.initial_balances = {};
-  cfg.genesis.state.initial_balances[addr] = taraxa::uint256_t("0x204FCE5E3E25026110000000");  //  10 Billion
+  cfg.genesis.state.initial_balances[addr] = ebla::uint256_t("0x204FCE5E3E25026110000000");  //  10 Billion
   init();
 
   auto nonce = 0;
@@ -765,7 +765,7 @@ TEST_F(FinalChainTest, fee_rewards_distribution) {
   const auto& addr = sender_keys.address();
   const auto& sk = sender_keys.secret();
   cfg.genesis.state.initial_balances = {};
-  cfg.genesis.state.initial_balances[addr] = taraxa::uint256_t("0x204FCE5E3E25026110000000");  //  10 Billion
+  cfg.genesis.state.initial_balances[addr] = ebla::uint256_t("0x204FCE5E3E25026110000000");  //  10 Billion
   cfg.genesis.state.hardforks.magnolia_hf.block_num = 2;
   create_validators();
   init();
@@ -840,7 +840,7 @@ TEST_F(FinalChainTest, remove_jailed_validator_votes_from_total) {
   cfg.genesis.state.hardforks.magnolia_hf.jail_time = 50;
 
   for (const auto& vk : validator_keys) {
-    const auto vrf_pub_key = taraxa::vrf_wrapper::getVrfKeyPair().first;
+    const auto vrf_pub_key = ebla::vrf_wrapper::getVrfKeyPair().first;
     state_api::ValidatorInfo validator{vk.address(), key.address(), vrf_pub_key, 0, "", "", {}};
     validator.delegations.emplace(key.address(), cfg.genesis.state.dpos.validator_maximum_stake);
     cfg.genesis.state.dpos.initial_validators.emplace_back(validator);
@@ -857,7 +857,7 @@ TEST_F(FinalChainTest, remove_jailed_validator_votes_from_total) {
   }
   advance({});
   // submit double votes for one validator
-  const auto [vrf_key, vrf_sk] = taraxa::vrf_wrapper::getVrfKeyPair();
+  const auto [vrf_key, vrf_sk] = ebla::vrf_wrapper::getVrfKeyPair();
   VrfPbftSortition vrf_sortition(vrf_sk, {PbftVoteTypes::propose_vote, 1, 1, 1});
   auto vote_a = std::make_shared<PbftVote>(validator_keys[0].secret(), vrf_sortition, blk_hash_t(1));
   vote_a->calculateWeight(1, 1, 1);
@@ -878,7 +878,7 @@ TEST_F(FinalChainTest, remove_jailed_validator_votes_from_total) {
 TEST_F(FinalChainTest, initial_validator_exceed_maximum_stake) {
   const dev::KeyPair key = dev::KeyPair::create();
   const dev::KeyPair validator_key = dev::KeyPair::create();
-  const auto vrf_pub_key = taraxa::vrf_wrapper::getVrfKeyPair().first;
+  const auto vrf_pub_key = ebla::vrf_wrapper::getVrfKeyPair().first;
   fillConfigForGenesisTests(key.address());
 
   state_api::ValidatorInfo validator{validator_key.address(), key.address(), vrf_pub_key, 0, "", "", {}};
@@ -889,6 +889,6 @@ TEST_F(FinalChainTest, initial_validator_exceed_maximum_stake) {
   EXPECT_THROW(init(), std::exception);
 }
 
-}  // namespace taraxa::final_chain
+}  // namespace ebla::final_chain
 
-TARAXA_TEST_MAIN({})
+EBLA_TEST_MAIN({})

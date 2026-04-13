@@ -4,13 +4,13 @@
 #include "network/tarcap/packets/latest/get_dag_sync_packet.hpp"
 #include "transaction/transaction.hpp"
 
-namespace taraxa {
+namespace ebla {
 class DagManager;
 class DbStorage;
 class TransactionManager;
-}  // namespace taraxa
+}  // namespace ebla
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 class GetDagSyncPacketHandler : public PacketHandler {
  public:
@@ -26,7 +26,7 @@ class GetDagSyncPacketHandler : public PacketHandler {
   static constexpr SubprotocolPacketType kPacketType_ = SubprotocolPacketType::kGetDagSyncPacket;
 
  private:
-  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<TaraxaPeer>& peer) override;
+  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<EblaPeer>& peer) override;
 
  protected:
   std::shared_ptr<TransactionManager> trx_mgr_;
@@ -34,4 +34,4 @@ class GetDagSyncPacketHandler : public PacketHandler {
   std::shared_ptr<DbStorage> db_;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

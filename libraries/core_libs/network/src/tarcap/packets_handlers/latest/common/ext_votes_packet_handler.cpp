@@ -7,7 +7,7 @@
 #include "vote/votes_bundle_rlp.hpp"
 #include "vote_manager/vote_manager.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 ExtVotesPacketHandler::ExtVotesPacketHandler(const FullNodeConfig &conf, std::shared_ptr<PeersState> peers_state,
                                              std::shared_ptr<TimePeriodPacketsStats> packets_stats,
@@ -26,7 +26,7 @@ ExtVotesPacketHandler::ExtVotesPacketHandler(const FullNodeConfig &conf, std::sh
 
 bool ExtVotesPacketHandler::processVote(const std::shared_ptr<PbftVote> &vote,
                                         const std::shared_ptr<PbftBlock> &pbft_block,
-                                        const std::shared_ptr<TaraxaPeer> &peer, bool validate_max_round_step) {
+                                        const std::shared_ptr<EblaPeer> &peer, bool validate_max_round_step) {
   if (pbft_block && !validateVoteAndBlock(vote, pbft_block)) {
     throw MaliciousPeerException("Received vote's voted value != received pbft block");
   }
@@ -70,7 +70,7 @@ bool ExtVotesPacketHandler::processVote(const std::shared_ptr<PbftVote> &vote,
 }
 
 std::pair<bool, std::string> ExtVotesPacketHandler::validateVotePeriodRoundStep(const std::shared_ptr<PbftVote> &vote,
-                                                                                const std::shared_ptr<TaraxaPeer> &peer,
+                                                                                const std::shared_ptr<EblaPeer> &peer,
                                                                                 bool validate_max_round_step) {
   const auto [current_pbft_round, current_pbft_period] = pbft_mgr_->getPbftRoundAndPeriod();
 
@@ -193,4 +193,4 @@ void ExtVotesPacketHandler::requestPbftNextVotesAtPeriodRound(const dev::p2p::No
   sealAndSend(peerID, SubprotocolPacketType::kGetNextVotesSyncPacket, encodePacketRlp(packet));
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

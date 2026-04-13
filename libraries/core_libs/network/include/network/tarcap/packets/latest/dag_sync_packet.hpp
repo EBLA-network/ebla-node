@@ -3,7 +3,7 @@
 #include "dag/dag_block.hpp"
 #include "transaction/system_transaction.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 struct DagSyncPacket {
   PbftPeriod request_period;
@@ -14,4 +14,4 @@ struct DagSyncPacket {
   RLP_FIELDS_DEFINE_INPLACE(request_period, response_period, transactions, dag_blocks)
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

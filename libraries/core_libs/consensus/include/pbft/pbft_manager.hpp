@@ -10,7 +10,7 @@
 #include "pbft/period_data_queue.hpp"
 #include "pbft/proposed_blocks.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 /** @addtogroup PBFT
  * @{
@@ -687,4 +687,4 @@ class PbftManager {
 
 /** @}*/
 
-}  // namespace taraxa
+}  // namespace ebla

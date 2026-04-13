@@ -2,12 +2,12 @@
 
 #include "pbft/pbft_manager.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 PeersState::PeersState(std::weak_ptr<dev::p2p::Host> host, const FullNodeConfig& conf)
     : host_(std::move(host)), kConf(conf) {}
 
-std::shared_ptr<TaraxaPeer> PeersState::getPeer(const dev::p2p::NodeID& node_id) const {
+std::shared_ptr<EblaPeer> PeersState::getPeer(const dev::p2p::NodeID& node_id) const {
   std::shared_lock lock(peers_mutex_);
 
   auto it_peer = peers_.find(node_id);
@@ -18,7 +18,7 @@ std::shared_ptr<TaraxaPeer> PeersState::getPeer(const dev::p2p::NodeID& node_id)
   return nullptr;
 }
 
-std::shared_ptr<TaraxaPeer> PeersState::getPendingPeer(const dev::p2p::NodeID& node_id) const {
+std::shared_ptr<EblaPeer> PeersState::getPendingPeer(const dev::p2p::NodeID& node_id) const {
   std::shared_lock lock(peers_mutex_);
 
   auto it_peer = pending_peers_.find(node_id);
@@ -29,7 +29,7 @@ std::shared_ptr<TaraxaPeer> PeersState::getPendingPeer(const dev::p2p::NodeID& n
   return nullptr;
 }
 
-std::pair<std::shared_ptr<TaraxaPeer>, std::string> PeersState::getPacketSenderPeer(
+std::pair<std::shared_ptr<EblaPeer>, std::string> PeersState::getPacketSenderPeer(
     const dev::p2p::NodeID& node_id, SubprotocolPacketType packet_type) const {
   std::shared_lock lock(peers_mutex_);
 
@@ -63,7 +63,7 @@ std::vector<dev::p2p::NodeID> PeersState::getAllPendingPeersIDs() const {
   std::shared_lock lock(peers_mutex_);
   peers.reserve(pending_peers_.size());
   std::transform(pending_peers_.begin(), pending_peers_.end(), std::back_inserter(peers),
-                 [](std::pair<const dev::p2p::NodeID, std::shared_ptr<TaraxaPeer>> const& peer) { return peer.first; });
+                 [](std::pair<const dev::p2p::NodeID, std::shared_ptr<EblaPeer>> const& peer) { return peer.first; });
 
   return peers;
 }
@@ -73,10 +73,10 @@ PeersState::PeersMap PeersState::getAllPeers() const {
   return peers_;
 }
 
-std::shared_ptr<TaraxaPeer> PeersState::addPendingPeer(const dev::p2p::NodeID& node_id, const std::string& address) {
+std::shared_ptr<EblaPeer> PeersState::addPendingPeer(const dev::p2p::NodeID& node_id, const std::string& address) {
   std::unique_lock lock(peers_mutex_);
   auto ret =
-      pending_peers_.emplace(node_id, std::make_shared<TaraxaPeer>(node_id, kConf.transactions_pool_size, address));
+      pending_peers_.emplace(node_id, std::make_shared<EblaPeer>(node_id, kConf.transactions_pool_size, address));
   if (!ret.second) {
     // LOG(log_er_) << "Peer " << node_id.abridged() << " is already in pending peers list";
   }
@@ -96,8 +96,8 @@ void PeersState::erasePeer(dev::p2p::NodeID const& node_id) {
   peers_.erase(node_id);
 }
 
-std::shared_ptr<TaraxaPeer> PeersState::setPeerAsReadyToSendMessages(dev::p2p::NodeID const& node_id,
-                                                                     std::shared_ptr<TaraxaPeer> peer) {
+std::shared_ptr<EblaPeer> PeersState::setPeerAsReadyToSendMessages(dev::p2p::NodeID const& node_id,
+                                                                     std::shared_ptr<EblaPeer> peer) {
   std::unique_lock lock(peers_mutex_);
   pending_peers_.erase(node_id);
   auto ret = peers_.emplace(node_id, std::move(peer));
@@ -150,9 +150,9 @@ void PeersState::disconnectPeer(const dev::p2p::NodeID& id) {
   }
 }
 
-std::shared_ptr<TaraxaPeer> PeersState::getMaxChainPeer(
-    const std::shared_ptr<PbftManager> pbft_mgr, std::function<bool(const std::shared_ptr<TaraxaPeer>&)> filter_func) {
-  std::shared_ptr<TaraxaPeer> max_pbft_chain_peer;
+std::shared_ptr<EblaPeer> PeersState::getMaxChainPeer(
+    const std::shared_ptr<PbftManager> pbft_mgr, std::function<bool(const std::shared_ptr<EblaPeer>&)> filter_func) {
+  std::shared_ptr<EblaPeer> max_pbft_chain_peer;
   PbftPeriod max_pbft_chain_size = 0;
   uint64_t max_node_dag_level = 0;
 
@@ -186,4 +186,4 @@ std::shared_ptr<TaraxaPeer> PeersState::getMaxChainPeer(
   return max_pbft_chain_peer;
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

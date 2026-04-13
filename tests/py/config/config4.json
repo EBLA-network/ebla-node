@@ -1,6 +1,6 @@
 {
   "chain_id": 0,
-  "data_path": "/tmp/taraxa4",
+  "data_path": "/tmp/ebla4",
   "network": {
     "rpc": {
       "http_port": 7780,
@@ -46,7 +46,7 @@
           },
           {
             "type": "file",
-            "file_name": "Taraxa_N4_%m%d%Y_%H%M%S_%5N.log",
+            "file_name": "Ebla_N4_%m%d%Y_%H%M%S_%5N.log",
             "rotation_size": 10000000,
             "time_based_rotation": "0,0,0",
             "format": "%ThreadID% %ShortNodeId% %Channel% [%TimeStamp%] %SeverityStr%: %Message%",

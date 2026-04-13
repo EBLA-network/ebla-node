@@ -4,12 +4,12 @@
 #include "network/tarcap/packets_handlers/interface/transaction_packet_handler.hpp"
 #include "transaction/transaction.hpp"
 
-namespace taraxa {
+namespace ebla {
 class TransactionManager;
 enum class TransactionStatus;
-}  // namespace taraxa
+}  // namespace ebla
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 class TransactionPacketHandler : public ITransactionPacketHandler {
  public:
@@ -25,14 +25,14 @@ class TransactionPacketHandler : public ITransactionPacketHandler {
    * @param transactions serialized transactions
    *
    */
-  void sendTransactions(std::shared_ptr<TaraxaPeer> peer,
+  void sendTransactions(std::shared_ptr<EblaPeer> peer,
                         std::pair<SharedTransactions, std::vector<trx_hash_t>>&& transactions) override;
 
   // Packet type that is processed by this handler
   static constexpr SubprotocolPacketType kPacketType_ = SubprotocolPacketType::kTransactionPacket;
 
  private:
-  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<TaraxaPeer>& peer) override;
+  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<EblaPeer>& peer) override;
 
  protected:
   std::shared_ptr<TransactionManager> trx_mgr_;
@@ -41,4 +41,4 @@ class TransactionPacketHandler : public ITransactionPacketHandler {
   std::atomic<uint64_t> unique_received_trx_count_{0};
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

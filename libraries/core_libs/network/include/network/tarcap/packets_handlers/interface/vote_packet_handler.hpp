@@ -2,7 +2,7 @@
 
 #include "network/tarcap/packets_handlers/latest/common/ext_votes_packet_handler.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 class IVotePacketHandler : public ExtVotesPacketHandler {
  public:
@@ -28,7 +28,7 @@ class IVotePacketHandler : public ExtVotesPacketHandler {
    * @param vote
    * @param block
    */
-  virtual void sendPbftVote(const std::shared_ptr<TaraxaPeer>& peer, const std::shared_ptr<PbftVote>& vote,
+  virtual void sendPbftVote(const std::shared_ptr<EblaPeer>& peer, const std::shared_ptr<PbftVote>& vote,
                             const std::shared_ptr<PbftBlock>& block);
 
   /**
@@ -47,8 +47,8 @@ class IVotePacketHandler : public ExtVotesPacketHandler {
    * @param vote
    * @param block
    */
-  virtual void sendPbftVotesBundle(const std::shared_ptr<TaraxaPeer>& peer,
+  virtual void sendPbftVotesBundle(const std::shared_ptr<EblaPeer>& peer,
                                    std::vector<std::shared_ptr<PbftVote>>&& votes);
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

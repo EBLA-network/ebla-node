@@ -2,7 +2,7 @@
 
 #include "pbft/pbft_manager.hpp"
 
-namespace taraxa::network::threadpool {
+namespace ebla::network::threadpool {
 
 PriorityQueue::PriorityQueue(size_t tp_workers_count, const std::shared_ptr<PbftManager>& pbft_mgr,
                              const addr_t& node_addr)
@@ -236,4 +236,4 @@ size_t PriorityQueue::getPrirotityQueueSize(PacketData::PacketPriority priority)
   return packets_queues_[priority].size();
 }
 
-}  // namespace taraxa::network::threadpool
+}  // namespace ebla::network::threadpool

@@ -5,7 +5,7 @@
 
 #include "common/encoding_rlp.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 VrfPbftMsg::VrfPbftMsg(PbftVoteTypes type, PbftPeriod period, PbftRound round, PbftStep step)
     : period_(period), round_(round), step_(step) {
@@ -99,4 +99,4 @@ dev::h256 getVoterIndexHash(const vrf_wrapper::vrf_output_t& vrf, const public_t
   return dev::sha3(s.invalidate());
 }
 
-}  // namespace taraxa
+}  // namespace ebla

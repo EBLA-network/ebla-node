@@ -8,7 +8,7 @@
 #include "logger/logger.hpp"
 #include "metrics/jsonrpc_metrics.hpp"
 
-namespace taraxa::net {
+namespace ebla::net {
 
 class HttpProcessor {
  public:
@@ -76,4 +76,4 @@ class HttpConnection : public std::enable_shared_from_this<HttpConnection> {
   boost::beast::http::response<boost::beast::http::string_body> response_;
 };
 
-}  // namespace taraxa::net
+}  // namespace ebla::net

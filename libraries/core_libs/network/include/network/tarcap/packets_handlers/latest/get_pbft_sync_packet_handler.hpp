@@ -3,14 +3,14 @@
 #include "common/packet_handler.hpp"
 #include "network/tarcap/packets/latest/get_pbft_sync_packet.hpp"
 
-namespace taraxa {
+namespace ebla {
 class PbftChain;
 class PbftManager;
 class DbStorage;
 class VoteManager;
-}  // namespace taraxa
+}  // namespace ebla
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 class PbftSyncingState;
 
@@ -26,10 +26,10 @@ class GetPbftSyncPacketHandler : public PacketHandler {
   static constexpr SubprotocolPacketType kPacketType_ = SubprotocolPacketType::kGetPbftSyncPacket;
 
  private:
-  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<TaraxaPeer>& peer) override;
+  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<EblaPeer>& peer) override;
 
  protected:
-  virtual void sendPbftBlocks(const std::shared_ptr<TaraxaPeer>& peer, PbftPeriod from_period,
+  virtual void sendPbftBlocks(const std::shared_ptr<EblaPeer>& peer, PbftPeriod from_period,
                               size_t blocks_to_transfer, bool pbft_chain_synced);
 
   std::shared_ptr<PbftSyncingState> pbft_syncing_state_;
@@ -39,4 +39,4 @@ class GetPbftSyncPacketHandler : public PacketHandler {
   std::shared_ptr<DbStorage> db_;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

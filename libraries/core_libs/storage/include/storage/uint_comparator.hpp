@@ -4,11 +4,11 @@
 
 #include "storage/db_utils.hpp"
 
-namespace taraxa {
+namespace ebla {
 template <class T>
 class UintComparator : public rocksdb::Comparator {
  public:
-  static const char *kClassName() { return "taraxa.UintComparator"; }
+  static const char *kClassName() { return "ebla.UintComparator"; }
   virtual const char *Name() const override { return kClassName(); }
 
   // Three-way comparison function:
@@ -30,7 +30,7 @@ class UintComparator : public rocksdb::Comparator {
 
 template <class T>
 inline const rocksdb::Comparator *getIntComparator() {
-  const static taraxa::UintComparator<T> kComparator;
+  const static ebla::UintComparator<T> kComparator;
   return &kComparator;
 }
-}  // end namespace taraxa
+}  // end namespace ebla

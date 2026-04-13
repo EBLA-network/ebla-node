@@ -12,10 +12,10 @@
 #include "network/tarcap/packets_handlers/latest/common/exceptions.hpp"
 #include "network/tarcap/shared_states/peers_state.hpp"
 #include "network/tarcap/stats/time_period_packets_stats.hpp"
-#include "network/tarcap/taraxa_peer.hpp"
+#include "network/tarcap/ebla_peer.hpp"
 #include "network/threadpool/packet_data.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 template <class PacketType>
 PacketType decodePacketRlp(const dev::RLP& packet_rlp) {
@@ -59,7 +59,7 @@ class PacketHandler : public BasePacketHandler {
   /**
    * @brief Main packet processing function
    */
-  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<TaraxaPeer>& peer) = 0;
+  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<EblaPeer>& peer) = 0;
 
  protected:
   bool sealAndSend(const dev::p2p::NodeID& node_id, SubprotocolPacketType packet_type, dev::bytes&& rlp_bytes);
@@ -78,4 +78,4 @@ class PacketHandler : public BasePacketHandler {
   LOG_OBJECTS_DEFINE
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

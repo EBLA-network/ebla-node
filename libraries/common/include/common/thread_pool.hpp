@@ -2,7 +2,7 @@
 
 #include <boost/asio.hpp>
 
-namespace taraxa::util {
+namespace ebla::util {
 
 class ThreadPool : std::enable_shared_from_this<ThreadPool> {
   using asio_callback = std::function<void(boost::system::error_code const &)>;
@@ -45,4 +45,4 @@ class ThreadPool : std::enable_shared_from_this<ThreadPool> {
   };
   void post_loop(Periodicity const &periodicity, std::function<void()> action);
 };
-}  // namespace taraxa::util
+}  // namespace ebla::util

@@ -8,7 +8,7 @@
 
 #include "metrics/metrics_group.hpp"
 
-namespace taraxa::metrics {
+namespace ebla::metrics {
 
 /**
  * @brief class for metrics collecting. Registering specific metrics classes and creating prometheus server(exposer)
@@ -49,4 +49,4 @@ class MetricsService {
   std::map<std::string, SharedMetricsGroup> metrics_;
   std::unique_ptr<std::thread> thread_;
 };
-}  // namespace taraxa::metrics
+}  // namespace ebla::metrics

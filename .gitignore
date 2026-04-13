@@ -23,7 +23,7 @@ local
 clang-format
 clang-tidy
 
-# cmake generated header with version of taraxad
+# cmake generated header with version of eblad
 libraries/config/include/config/version.hpp
 
 # cmake generated header with configs

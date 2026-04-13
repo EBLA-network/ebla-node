@@ -11,7 +11,7 @@
 #include "logger/logger.hpp"
 #include "transaction/transaction.hpp"
 
-namespace taraxa {
+namespace ebla {
 TransactionManager::TransactionManager(const FullNodeConfig &conf, std::shared_ptr<DbStorage> db,
                                        std::shared_ptr<final_chain::FinalChain> final_chain, addr_t node_addr)
     : kConf(conf),
@@ -24,7 +24,7 @@ TransactionManager::TransactionManager(const FullNodeConfig &conf, std::shared_p
   LOG_OBJECTS_CREATE("TRXMGR");
   {
     std::unique_lock transactions_lock(transactions_mutex_);
-    trx_count_ = db_->getStatusField(taraxa::StatusDbField::TrxCount);
+    trx_count_ = db_->getStatusField(ebla::StatusDbField::TrxCount);
   }
 }
 
@@ -250,7 +250,7 @@ void TransactionManager::saveTransactionsFromDagBlock(SharedTransactions const &
       }
 
       // Checking nonce in cheaper than checking db, verify with nonce if possible
-      const auto account = final_chain_->getAccount(t->getSender()).value_or(taraxa::state_api::ZeroAccount);
+      const auto account = final_chain_->getAccount(t->getSender()).value_or(ebla::state_api::ZeroAccount);
       if (account.nonce >= t->getNonce()) {
         // This is a very rare scenario but it can happen:
         // The check against database is needed because there is a possibility that transaction was executed within last
@@ -355,7 +355,7 @@ bool TransactionManager::verifyTransactionsNotFinalized(const SharedTransactions
     }
 
     // Checking nonce in cheaper than checking db, verify with nonce if possible
-    const auto account = final_chain_->getAccount(t->getSender()).value_or(taraxa::state_api::ZeroAccount);
+    const auto account = final_chain_->getAccount(t->getSender()).value_or(ebla::state_api::ZeroAccount);
     if (account.nonce >= t->getNonce()) {
       // This is a very rare scenario but it can happen:
       // The check against database is needed because there is a possibility that transaction was executed within last
@@ -540,4 +540,4 @@ val_t TransactionManager::getMinGasPriceForBlockInclusion() const {
   return transactions_pool_.getMinGasPriceForBlockInclusion(kConf.propose_dag_gas_limit);
 }
 
-}  // namespace taraxa
+}  // namespace ebla

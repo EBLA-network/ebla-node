@@ -8,21 +8,21 @@
 #include "DebugFace.h"
 #include "common/app_base.hpp"
 
-namespace taraxa {
+namespace ebla {
 struct Transaction;
 }
 
-namespace taraxa::state_api {
+namespace ebla::state_api {
 struct TransactionReceipt;
 struct EVMTransaction;
 struct Tracing;
-}  // namespace taraxa::state_api
+}  // namespace ebla::state_api
 
 namespace dev::eth {
 class Client;
 }
 
-namespace taraxa::net {
+namespace ebla::net {
 
 class InvalidAddress : public std::exception {
  public:
@@ -36,7 +36,7 @@ class InvalidTracingParams : public std::exception {
 
 class Debug : public DebugFace {
  public:
-  explicit Debug(std::shared_ptr<taraxa::AppBase> app, uint64_t gas_limit) : app_(app), kGasLimit(gas_limit) {}
+  explicit Debug(std::shared_ptr<ebla::AppBase> app, uint64_t gas_limit) : app_(app), kGasLimit(gas_limit) {}
   virtual RPCModules implementedModules() const override { return RPCModules{RPCModule{"debug", "1.0"}}; }
 
   virtual Json::Value debug_traceTransaction(const std::string& param1) override;
@@ -61,8 +61,8 @@ class Debug : public DebugFace {
   std::tuple<std::vector<state_api::EVMTransaction>, state_api::EVMTransaction, uint64_t> get_transaction_with_state(
       const std::string& transaction_hash);
 
-  std::weak_ptr<taraxa::AppBase> app_;
+  std::weak_ptr<ebla::AppBase> app_;
   const uint64_t kGasLimit = ((uint64_t)1 << 53) - 1;
 };
 
-}  // namespace taraxa::net
+}  // namespace ebla::net

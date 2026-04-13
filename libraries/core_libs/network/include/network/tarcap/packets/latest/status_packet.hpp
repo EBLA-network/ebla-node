@@ -1,6 +1,6 @@
 #pragma once
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 struct StatusPacket {
   struct InitialData {
@@ -25,4 +25,4 @@ struct StatusPacket {
   RLP_FIELDS_DEFINE_INPLACE(peer_pbft_chain_size, peer_pbft_round, peer_dag_level, peer_syncing, initial_data)
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

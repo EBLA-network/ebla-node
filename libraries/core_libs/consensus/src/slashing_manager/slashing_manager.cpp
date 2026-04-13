@@ -6,7 +6,7 @@
 #include "transaction/transaction_manager.hpp"
 #include "vote/pbft_vote.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 const auto kContractAddress = addr_t("0x00000000000000000000000000000000000000EE");
 
@@ -56,7 +56,7 @@ bool SlashingManager::submitDoubleVotingProof(const std::shared_ptr<PbftVote> &v
   // Find first wallet with funds to submit proof
   for (const auto &wallet : kConfig.wallets) {
     // Check the balance
-    const auto account = final_chain_->getAccount(wallet.node_addr).value_or(taraxa::state_api::ZeroAccount);
+    const auto account = final_chain_->getAccount(wallet.node_addr).value_or(ebla::state_api::ZeroAccount);
     if (account.balance == 0) {
       continue;
     }
@@ -72,4 +72,4 @@ bool SlashingManager::submitDoubleVotingProof(const std::shared_ptr<PbftVote> &v
 
   return false;
 }
-}  // namespace taraxa
+}  // namespace ebla

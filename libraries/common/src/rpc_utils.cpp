@@ -1,6 +1,6 @@
 #include "common/rpc_utils.hpp"
 
-namespace taraxa::util {
+namespace ebla::util {
 
 Json::Value mergeJsons(Json::Value&& o1, Json::Value&& o2) {
   for (auto itr = o2.begin(); itr != o2.end(); ++itr) {
@@ -9,4 +9,4 @@ Json::Value mergeJsons(Json::Value&& o1, Json::Value&& o2) {
   return o1;
 }
 
-}  // namespace taraxa::util
+}  // namespace ebla::util

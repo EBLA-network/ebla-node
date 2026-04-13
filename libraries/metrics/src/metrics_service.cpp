@@ -7,7 +7,7 @@
 #include <memory>
 #include <thread>
 
-namespace taraxa::metrics {
+namespace ebla::metrics {
 MetricsService::MetricsService(const std::string& host, uint16_t port, uint16_t polling_interval_ms)
     : kPollingIntervalMs(polling_interval_ms) {
   exposer_ = std::make_unique<prometheus::Exposer>(host + ":" + std::to_string(port));
@@ -33,4 +33,4 @@ void MetricsService::start() {
     }
   });
 }
-}  // namespace taraxa::metrics
+}  // namespace ebla::metrics

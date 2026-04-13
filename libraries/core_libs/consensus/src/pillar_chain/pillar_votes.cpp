@@ -1,6 +1,6 @@
 #include "pillar_chain/pillar_votes.hpp"
 
-namespace taraxa::pillar_chain {
+namespace ebla::pillar_chain {
 
 bool PillarVotes::voteExists(const std::shared_ptr<PillarVote> vote) const {
   std::shared_lock<std::shared_mutex> lock(mutex_);
@@ -140,4 +140,4 @@ void PillarVotes::eraseVotes(PbftPeriod min_period) {
   std::erase_if(votes_, [min_period](const auto& item) { return item.first < min_period; });
 }
 
-}  // namespace taraxa::pillar_chain
+}  // namespace ebla::pillar_chain

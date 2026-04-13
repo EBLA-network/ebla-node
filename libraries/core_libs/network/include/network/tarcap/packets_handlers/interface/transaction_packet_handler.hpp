@@ -3,7 +3,7 @@
 #include "network/tarcap/packets_handlers/latest/common/packet_handler.hpp"
 #include "transaction/transaction.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 class ITransactionPacketHandler : public PacketHandler {
  public:
@@ -26,7 +26,7 @@ class ITransactionPacketHandler : public PacketHandler {
    * @param transactions serialized transactions
    *
    */
-  virtual void sendTransactions(std::shared_ptr<TaraxaPeer> peer,
+  virtual void sendTransactions(std::shared_ptr<EblaPeer> peer,
                                 std::pair<SharedTransactions, std::vector<trx_hash_t>>&& transactions) = 0;
 
   /**
@@ -35,7 +35,7 @@ class ITransactionPacketHandler : public PacketHandler {
    * @param transactions to be sent
    * @return selected transactions and hashes to be sent per peer
    */
-  std::vector<std::pair<std::shared_ptr<TaraxaPeer>, std::pair<SharedTransactions, std::vector<trx_hash_t>>>>
+  std::vector<std::pair<std::shared_ptr<EblaPeer>, std::pair<SharedTransactions, std::vector<trx_hash_t>>>>
   transactionsToSendToPeers(std::vector<SharedTransactions>&& transactions);
 
  private:
@@ -48,8 +48,8 @@ class ITransactionPacketHandler : public PacketHandler {
    * @return index of the next account to continue and selected transactions and hashes to be sent per peer
    */
   std::pair<uint32_t, std::pair<SharedTransactions, std::vector<trx_hash_t>>> transactionsToSendToPeer(
-      std::shared_ptr<TaraxaPeer> peer, const std::vector<SharedTransactions>& transactions,
+      std::shared_ptr<EblaPeer> peer, const std::vector<SharedTransactions>& transactions,
       uint32_t account_start_index);
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

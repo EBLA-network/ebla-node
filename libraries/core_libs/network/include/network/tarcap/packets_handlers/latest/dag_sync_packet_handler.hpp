@@ -3,11 +3,11 @@
 #include "network/tarcap/packets/latest/dag_sync_packet.hpp"
 #include "network/tarcap/packets_handlers/interface/sync_packet_handler.hpp"
 
-namespace taraxa {
+namespace ebla {
 class TransactionManager;
-}  // namespace taraxa
+}  // namespace ebla
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 class DagSyncPacketHandler : public ISyncPacketHandler {
  public:
@@ -22,10 +22,10 @@ class DagSyncPacketHandler : public ISyncPacketHandler {
   static constexpr SubprotocolPacketType kPacketType_ = SubprotocolPacketType::kDagSyncPacket;
 
  private:
-  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<TaraxaPeer>& peer) override;
+  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<EblaPeer>& peer) override;
 
  protected:
   std::shared_ptr<TransactionManager> trx_mgr_{nullptr};
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

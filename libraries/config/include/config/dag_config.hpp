@@ -4,7 +4,7 @@
 
 #include "common/types.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 struct DagBlockProposerConfig {
   uint16_t shard = 1;
@@ -23,4 +23,4 @@ struct DagConfig {
 Json::Value enc_json(const DagConfig& obj);
 void dec_json(const Json::Value& json, DagConfig& obj);
 
-}  // namespace taraxa
+}  // namespace ebla

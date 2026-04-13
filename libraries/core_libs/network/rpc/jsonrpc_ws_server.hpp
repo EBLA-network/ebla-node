@@ -2,7 +2,7 @@
 
 #include "network/ws_server.hpp"
 
-namespace taraxa::net {
+namespace ebla::net {
 
 class JsonRpcWsSession final : public WsSession {
  public:
@@ -21,4 +21,4 @@ class JsonRpcWsServer final : public WsServer {
   std::shared_ptr<WsSession> createSession(tcp::socket&& socket) override;
 };
 
-}  // namespace taraxa::net
+}  // namespace ebla::net

@@ -7,7 +7,7 @@ metadata:
   labels:
     app: node
     app.kubernetes.io/name: node
-    helm.sh/chart: {{ include "taraxa-node.chart" . }}
+    helm.sh/chart: {{ include "ebla-node.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
@@ -17,7 +17,7 @@ data:
     import subprocess
 
     def get_vrf_public(vrf_prv_key):
-        process = subprocess.Popen(['taraxad', '--command', 'vrf', vrf_prv_key],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process = subprocess.Popen(['eblad', '--command', 'vrf', vrf_prv_key],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         for line in process.stdout:
             l = line.decode("utf-8")
@@ -27,7 +27,7 @@ data:
                 return f'0x{vrf_public}'
 
     def get_addr(prv_key):
-        process = subprocess.Popen(['taraxad', '--command', 'account', prv_key],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process = subprocess.Popen(['eblad', '--command', 'account', prv_key],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         for line in process.stdout:
             l = line.decode("utf-8")
@@ -71,7 +71,7 @@ data:
               'address': '',
               'commission': '0x0',
               'delegations': {},
-              'description': 'Taraxa validator',
+              'description': 'Ebla validator',
               'endpoint': '',
               'owner': ''
           }
@@ -93,18 +93,18 @@ data:
 
   entrypoint.sh: |-
     #!/bin/bash
-    DATA_PATH=/root/.taraxa
-    CONFIG_PATH=$DATA_PATH/conf_taraxa.json
-    GENESIS_PATH=$DATA_PATH/genesis_taraxa.json
-    WALLET_PATH=$DATA_PATH/wallet_taraxa.json
+    DATA_PATH=/root/.ebla
+    CONFIG_PATH=$DATA_PATH/conf_ebla.json
+    GENESIS_PATH=$DATA_PATH/genesis_ebla.json
+    WALLET_PATH=$DATA_PATH/wallet_ebla.json
 
     echo "Cleaning up old config..."
     rm -rf $CONFIG_PATH
 
     echo "Generating config"
     INDEX=${HOSTNAME##*-}
-    KEY="TARAXA_NODE_KEY_${INDEX}"
-    VRF="TARAXA_NODE_VRF_${INDEX}"
+    KEY="EBLA_NODE_KEY_${INDEX}"
+    VRF="EBLA_NODE_VRF_${INDEX}"
 
     KEY="${!KEY}"
     VRF="${!VRF}"
@@ -114,8 +114,8 @@ data:
       if [ ! -f "$WALLET_PATH" ]
       then
         echo "No predifined keys. Generating new wallet..."
-        KEY=$(taraxad --command account | grep node_secret | cut -d\  -f3- | tr -d \")
-        VRF=$(taraxad --command vrf | grep vrf_secret | cut -d\  -f3 | tr -d \")
+        KEY=$(eblad --command account | grep node_secret | cut -d\  -f3- | tr -d \")
+        VRF=$(eblad --command vrf | grep vrf_secret | cut -d\  -f3 | tr -d \")
       else
         echo "Found wallet file."
         KEY=$(cat "$WALLET_PATH" | jq -r .node_secret)
@@ -124,7 +124,7 @@ data:
     fi
 
     echo "Generating config"
-    taraxad --command config \
+    eblad --command config \
       --chain-id {{ .Values.config.network }} \
       --node-secret ${KEY} \
       --vrf-secret ${VRF} \
@@ -132,7 +132,7 @@ data:
       {{- $lbEnabled := .Values.bootnode.loadBalancer.enabled -}}
       {{- $lbIPs := .Values.bootnode.loadBalancer.addresses -}}
       {{- range $key, $value := .Values.config.bootnode.addresses }}
-      --boot-nodes {{ if $lbEnabled }}{{ index $lbIPs $key }}{{- else }}{{ include "taraxa-boot-node.fullname" $ }}-{{ $key }}.{{ include "taraxa-boot-node.fullname" $ }}.{{$.Release.Namespace}}{{- end }}:10002/{{ $value }} \
+      --boot-nodes {{ if $lbEnabled }}{{ index $lbIPs $key }}{{- else }}{{ include "ebla-boot-node.fullname" $ }}-{{ $key }}.{{ include "ebla-boot-node.fullname" $ }}.{{$.Release.Namespace}}{{- end }}:10002/{{ $value }} \
       {{- end }}
       {{- end }}
       {{- if .Values.config.extraArgs }}
@@ -149,7 +149,7 @@ data:
 
     {{- if and (ne .Values.config.network "841") (ne .Values.config.network "842") (ne .Values.config.network "843") }}
     {{ if .Values.explorer.enabled }}
-    export FAUCET_ADDRESS=$(taraxad --command account ${EXPLORER_FAUCET_PRIVATE_KEY} | grep node_address | cut -d\  -f3 | tr -d \")
+    export FAUCET_ADDRESS=$(eblad --command account ${EXPLORER_FAUCET_PRIVATE_KEY} | grep node_address | cut -d\  -f3 | tr -d \")
     cat $GENESIS_PATH | jq '.initial_balances += ({("0x"+env.FAUCET_ADDRESS): "0x1027e72f1f12813088000000"})' > $GENESIS_PATH.tmp && mv $GENESIS_PATH.tmp $GENESIS_PATH
     {{- end }}
     {{- end }}

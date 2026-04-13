@@ -1,13 +1,13 @@
 #include "network/http_server.hpp"
 
-namespace taraxa::net {
+namespace ebla::net {
 
 HttpServer::HttpServer(boost::asio::io_context &io, boost::asio::ip::tcp::endpoint ep, const addr_t &node_addr,
                        const std::shared_ptr<HttpProcessor> &request_processor,
                        std::shared_ptr<metrics::JsonRpcMetrics> metrics)
     : request_processor_(request_processor), metrics_(metrics), io_context_(io), acceptor_(io), ep_(std::move(ep)) {
   LOG_OBJECTS_CREATE("HTTP");
-  LOG(log_si_) << "Taraxa HttpServer started at port: " << ep_.port();
+  LOG(log_si_) << "Ebla HttpServer started at port: " << ep_.port();
 }
 
 std::shared_ptr<HttpServer> HttpServer::getShared() {
@@ -126,4 +126,4 @@ void HttpConnection::read() {
       });
 }
 
-}  // namespace taraxa::net
+}  // namespace ebla::net

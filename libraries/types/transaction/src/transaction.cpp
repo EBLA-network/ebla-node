@@ -11,7 +11,7 @@
 #include "common/constants.hpp"
 #include "common/encoding_rlp.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 uint64_t toChainID(const u256 &val) {
   if (val == 0 || std::numeric_limits<uint64_t>::max() < val) {
@@ -174,9 +174,9 @@ Json::Value Transaction::toJSON() const {
   return res;
 }
 
-void Transaction::rlp(::taraxa::util::RLPDecoderRef encoding) { fromRLP(encoding.value, false); }
+void Transaction::rlp(::ebla::util::RLPDecoderRef encoding) { fromRLP(encoding.value, false); }
 
-void Transaction::rlp(::taraxa::util::RLPEncoderRef encoding) const { encoding.appendRaw(rlp()); }
+void Transaction::rlp(::ebla::util::RLPEncoderRef encoding) const { encoding.appendRaw(rlp()); }
 
 inline uint64_t IntrinsicGas(const std::vector<uint8_t> &data, bool is_contract_creation) {
   uint64_t gas;
@@ -214,4 +214,4 @@ bool Transaction::intrinsicGasCovered() const {
   }
 }
 
-}  // namespace taraxa
+}  // namespace ebla

@@ -3,11 +3,11 @@
 #include "network/tarcap/packets/latest/dag_block_packet.hpp"
 #include "network/tarcap/packets_handlers/interface/dag_block_packet_handler.hpp"
 
-namespace taraxa {
+namespace ebla {
 class TransactionManager;
-}  // namespace taraxa
+}  // namespace ebla
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 class DagBlockPacketHandler : public IDagBlockPacketHandler {
  public:
@@ -18,20 +18,20 @@ class DagBlockPacketHandler : public IDagBlockPacketHandler {
                         std::shared_ptr<TransactionManager> trx_mgr, std::shared_ptr<DbStorage> db,
                         const addr_t &node_addr, const std::string &logs_prefix = "");
 
-  void sendBlockWithTransactions(const std::shared_ptr<TaraxaPeer> &peer, const std::shared_ptr<DagBlock> &block,
+  void sendBlockWithTransactions(const std::shared_ptr<EblaPeer> &peer, const std::shared_ptr<DagBlock> &block,
                                  SharedTransactions &&trxs) override;
 
-  void onNewBlockReceived(std::shared_ptr<DagBlock> &&block, const std::shared_ptr<TaraxaPeer> &peer = nullptr,
+  void onNewBlockReceived(std::shared_ptr<DagBlock> &&block, const std::shared_ptr<EblaPeer> &peer = nullptr,
                           const std::unordered_map<trx_hash_t, std::shared_ptr<Transaction>> &trxs = {});
 
   // Packet type that is processed by this handler
   static constexpr SubprotocolPacketType kPacketType_ = SubprotocolPacketType::kDagBlockPacket;
 
  private:
-  virtual void process(const threadpool::PacketData &packet_data, const std::shared_ptr<TaraxaPeer> &peer) override;
+  virtual void process(const threadpool::PacketData &packet_data, const std::shared_ptr<EblaPeer> &peer) override;
 
  protected:
   std::shared_ptr<TransactionManager> trx_mgr_{nullptr};
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

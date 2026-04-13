@@ -4,7 +4,7 @@
 #include "common/encoding_rlp.hpp"
 #include "vdf/sortition.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 using VdfSortition = vdf_sortition::VdfSortition;
 
@@ -139,4 +139,4 @@ struct DagFrontier {
   vec_blk_t tips;
 };
 
-}  // namespace taraxa
+}  // namespace ebla

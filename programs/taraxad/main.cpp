@@ -8,12 +8,12 @@
 #include "plugin/light.hpp"
 #include "plugin/rpc.hpp"
 
-using namespace taraxa;
+using namespace ebla;
 
 int main(int argc, const char* argv[]) {
   static_init();
 
-  if (!checkDiskSpace(cli::tools::getTaraxaDataDefaultDir(), 512)) {
+  if (!checkDiskSpace(cli::tools::getEblaDataDefaultDir(), 512)) {
     std::cerr << "Insufficient disk space" << std::endl;
     return 1;
   }
@@ -36,16 +36,16 @@ int main(int argc, const char* argv[]) {
       }
 
       if (app->isStarted()) {
-        std::cout << "Taraxa node started" << std::endl;
+        std::cout << "Ebla node started" << std::endl;
         // TODO graceful shutdown
         std::mutex mu;
         std::unique_lock l(mu);
         std::condition_variable().wait(l);
       }
     }
-    std::cout << "Taraxa Node exited ..." << std::endl;
+    std::cout << "Ebla Node exited ..." << std::endl;
     return 0;
-  } catch (taraxa::ConfigException const& e) {
+  } catch (ebla::ConfigException const& e) {
     std::cerr << "Configuration exception: " << e.what() << std::endl;
   } catch (...) {
     std::cerr << boost::current_exception_diagnostic_information() << std::endl;

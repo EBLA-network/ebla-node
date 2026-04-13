@@ -7,7 +7,7 @@
 #include "common/vrf_wrapper.hpp"
 #include "config/hardfork.hpp"
 
-namespace taraxa::state_api {
+namespace ebla::state_api {
 
 static constexpr auto BlockNumberNIL = std::numeric_limits<EthBlockNumber>::max();
 
@@ -82,4 +82,4 @@ struct OptsDB {
   HAS_RLP_FIELDS
 };
 
-}  // namespace taraxa::state_api
+}  // namespace ebla::state_api

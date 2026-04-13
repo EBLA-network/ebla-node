@@ -10,7 +10,7 @@
 
 #include "common/thread_pool.hpp"
 #include "storage/storage.hpp"
-namespace taraxa::storage::migration {
+namespace ebla::storage::migration {
 
 TransactionReceiptsByPeriod::TransactionReceiptsByPeriod(std::shared_ptr<DbStorage> db) : migration::Base(db) {}
 
@@ -93,4 +93,4 @@ void TransactionReceiptsByPeriod::migrate(logger::Logger& log) {
   db_->compactColumn(target_col);
 }
 
-}  // namespace taraxa::storage::migration
+}  // namespace ebla::storage::migration

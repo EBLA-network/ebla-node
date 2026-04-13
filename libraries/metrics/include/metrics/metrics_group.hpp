@@ -4,7 +4,7 @@
 #include <prometheus/histogram.h>
 #include <prometheus/registry.h>
 
-namespace taraxa::metrics {
+namespace ebla::metrics {
 
 /**
  * @brief add method that is setting specific gauge metric.
@@ -75,4 +75,4 @@ class MetricsGroup {
 };
 
 using SharedMetricsGroup = std::shared_ptr<MetricsGroup>;
-}  // namespace taraxa::metrics
+}  // namespace ebla::metrics

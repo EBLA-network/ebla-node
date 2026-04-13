@@ -5,13 +5,13 @@
 #include "graphql/account.hpp"
 #include "graphql/transaction.hpp"
 
-namespace graphql::taraxa {
+namespace graphql::ebla {
 
-DagBlock::DagBlock(std::shared_ptr<::taraxa::DagBlock> dag_block,
-                   std::shared_ptr<::taraxa::final_chain::FinalChain> final_chain,
-                   std::shared_ptr<::taraxa::PbftManager> pbft_manager,
-                   std::shared_ptr<::taraxa::TransactionManager> transaction_manager,
-                   std::function<std::shared_ptr<object::Block>(::taraxa::EthBlockNumber)> get_block_by_num) noexcept
+DagBlock::DagBlock(std::shared_ptr<::ebla::DagBlock> dag_block,
+                   std::shared_ptr<::ebla::final_chain::FinalChain> final_chain,
+                   std::shared_ptr<::ebla::PbftManager> pbft_manager,
+                   std::shared_ptr<::ebla::TransactionManager> transaction_manager,
+                   std::function<std::shared_ptr<object::Block>(::ebla::EthBlockNumber)> get_block_by_num) noexcept
     : dag_block_(std::move(dag_block)),
       final_chain_(std::move(final_chain)),
       pbft_manager_(std::move(pbft_manager)),
@@ -41,7 +41,7 @@ std::optional<response::Value> DagBlock::getPbftPeriod() const noexcept {
   if (period_) {
     return response::Value(static_cast<int>(*period_));
   }
-  const auto [has_period, period] = pbft_manager_->getDagBlockPeriod(::taraxa::blk_hash_t(dag_block_->getHash()));
+  const auto [has_period, period] = pbft_manager_->getDagBlockPeriod(::ebla::blk_hash_t(dag_block_->getHash()));
   if (has_period) {
     period_ = period;
     return {response::Value(static_cast<int>(*period_))};
@@ -52,7 +52,7 @@ std::optional<response::Value> DagBlock::getPbftPeriod() const noexcept {
 std::shared_ptr<object::Account> DagBlock::getAuthor() const noexcept {
   std::lock_guard<std::mutex> lock{mu_};
   if (!period_) {
-    const auto [has_period, period] = pbft_manager_->getDagBlockPeriod(::taraxa::blk_hash_t(dag_block_->getHash()));
+    const auto [has_period, period] = pbft_manager_->getDagBlockPeriod(::ebla::blk_hash_t(dag_block_->getHash()));
     if (has_period) {
       period_ = period;
       return std::make_shared<object::Account>(
@@ -82,4 +82,4 @@ std::optional<std::vector<std::shared_ptr<object::Transaction>>> DagBlock::getTr
   return transactions_result;
 }
 
-}  // namespace graphql::taraxa
+}  // namespace graphql::ebla

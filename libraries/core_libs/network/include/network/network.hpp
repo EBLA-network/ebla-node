@@ -11,11 +11,11 @@
 
 #include "common/thread_pool.hpp"
 #include "config/config.hpp"
-#include "network/tarcap/taraxa_capability.hpp"
+#include "network/tarcap/ebla_capability.hpp"
 #include "network/tarcap/tarcap_version.hpp"
 #include "transaction/transaction.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 namespace network::tarcap {
 class TimePeriodPacketsStats;
@@ -61,7 +61,7 @@ class Network {
   void gossipVotesBundle(const std::vector<std::shared_ptr<PbftVote>> &votes, bool rebroadcast = false);
   void gossipPillarBlockVote(const std::shared_ptr<PillarVote> &vote, bool rebroadcast = false);
   void handleMaliciousSyncPeer(const dev::p2p::NodeID &id);
-  std::shared_ptr<network::tarcap::TaraxaPeer> getMaxChainPeer() const;
+  std::shared_ptr<network::tarcap::EblaPeer> getMaxChainPeer() const;
 
   /**
    * @brief Request pillar block votes bundle packet from random peer
@@ -83,7 +83,7 @@ class Network {
   std::shared_ptr<PacketHandlerType> getSpecificHandler(network::SubprotocolPacketType packet_type) const;
 
   dev::p2p::NodeID getNodeId() const;
-  std::shared_ptr<network::tarcap::TaraxaPeer> getPeer(dev::p2p::NodeID const &id) const;
+  std::shared_ptr<network::tarcap::EblaPeer> getPeer(dev::p2p::NodeID const &id) const;
   // END METHODS USED IN TESTS ONLY
 
  private:
@@ -120,8 +120,8 @@ class Network {
   util::ThreadPool tp_;
   std::shared_ptr<dev::p2p::Host> host_;
 
-  // All supported taraxa capabilities - in descending order
-  std::map<network::tarcap::TarcapVersion, std::shared_ptr<network::tarcap::TaraxaCapability>,
+  // All supported ebla capabilities - in descending order
+  std::map<network::tarcap::TarcapVersion, std::shared_ptr<network::tarcap::EblaCapability>,
            std::greater<network::tarcap::TarcapVersion>>
       tarcaps_;
 
@@ -139,4 +139,4 @@ std::shared_ptr<PacketHandlerType> Network::getSpecificHandler(network::Subproto
   return tarcaps_.begin()->second->getSpecificHandler<PacketHandlerType>(packet_type);
 }
 
-}  // namespace taraxa
+}  // namespace ebla

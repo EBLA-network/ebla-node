@@ -9,7 +9,7 @@
 #include "common/jsoncpp.hpp"
 #include "config/version.hpp"
 
-namespace taraxa::cli {
+namespace ebla::cli {
 
 Config::Config() : plugins_options_("PLUGINS") {}
 
@@ -29,9 +29,9 @@ void Config::parseCommandLine(int argc, const char* argv[], const std::string& a
   bpo::notify(cli_options_);
   if (cli_options_.count(HELP)) {
     std::cout << "NAME:\n  "
-                 "taraxad - Taraxa blockchain full node implementation\n"
+                 "eblad - Ebla blockchain full node implementation\n"
                  "VERSION:\n  "
-              << TARAXA_VERSION << "\nUSAGE:\n  taraxad [options]\n";
+              << EBLA_VERSION << "\nUSAGE:\n  eblad [options]\n";
     std::cout << allowed_options << std::endl;
     // std::cout << node_command_options << std::endl;
     // If help message requested, ignore any additional commands
@@ -261,7 +261,7 @@ bpo::options_description Config::makeMainOptions() {
 
   // Define all the command line options and descriptions
   main_options.add_options()(HELP, "Print this help message and exit");
-  main_options.add_options()(VERSION, "Print version of taraxad");
+  main_options.add_options()(VERSION, "Print version of eblad");
 
   main_options.add_options()(COMMAND, bpo::value<std::vector<std::string>>()->multitoken(),
                              "Command arg:"
@@ -276,22 +276,22 @@ bpo::options_description Config::makeMainOptions() {
 bpo::options_description Config::makeNodeOptions(const std::string& available_plugins) {
   bpo::options_description node_command_options("NODE COMMAND OPTIONS");
   // Set config file and data directory to default values
-  config = tools::getTaraxaDefaultConfigFile();
-  wallets = {tools::getTaraxaDefaultWalletFile()};
-  genesis = tools::getTaraxaDefaultGenesisFile();
+  config = tools::getEblaDefaultConfigFile();
+  wallets = {tools::getEblaDefaultWalletFile()};
+  genesis = tools::getEblaDefaultGenesisFile();
 
   auto plugins_desc = "List of plugins to activate separated by space: " + available_plugins +
                       " (default: " + std::accumulate(plugins_.begin(), plugins_.end(), std::string()) + ")";
   node_command_options.add_options()(PLUGINS, bpo::value<std::vector<std::string>>()->multitoken()->composing(),
                                      plugins_desc.c_str());
   node_command_options.add_options()(WALLET, bpo::value<std::vector<std::string>>(&wallets)->multitoken(),
-                                     "JSON wallet file(s) (default: \"~/.taraxa/wallet.json\")");
+                                     "JSON wallet file(s) (default: \"~/.ebla/wallet.json\")");
   node_command_options.add_options()(CONFIG, bpo::value<std::string>(&config),
-                                     "JSON configuration file (default: \"~/.taraxa/config.json\")");
+                                     "JSON configuration file (default: \"~/.ebla/config.json\")");
   node_command_options.add_options()(GENESIS, bpo::value<std::string>(&genesis),
-                                     "JSON genesis file (default: \"~/.taraxa/genesis.json\")");
+                                     "JSON genesis file (default: \"~/.ebla/genesis.json\")");
   node_command_options.add_options()(DATA_DIR, bpo::value<std::string>(&data_dir),
-                                     "Data directory for the databases, logs ... (default: \"~/.taraxa/data\")");
+                                     "Data directory for the databases, logs ... (default: \"~/.ebla/data\")");
   node_command_options.add_options()(LIGHT, bpo::bool_switch()->default_value(false),
                                      "Enable light node functionality");
   node_command_options.add_options()(CHAIN_ID, bpo::value<int>(),
@@ -353,4 +353,4 @@ bpo::options_description Config::makeNodeOptions(const std::string& available_pl
   return node_command_options;
 }
 
-}  // namespace taraxa::cli
+}  // namespace ebla::cli

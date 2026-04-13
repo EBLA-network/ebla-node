@@ -4,7 +4,7 @@
 #include "rewards/block_stats.hpp"
 #include "storage/storage.hpp"
 
-namespace taraxa::rewards {
+namespace ebla::rewards {
 /**
  * @brief class that is managing rewards stats processing and hardforks(intervals changes)
  * So intermediate blocks stats are stored in the vector in data(to restore on the node restart)
@@ -54,4 +54,4 @@ class Stats {
   const std::function<uint64_t(EthBlockNumber)> dpos_eligible_total_vote_count_;
   std::unordered_map<PbftPeriod, BlockStats> blocks_stats_;
 };
-}  // namespace taraxa::rewards
+}  // namespace ebla::rewards

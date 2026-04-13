@@ -6,7 +6,7 @@
 #include "common/vrf_wrapper.hpp"
 #include "final_chain/final_chain.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 class KeyManager {
  public:
@@ -25,4 +25,4 @@ class KeyManager {
   std::shared_ptr<final_chain::FinalChain> final_chain_;
 };
 
-}  // namespace taraxa
+}  // namespace ebla

@@ -4,11 +4,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "taraxa-boot-node.fullname" . }}
+  name: {{ include "ebla-boot-node.fullname" . }}
   labels:
     name: boot-node
     app.kubernetes.io/name: boot-node
-    helm.sh/chart: {{ include "taraxa-node.chart" . }}
+    helm.sh/chart: {{ include "ebla-node.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:

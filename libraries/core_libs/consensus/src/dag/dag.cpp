@@ -12,7 +12,7 @@
 
 #include "dag/dag.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 Dag::Dag(blk_hash_t const &dag_genesis_block_hash, addr_t node_addr) {
   LOG_OBJECTS_CREATE("DAGMGR");
@@ -269,4 +269,4 @@ std::vector<blk_hash_t> PivotTree::getGhostPath(const blk_hash_t &vertex) const 
 
   return pivot_chain;
 }
-}  // namespace taraxa
+}  // namespace ebla

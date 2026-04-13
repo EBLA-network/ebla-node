@@ -5,11 +5,11 @@
 #include "common/encoding_rlp.hpp"
 #include "common/types.hpp"
 
-namespace taraxa {
+namespace ebla {
 struct Redelegation {
-  taraxa::addr_t validator;
-  taraxa::addr_t delegator;
-  taraxa::uint256_t amount;
+  ebla::addr_t validator;
+  ebla::addr_t delegator;
+  ebla::uint256_t amount;
   HAS_RLP_FIELDS
 };
 Json::Value enc_json(const Redelegation& obj);
@@ -30,10 +30,10 @@ struct AspenHardfork {
   // Part 2 implements new yield curve
   uint64_t block_num_part_two{0};
 
-  taraxa::uint256_t max_supply{"0x26C62AD77DC602DAE0000000"};  // 12 Billion
+  ebla::uint256_t max_supply{"0x26C62AD77DC602DAE0000000"};  // 12 Billion
   // total generated rewards from block 1 to block_num
   // It is partially estimated for blocks between the aspen hf release block and actual aspen hf block_num
-  taraxa::uint256_t generated_rewards{0};
+  ebla::uint256_t generated_rewards{0};
 
   HAS_RLP_FIELDS
 };
@@ -43,27 +43,27 @@ void dec_json(const Json::Value& json, AspenHardfork& obj);
 struct FicusHardforkConfig {
   uint64_t block_num{10};
   uint64_t pillar_blocks_interval{10};     // [periods] how often is the new pillar block created
-  taraxa::addr_t bridge_contract_address;  // [address] of the bridge contract
+  ebla::addr_t bridge_contract_address;  // [address] of the bridge contract
 
-  bool isFicusHardfork(taraxa::PbftPeriod period) const;
+  bool isFicusHardfork(ebla::PbftPeriod period) const;
 
   /**
    * @param period
    * @param skip_first_pillar_block if true, isPillarBlockPeriod returns false if period == first pillar block period
    * @return true if period is the pbft period, during which new pillar block is created
    */
-  bool isPillarBlockPeriod(taraxa::PbftPeriod period, bool skip_first_pillar_block = false) const;
+  bool isPillarBlockPeriod(ebla::PbftPeriod period, bool skip_first_pillar_block = false) const;
 
   /**
    * @param period
    * @return true if period is the period, during which pillar block hash is included in pbft block
    */
-  bool isPbftWithPillarBlockPeriod(taraxa::PbftPeriod period) const;
+  bool isPbftWithPillarBlockPeriod(ebla::PbftPeriod period) const;
 
   /**
    * @return first pillar block period
    */
-  taraxa::PbftPeriod firstPillarBlockPeriod() const;
+  ebla::PbftPeriod firstPillarBlockPeriod() const;
 
   void validate(uint32_t delegation_delay) const;
 
@@ -95,8 +95,8 @@ void dec_json(const Json::Value& json, SoleiroliaHardforkConfig& obj);
 
 // Keeping it for next HF
 // struct BambooRedelegation {
-//   taraxa::addr_t validator;
-//   taraxa::uint256_t amount;
+//   ebla::addr_t validator;
+//   ebla::uint256_t amount;
 //   HAS_RLP_FIELDS
 // };
 // Json::Value enc_json(const BambooRedelegation& obj);
@@ -166,4 +166,4 @@ struct HardforksConfig {
 
 Json::Value enc_json(const HardforksConfig& obj);
 void dec_json(const Json::Value& json, HardforksConfig& obj);
-}  // namespace taraxa
+}  // namespace ebla

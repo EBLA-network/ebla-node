@@ -1,7 +1,7 @@
-add_executable(taraxad main.cpp)
-target_link_libraries(taraxad PRIVATE
+add_executable(eblad main.cpp)
+target_link_libraries(eblad PRIVATE
     app
 )
 
-set(TARAXAD_INSTALL_DIR "/usr/local/bin" CACHE PATH "Taraxa application install directory")
-install(PROGRAMS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/taraxad DESTINATION ${TARAXAD_INSTALL_DIR} COMPONENT taraxad)
+set(EBLAD_INSTALL_DIR "/usr/local/bin" CACHE PATH "Ebla application install directory")
+install(PROGRAMS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/eblad DESTINATION ${EBLAD_INSTALL_DIR} COMPONENT eblad)

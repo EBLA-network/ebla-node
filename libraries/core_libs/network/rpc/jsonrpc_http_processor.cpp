@@ -3,7 +3,7 @@
 
 #include "common/jsoncpp.hpp"
 #include "common/util.hpp"
-namespace taraxa::net {
+namespace ebla::net {
 
 HttpProcessor::Response JsonRpcHttpProcessor::process(const Request &request) {
   Response response;
@@ -52,4 +52,4 @@ HttpProcessor::Response JsonRpcHttpProcessor::process(const Request &request) {
   return response;
 }
 
-}  // namespace taraxa::net
+}  // namespace ebla::net

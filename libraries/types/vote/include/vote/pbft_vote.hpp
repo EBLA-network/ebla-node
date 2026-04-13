@@ -7,7 +7,7 @@
 #include "vote.hpp"
 #include "vrf_sortition.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 /** @addtogroup Vote
  * @{
@@ -145,4 +145,4 @@ class PbftVote : public Vote {
 
 /** @}*/
 
-}  // namespace taraxa
+}  // namespace ebla

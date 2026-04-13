@@ -3,7 +3,7 @@
 #include "common/encoding_rlp.hpp"
 #include "common/types.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 using LogBloom = dev::h2048;
 using LogBlooms = std::vector<LogBloom>;
@@ -53,4 +53,4 @@ struct TransactionLocation {
 
 using SharedTransactionReceipts = std::shared_ptr<std::vector<TransactionReceipt>>;
 
-}  // namespace taraxa
+}  // namespace ebla

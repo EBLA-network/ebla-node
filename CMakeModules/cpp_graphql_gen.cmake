@@ -33,7 +33,7 @@ list(APPEND GRAPHQL_GENERATED_SOURCES
   ${GRAPHQL_GEN_DIR}/QueryObject.cpp
   ${GRAPHQL_GEN_DIR}/SubscriptionObject.cpp
   ${GRAPHQL_GEN_DIR}/SyncStateObject.cpp
-  ${GRAPHQL_GEN_DIR}/TaraxaSchema.cpp
+  ${GRAPHQL_GEN_DIR}/EblaSchema.cpp
   ${GRAPHQL_GEN_DIR}/TransactionObject.cpp
 )
 
@@ -41,8 +41,8 @@ add_custom_command(
   OUTPUT ${GRAPHQL_GENERATED_SOURCES}
   COMMAND ${CMAKE_COMMAND} -E remove -f ${GRAPHQL_GEN_DIR}/*.cpp
   COMMAND ${CMAKE_COMMAND} -E remove -f ${GRAPHQL_GEN_DIR}/*.h
-  COMMAND cppgraphqlgen::schemagen --schema="${CMAKE_CURRENT_SOURCE_DIR}/network/graphql/schema/schema.taraxa.graphql" --prefix="Taraxa" --namespace="taraxa"
+  COMMAND cppgraphqlgen::schemagen --schema="${CMAKE_CURRENT_SOURCE_DIR}/network/graphql/schema/schema.ebla.graphql" --prefix="Ebla" --namespace="ebla"
   WORKING_DIRECTORY ${GRAPHQL_GEN_DIR}
-  COMMENT "Regenerating TaraxaSchema files"
-  DEPENDS ${GRAPHQL_GEN_DIR}/../schema/schema.taraxa.graphql
+  COMMENT "Regenerating EblaSchema files"
+  DEPENDS ${GRAPHQL_GEN_DIR}/../schema/schema.ebla.graphql
 )

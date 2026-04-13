@@ -3,7 +3,7 @@
 #include "network/tarcap/packets/latest/pillar_votes_bundle_packet.hpp"
 #include "network/tarcap/packets_handlers/latest/common/ext_pillar_vote_packet_handler.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 class PillarVotesBundlePacketHandler : public ExtPillarVotePacketHandler {
  public:
@@ -18,7 +18,7 @@ class PillarVotesBundlePacketHandler : public ExtPillarVotePacketHandler {
   constexpr static size_t kMaxPillarVotesInBundleRlp{250};
 
  private:
-  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<TaraxaPeer>& peer) override;
+  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<EblaPeer>& peer) override;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

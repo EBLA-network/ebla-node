@@ -2,7 +2,7 @@
 
 #include <boost/log/utility/setup/common_attributes.hpp>
 
-namespace taraxa::logger {
+namespace ebla::logger {
 
 namespace {
 
@@ -40,4 +40,4 @@ Config createDefaultLoggingConfig() { return Config(); }
 
 void InitLogging(Config& logging_config, const addr_t& node_id) { logging_config.InitLogging(node_id); }
 
-}  // namespace taraxa::logger
+}  // namespace ebla::logger

@@ -13,7 +13,7 @@
 #include "logger/logger.hpp"
 #include "plugin/plugin.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 class Plugin;
 
@@ -122,4 +122,4 @@ class App : public std::enable_shared_from_this<App>, public AppBase {
   LOG_OBJECTS_DEFINE
 };
 
-}  // namespace taraxa
+}  // namespace ebla

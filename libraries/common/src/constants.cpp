@@ -3,11 +3,11 @@
 #include <libdevcore/RLP.h>
 #include <libdevcore/SHA3.h>
 
-namespace taraxa {
+namespace ebla {
 
 GLOBAL_CONST_DEF(ZeroHash, {})
 GLOBAL_CONST_DEF(EmptyRLPListSHA3, dev::sha3(dev::RLPStream(0).out()))
 GLOBAL_CONST_DEF(EmptyNonce, {})
 GLOBAL_CONST_DEF(ZeroU256, {})
 
-}  // namespace taraxa
+}  // namespace ebla

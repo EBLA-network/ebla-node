@@ -3,10 +3,10 @@
 
 #include "network/tarcap/packets_handlers/latest/pbft_sync_packet_handler.hpp"
 
-namespace graphql::taraxa {
+namespace graphql::ebla {
 
-SyncState::SyncState(std::shared_ptr<::taraxa::final_chain::FinalChain> final_chain,
-                     std::weak_ptr<::taraxa::Network> network) noexcept
+SyncState::SyncState(std::shared_ptr<::ebla::final_chain::FinalChain> final_chain,
+                     std::weak_ptr<::ebla::Network> network) noexcept
     : final_chain_(std::move(final_chain)), network_(std::move(network)) {}
 
 response::Value SyncState::getStartingBlock() const noexcept { return response::Value(0); }
@@ -33,4 +33,4 @@ std::optional<response::Value> SyncState::getPulledStates() const noexcept { ret
 
 std::optional<response::Value> SyncState::getKnownStates() const noexcept { return std::nullopt; }
 
-}  // namespace graphql::taraxa
+}  // namespace graphql::ebla

@@ -5,7 +5,7 @@
 #include "network/tarcap/packets_handlers/interface/sync_packet_handler.hpp"
 #include "vote_manager/vote_manager.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 class PbftSyncPacketHandler : public ISyncPacketHandler {
  public:
@@ -20,7 +20,7 @@ class PbftSyncPacketHandler : public ISyncPacketHandler {
   static constexpr SubprotocolPacketType kPacketType_ = SubprotocolPacketType::kPbftSyncPacket;
 
  private:
-  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<TaraxaPeer>& peer) override;
+  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<EblaPeer>& peer) override;
 
  protected:
   virtual PeriodData decodePeriodData(const dev::RLP& period_data_rlp) const;
@@ -35,4 +35,4 @@ class PbftSyncPacketHandler : public ISyncPacketHandler {
   util::ThreadPool periodic_events_tp_;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

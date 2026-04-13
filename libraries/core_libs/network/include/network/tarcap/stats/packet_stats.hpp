@@ -5,7 +5,7 @@
 
 #include <chrono>
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 /**
  * @brief Stats single packet type
@@ -21,4 +21,4 @@ class PacketStats {
   Json::Value getStatsJson() const;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

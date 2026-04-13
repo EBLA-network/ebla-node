@@ -2,7 +2,7 @@
 
 #include "SubscriptionObject.h"
 
-namespace graphql::taraxa {
+namespace graphql::ebla {
 
 class Subscription {
  public:
@@ -11,4 +11,4 @@ class Subscription {
   response::Value getTestSubscription() const noexcept;
 };
 
-}  // namespace graphql::taraxa
+}  // namespace graphql::ebla

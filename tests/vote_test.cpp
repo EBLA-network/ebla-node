@@ -8,7 +8,7 @@
 #include "pbft/pbft_manager.hpp"
 #include "test_util/test_util.hpp"
 
-namespace taraxa::core_tests {
+namespace ebla::core_tests {
 using namespace vrf_wrapper;
 
 auto g_vrf_sk = Lazy([] {
@@ -270,11 +270,11 @@ TEST_F(VoteTest, vote_count_compare) {
   }
 }
 
-}  // namespace taraxa::core_tests
+}  // namespace ebla::core_tests
 
-using namespace taraxa;
+using namespace ebla;
 int main(int argc, char **argv) {
-  taraxa::static_init();
+  ebla::static_init();
   auto logging = logger::createDefaultLoggingConfig();
   logging.verbosity = logger::Verbosity::Error;
 

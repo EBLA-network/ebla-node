@@ -9,7 +9,7 @@
 #include "vote/votes_bundle_rlp.hpp"
 #include "vote_manager/vote_manager.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 /**
  * @brief ExtVotesPacketHandler is extended abstract PacketHandler with added functions that are used in packet
@@ -39,7 +39,7 @@ class ExtVotesPacketHandler : public PacketHandler {
    * @return if vote was successfully processed, otherwise false
    */
   bool processVote(const std::shared_ptr<PbftVote>& vote, const std::shared_ptr<PbftBlock>& pbft_block,
-                   const std::shared_ptr<TaraxaPeer>& peer, bool validate_max_round_step);
+                   const std::shared_ptr<EblaPeer>& peer, bool validate_max_round_step);
 
   /**
    * @brief Checks is vote is relevant for current pbft state in terms of period, round and type
@@ -60,7 +60,7 @@ class ExtVotesPacketHandler : public PacketHandler {
    * @return <true, ""> vote validation passed, otherwise <false, "err msg">
    */
   std::pair<bool, std::string> validateVotePeriodRoundStep(const std::shared_ptr<PbftVote>& vote,
-                                                           const std::shared_ptr<TaraxaPeer>& peer,
+                                                           const std::shared_ptr<EblaPeer>& peer,
                                                            bool validate_max_round_step);
 
   /**
@@ -85,4 +85,4 @@ class ExtVotesPacketHandler : public PacketHandler {
   std::shared_ptr<SlashingManager> slashing_manager_;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

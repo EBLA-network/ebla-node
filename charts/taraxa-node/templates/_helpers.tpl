@@ -2,7 +2,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "taraxa-node.name" -}}
+{{- define "ebla-node.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
@@ -11,7 +11,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "taraxa-node.fullname" -}}
+{{- define "ebla-node.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -29,7 +29,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "taraxa-boot-node.fullname" -}}
+{{- define "ebla-boot-node.fullname" -}}
 {{- if .Values.bootnode.fullnameOverride -}}
 {{- .Values.bootnode.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -47,7 +47,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "taraxa-consensus-node.fullname" -}}
+{{- define "ebla-consensus-node.fullname" -}}
 {{- if .Values.consensusnode.fullnameOverride -}}
 {{- .Values.consensusnode.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -63,7 +63,7 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "taraxa-node.chart" -}}
+{{- define "ebla-node.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{/*
@@ -79,7 +79,7 @@ Create a default fully qualified websocket.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "taraxa-node.wsName" -}}
+{{- define "ebla-node.wsName" -}}
 {{- if .Values.wsNameOverride -}}
 {{- .Values.wsNameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -92,7 +92,7 @@ Create a default fully qualified indexer name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "taraxa-node.indexerName" -}}
+{{- define "ebla-node.indexerName" -}}
 {{- if .Values.indexerNameOverride -}}
 {{- .Values.indexerNameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -105,7 +105,7 @@ Create a default fully qualified graphql websocket.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "taraxa-node.graphQlWsName" -}}
+{{- define "ebla-node.graphQlWsName" -}}
 {{- if .Values.graphQlWsNameOverride -}}
 {{- .Values.graphQlWsNameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -118,7 +118,7 @@ Create a default fully qualified rpc.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "taraxa-node.rpcName" -}}
+{{- define "ebla-node.rpcName" -}}
 {{- if .Values.rpcNameOverride -}}
 {{- .Values.rpcNameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -131,7 +131,7 @@ Create a default fully qualified graphql.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "taraxa-node.graphQlName" -}}
+{{- define "ebla-node.graphQlName" -}}
 {{- if .Values.graphQlNameOverride -}}
 {{- .Values.graphQlNameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -140,13 +140,13 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/* Allow KubeVersion to be overridden. */}}
-{{- define "taraxa-node.kubeVersion" -}}
+{{- define "ebla-node.kubeVersion" -}}
   {{- default .Capabilities.KubeVersion.Version .Values.kubeVersionOverride -}}
 {{- end -}}
 
 {{/* Get Ingress API Version */}}
-{{- define "taraxa-node.ingress.apiVersion" -}}
-  {{- if and (.Capabilities.APIVersions.Has "networking.k8s.io/v1") (semverCompare ">= 1.19-0" (include "taraxa-node.kubeVersion" .)) -}}
+{{- define "ebla-node.ingress.apiVersion" -}}
+  {{- if and (.Capabilities.APIVersions.Has "networking.k8s.io/v1") (semverCompare ">= 1.19-0" (include "ebla-node.kubeVersion" .)) -}}
       {{- print "networking.k8s.io/v1" -}}
   {{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" -}}
     {{- print "networking.k8s.io/v1beta1" -}}
@@ -156,12 +156,12 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/* Check Ingress stability */}}
-{{- define "taraxa-node.ingress.isStable" -}}
-  {{- eq (include "taraxa-node.ingress.apiVersion" .) "networking.k8s.io/v1" -}}
+{{- define "ebla-node.ingress.isStable" -}}
+  {{- eq (include "ebla-node.ingress.apiVersion" .) "networking.k8s.io/v1" -}}
 {{- end -}}
 
 {{/* Check Ingress supports pathType */}}
 {{/* pathType was added to networking.k8s.io/v1beta1 in Kubernetes 1.18 */}}
-{{- define "taraxa-node.ingress.supportsPathType" -}}
-  {{- or (eq (include "taraxa-node.ingress.isStable" .) "true") (and (eq (include "taraxa-node.ingress.apiVersion" .) "networking.k8s.io/v1beta1") (semverCompare ">= 1.18-0" (include "taraxa-node.kubeVersion" .))) -}}
+{{- define "ebla-node.ingress.supportsPathType" -}}
+  {{- or (eq (include "ebla-node.ingress.isStable" .) "true") (and (eq (include "ebla-node.ingress.apiVersion" .) "networking.k8s.io/v1beta1") (semverCompare ">= 1.18-0" (include "ebla-node.kubeVersion" .))) -}}
 {{- end -}}

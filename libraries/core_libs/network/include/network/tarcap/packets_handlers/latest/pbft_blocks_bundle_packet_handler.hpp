@@ -2,15 +2,15 @@
 
 #include "common/packet_handler.hpp"
 
-namespace taraxa {
+namespace ebla {
 class PbftManager;
 namespace final_chain {
 class FinalChain;
 }
 
-}  // namespace taraxa
+}  // namespace ebla
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 class PbftSyncingState;
 
@@ -28,11 +28,11 @@ class PbftBlocksBundlePacketHandler : public PacketHandler {
   static constexpr size_t kMaxBlocksInPacket = 10;
 
  private:
-  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<TaraxaPeer>& peer) override;
+  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<EblaPeer>& peer) override;
 
   std::shared_ptr<PbftManager> pbft_mgr_;
   std::shared_ptr<final_chain::FinalChain> final_chain_;
   std::shared_ptr<PbftSyncingState> pbft_syncing_state_;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

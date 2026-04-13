@@ -2,7 +2,7 @@
 
 #include "transaction/transaction.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 struct TransactionPacket {
   std::vector<std::shared_ptr<Transaction>> transactions;
@@ -11,4 +11,4 @@ struct TransactionPacket {
   RLP_FIELDS_DEFINE_INPLACE(transactions, extra_transactions_hashes)
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

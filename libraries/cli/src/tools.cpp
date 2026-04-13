@@ -12,7 +12,7 @@
 using namespace std;
 using namespace dev;
 
-namespace taraxa::cli::tools {
+namespace ebla::cli::tools {
 
 int getChainIdFromString(std::string chain_str) {
   boost::algorithm::to_lower(chain_str);
@@ -70,7 +70,7 @@ Json::Value overrideConfig(Json::Value& conf, std::string& data_dir, const std::
                            const std::vector<std::string>& log_channels_append) {
   if (data_dir.empty()) {
     if (conf["data_path"].asString().empty()) {
-      conf["data_path"] = getTaraxaDataDefaultDir();
+      conf["data_path"] = getEblaDataDefaultDir();
     }
     data_dir = conf["data_path"].asString();
   } else {
@@ -164,7 +164,7 @@ Json::Value overrideConfig(Json::Value& conf, std::string& data_dir, const std::
 void generateWallet(const string& wallet) {
   // Wallet
   dev::KeyPair account = dev::KeyPair::create();
-  auto [pk, sk] = taraxa::vrf_wrapper::getVrfKeyPair();
+  auto [pk, sk] = ebla::vrf_wrapper::getVrfKeyPair();
 
   auto account_json = createWalletJson(account, sk, pk);
 
@@ -182,8 +182,8 @@ Json::Value overrideWallet(Json::Value& wallet, const std::string& node_key, con
   }
 
   if (!vrf_key.empty()) {
-    auto sk = taraxa::vrf_wrapper::vrf_sk_t(vrf_key);
-    auto pk = taraxa::vrf_wrapper::getVrfPublicKey(sk);
+    auto sk = ebla::vrf_wrapper::vrf_sk_t(vrf_key);
+    auto pk = ebla::vrf_wrapper::getVrfPublicKey(sk);
     wallet["vrf_secret"] = sk.toString();
     wallet["vrf_public"] = pk.toString();
   }
@@ -205,24 +205,24 @@ void generateAccountFromKey(const string& key) {
   generateAccount(account);
 }
 
-void generateVrf(const taraxa::vrf_wrapper::vrf_sk_t& sk, const taraxa::vrf_wrapper::vrf_pk_t& pk) {
+void generateVrf(const ebla::vrf_wrapper::vrf_sk_t& sk, const ebla::vrf_wrapper::vrf_pk_t& pk) {
   cout << "\"vrf_secret\" : \"" << sk.toString() << "\"" << endl;
   cout << "\"vrf_public\" : \"" << pk.toString() << "\"" << endl;
 }
 
 void generateVrf() {
-  auto [pk, sk] = taraxa::vrf_wrapper::getVrfKeyPair();
+  auto [pk, sk] = ebla::vrf_wrapper::getVrfKeyPair();
   generateVrf(sk, pk);
 }
 
 void generateVrfFromKey(const string& key) {
-  auto sk = taraxa::vrf_wrapper::vrf_sk_t(key);
-  auto pk = taraxa::vrf_wrapper::getVrfPublicKey(sk);
+  auto sk = ebla::vrf_wrapper::vrf_sk_t(key);
+  auto pk = ebla::vrf_wrapper::getVrfPublicKey(sk);
   generateVrf(sk, pk);
 }
 
-Json::Value createWalletJson(const dev::KeyPair& account, const taraxa::vrf_wrapper::vrf_sk_t& sk,
-                             const taraxa::vrf_wrapper::vrf_pk_t& pk) {
+Json::Value createWalletJson(const dev::KeyPair& account, const ebla::vrf_wrapper::vrf_sk_t& sk,
+                             const ebla::vrf_wrapper::vrf_pk_t& pk) {
   Json::Value json(Json::objectValue);
   json["node_secret"] = toHex(account.secret().ref());
   json["node_public"] = account.pub().toString();
@@ -235,14 +235,14 @@ Json::Value createWalletJson(const dev::KeyPair& account, const taraxa::vrf_wrap
 
 string getHomeDir() { return string(getpwuid(getuid())->pw_dir); }
 
-string getTaraxaDefaultDir() { return getHomeDir() + "/" + DEFAULT_TARAXA_DIR_NAME; }
+string getEblaDefaultDir() { return getHomeDir() + "/" + DEFAULT_EBLA_DIR_NAME; }
 
-string getTaraxaDataDefaultDir() { return getHomeDir() + "/" + DEFAULT_TARAXA_DATA_DIR_NAME; }
+string getEblaDataDefaultDir() { return getHomeDir() + "/" + DEFAULT_EBLA_DATA_DIR_NAME; }
 
-string getTaraxaDefaultWalletFile() { return getTaraxaDefaultDir() + "/" + DEFAULT_WALLET_FILE_NAME; }
+string getEblaDefaultWalletFile() { return getEblaDefaultDir() + "/" + DEFAULT_WALLET_FILE_NAME; }
 
-string getTaraxaDefaultConfigFile() { return getTaraxaDefaultDir() + "/" + DEFAULT_CONFIG_FILE_NAME; }
+string getEblaDefaultConfigFile() { return getEblaDefaultDir() + "/" + DEFAULT_CONFIG_FILE_NAME; }
 
-string getTaraxaDefaultGenesisFile() { return getTaraxaDefaultDir() + "/" + DEFAULT_GENESIS_FILE_NAME; }
+string getEblaDefaultGenesisFile() { return getEblaDefaultDir() + "/" + DEFAULT_GENESIS_FILE_NAME; }
 
-}  // namespace taraxa::cli::tools
+}  // namespace ebla::cli::tools

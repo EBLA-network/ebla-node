@@ -4,7 +4,7 @@
 
 #include "common/vrf_wrapper.hpp"
 
-namespace taraxa::state_api {
+namespace ebla::state_api {
 
 Json::Value enc_json(const EVMChainConfig& /*obj*/) {
   Json::Value json(Json::objectValue);
@@ -127,4 +127,4 @@ RLP_FIELDS_DEFINE(Config, evm_chain_config, initial_balances, dpos, hardforks)
 RLP_FIELDS_DEFINE(Opts, expected_max_trx_per_block, max_trie_full_node_levels_to_cache)
 RLP_FIELDS_DEFINE(OptsDB, db_path, disable_most_recent_trie_value_views)
 
-}  // namespace taraxa::state_api
+}  // namespace ebla::state_api

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-export TARAXA_CONF_PATH=${TARAXA_CONF_PATH:=/root/.taraxa/conf_taraxa.json}
-export TARAXA_PERSISTENT_PATH=${TARAXA_PERSISTENT_PATH:=/root/.taraxa}
-export TARAXA_COPY_COREDUMPS=${TARAXA_COPY_COREDUMPS:=true}
-export TARAXA_SLEEP_DIAGNOSE=${TARAXA_SLEEP_DIAGNOSE:=false}
+export EBLA_CONF_PATH=${EBLA_CONF_PATH:=/root/.ebla/conf_ebla.json}
+export EBLA_PERSISTENT_PATH=${EBLA_PERSISTENT_PATH:=/root/.ebla}
+export EBLA_COPY_COREDUMPS=${EBLA_COPY_COREDUMPS:=true}
+export EBLA_SLEEP_DIAGNOSE=${EBLA_SLEEP_DIAGNOSE:=false}
 
 FLAGS=""
 if [[ -z "${HOSTNAME}" ]]; then
@@ -33,28 +33,28 @@ fi
 
 case $1 in
 
-  taraxa-bootnode)
-    echo "Starting taraxa-bootnode..."
-    taraxa-bootnode $FLAGS "${@:2}"
+  ebla-bootnode)
+    echo "Starting ebla-bootnode..."
+    ebla-bootnode $FLAGS "${@:2}"
     ;;
 
-  taraxad)
-    echo "Starting taraxad..."
-    taraxad $FLAGS "${@:2}"
+  eblad)
+    echo "Starting eblad..."
+    eblad $FLAGS "${@:2}"
     ;;
 
   join)
-    echo "Starting taraxad..."
-    taraxad $FLAGS \
-            --config $TARAXA_CONF_PATH \
+    echo "Starting eblad..."
+    eblad $FLAGS \
+            --config $EBLA_CONF_PATH \
             --chain-id $2
 
     ;;
 
   single)
-	  echo "Starting taraxad..."
-    taraxad $FLAGS \
-            --config $TARAXA_CONF_PATH
+	  echo "Starting eblad..."
+    eblad $FLAGS \
+            --config $EBLA_CONF_PATH
 
     ;;
   exec)
@@ -63,20 +63,20 @@ case $1 in
 
   *)
     echo "You should choose between:"
-    echo "taraxa-bootnode, taraxad, single, join {NAMED_NETWOTK}"
+    echo "ebla-bootnode, eblad, single, join {NAMED_NETWOTK}"
     ;;
 
 esac
 
 # Hack to copy coredumps on  K8s (gke) current /proc/sys/kernel/core_pattern
-if [ "$TARAXA_COPY_COREDUMPS" = true ] ; then
-    echo "Copying dump (if any) to $TARAXA_PERSISTENT_PATH"
-    find / -maxdepth 1 -type f -name '*core*' -exec cp -v "{}" $TARAXA_PERSISTENT_PATH  \;
+if [ "$EBLA_COPY_COREDUMPS" = true ] ; then
+    echo "Copying dump (if any) to $EBLA_PERSISTENT_PATH"
+    find / -maxdepth 1 -type f -name '*core*' -exec cp -v "{}" $EBLA_PERSISTENT_PATH  \;
 fi
 
 # Hack to sleep forever so devs can diagnose the pod on k8s
 # We should not set Liveness/Readiness for this to work
-if [ "$TARAXA_SLEEP_DIAGNOSE" = true ] ; then
+if [ "$EBLA_SLEEP_DIAGNOSE" = true ] ; then
     echo "Sleeping forever for diagnosis"
     while true
     do

@@ -9,13 +9,13 @@
 
 using namespace std::literals;
 
-namespace graphql::taraxa {
+namespace graphql::ebla {
 
-Block::Block(std::shared_ptr<::taraxa::final_chain::FinalChain> final_chain,
-             std::shared_ptr<::taraxa::TransactionManager> trx_manager,
-             std::function<std::shared_ptr<object::Block>(::taraxa::EthBlockNumber)> get_block_by_num,
-             const ::taraxa::blk_hash_t& pbft_block_hash,
-             std::shared_ptr<const ::taraxa::final_chain::BlockHeader> block_header) noexcept
+Block::Block(std::shared_ptr<::ebla::final_chain::FinalChain> final_chain,
+             std::shared_ptr<::ebla::TransactionManager> trx_manager,
+             std::function<std::shared_ptr<object::Block>(::ebla::EthBlockNumber)> get_block_by_num,
+             const ::ebla::blk_hash_t& pbft_block_hash,
+             std::shared_ptr<const ::ebla::final_chain::BlockHeader> block_header) noexcept
     : final_chain_(std::move(final_chain)),
       trx_manager_(std::move(trx_manager)),
       get_block_by_num_(std::move(get_block_by_num)),
@@ -126,11 +126,11 @@ std::vector<std::shared_ptr<object::Log>> Block::getLogs(BlockFilterCriteria&&) 
 
 std::shared_ptr<object::Account> Block::getAccount(response::Value&& addressArg) const {
   return std::make_shared<object::Account>(
-      std::make_shared<Account>(final_chain_, ::taraxa::addr_t(addressArg.get<std::string>()), block_header_->number));
+      std::make_shared<Account>(final_chain_, ::ebla::addr_t(addressArg.get<std::string>()), block_header_->number));
 }
 
 std::shared_ptr<object::CallResult> Block::getCall(CallData&&) const noexcept { return nullptr; }
 
 response::Value Block::getEstimateGas(CallData&&) const noexcept { return response::Value(0); }
 
-}  // namespace graphql::taraxa
+}  // namespace graphql::ebla

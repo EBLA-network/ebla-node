@@ -11,7 +11,7 @@
 #include "test_util/test_util.hpp"
 #include "vote_manager/vote_manager.hpp"
 
-namespace taraxa::state_api {
+namespace ebla::state_api {
 using boost::filesystem::create_directories;
 using boost::filesystem::path;
 using boost::filesystem::remove_all;
@@ -173,11 +173,11 @@ TEST_F(StateAPITest, DISABLED_dpos_integration) {
 
 TEST_F(StateAPITest, DISABLED_eth_mainnet_smoke) {
   auto test_blocks =
-      parse_rlp_file<vector<TestBlock>>(path(__FILE__).parent_path().parent_path() / "submodules" / "taraxa-evm" /
-                                        "taraxa" / "data" / "eth_mainnet_blocks_0_300000.rlp");
+      parse_rlp_file<vector<TestBlock>>(path(__FILE__).parent_path().parent_path() / "submodules" / "ebla-evm" /
+                                        "ebla" / "data" / "eth_mainnet_blocks_0_300000.rlp");
 
   Config chain_config;
-  auto initial_balances_rlp_hex_c = taraxa_evm_mainnet_initial_balances();
+  auto initial_balances_rlp_hex_c = ebla_evm_mainnet_initial_balances();
   auto initial_balances_rlp =
       dev::jsToBytes(string((char*)initial_balances_rlp_hex_c.Data, initial_balances_rlp_hex_c.Len));
   util::rlp(dev::RLP(initial_balances_rlp), chain_config.initial_balances);
@@ -251,6 +251,6 @@ TEST_F(StateAPITest, slashing) {
   //  });
 }
 
-}  // namespace taraxa::state_api
+}  // namespace ebla::state_api
 
-TARAXA_TEST_MAIN({})
+EBLA_TEST_MAIN({})

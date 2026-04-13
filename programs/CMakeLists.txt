@@ -1,4 +1,4 @@
-# Main taraxad binary
-add_subdirectory(taraxad)
+# Main eblad binary
+add_subdirectory(eblad)
 # bootnode binary
-add_subdirectory(taraxa-bootnode)
+add_subdirectory(ebla-bootnode)

@@ -2,7 +2,7 @@
 
 #include "network/tarcap/packets_handlers/interface/sync_packet_handler.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 class StatusPacketHandler : public ISyncPacketHandler {
  public:
@@ -17,9 +17,9 @@ class StatusPacketHandler : public ISyncPacketHandler {
   static constexpr SubprotocolPacketType kPacketType_ = SubprotocolPacketType::kStatusPacket;
 
  private:
-  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<TaraxaPeer>& peer) override;
+  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<EblaPeer>& peer) override;
 
   const h256 kGenesisHash;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

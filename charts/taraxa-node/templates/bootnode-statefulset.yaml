@@ -2,23 +2,23 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "taraxa-boot-node.fullname" . }}
+  name: {{ include "ebla-boot-node.fullname" . }}
   labels:
     app: boot-node
     app.kubernetes.io/name: boot-node
-    helm.sh/chart: {{ include "taraxa-node.chart" . }}
+    helm.sh/chart: {{ include "ebla-node.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     {{ if .Values.kubemonkey.enabled }}
     kube-monkey/enabled: enabled
-    kube-monkey/identifier: {{ include "taraxa-boot-node.fullname" . }}
+    kube-monkey/identifier: {{ include "ebla-boot-node.fullname" . }}
     kube-monkey/mtbf: {{ .Values.kubemonkey.mtbf | quote }}
     kube-monkey/kill-mode: {{ .Values.kubemonkey.killMode | quote }}
     kube-monkey/kill-value: {{ .Values.kubemonkey.killValue | quote }}
     {{ end }}
 spec:
   replicas: {{ .Values.bootnode.replicaCount }}
-  serviceName: {{ include "taraxa-boot-node.fullname" . }}
+  serviceName: {{ include "ebla-boot-node.fullname" . }}
   # to launch or terminate all Pods in parallel.
   # https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#parallel-pod-management
   podManagementPolicy: Parallel
@@ -38,7 +38,7 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
         {{ if .Values.kubemonkey.enabled }}
         kube-monkey/enabled: enabled
-        kube-monkey/identifier: {{ include "taraxa-boot-node.fullname" . }}
+        kube-monkey/identifier: {{ include "ebla-boot-node.fullname" . }}
         kube-monkey/mtbf: {{ .Values.kubemonkey.mtbf | quote }}
         kube-monkey/kill-mode: {{ .Values.kubemonkey.killMode | quote }}
         kube-monkey/kill-value: {{ .Values.kubemonkey.killValue | quote }}
@@ -74,7 +74,7 @@ spec:
               readOnly: true
               subPath: entrypoint.sh
             - name: data
-              mountPath: /root/.taraxa
+              mountPath: /root/.ebla
       containers:
         - name: boot-node
           {{- if and .Values.bootnode.image.repository .Values.bootnode.image.tag }}
@@ -103,7 +103,7 @@ spec:
                 fieldRef:
                   fieldPath: status.podIP
           {{- if not .Values.bootnode.probes.enabled }}
-            - name: TARAXA_SLEEP_DIAGNOSE
+            - name: EBLA_SLEEP_DIAGNOSE
               value: "true"
           {{- end }}
           {{ if .Values.bootnode.loadBalancer.enabled }}
@@ -120,7 +120,7 @@ spec:
               command:
               - /bin/sh
               - -c
-              - "ps -A | grep taraxa-bootnode"
+              - "ps -A | grep ebla-bootnode"
             initialDelaySeconds: 10
             periodSeconds: 5
           {{- end }}
@@ -128,7 +128,7 @@ spec:
             {{- toYaml .Values.bootnode.resources | nindent 12 }}
           volumeMounts:
             - name: data
-              mountPath: /root/.taraxa
+              mountPath: /root/.ebla
           securityContext:
             capabilities:
               add:

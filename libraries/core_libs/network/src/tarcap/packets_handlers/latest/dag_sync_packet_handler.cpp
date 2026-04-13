@@ -6,7 +6,7 @@
 #include "transaction/transaction.hpp"
 #include "transaction/transaction_manager.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 DagSyncPacketHandler::DagSyncPacketHandler(const FullNodeConfig& conf, std::shared_ptr<PeersState> peers_state,
                                            std::shared_ptr<TimePeriodPacketsStats> packets_stats,
@@ -20,7 +20,7 @@ DagSyncPacketHandler::DagSyncPacketHandler(const FullNodeConfig& conf, std::shar
                          logs_prefix + "DAG_SYNC_PH"),
       trx_mgr_(std::move(trx_mgr)) {}
 
-void DagSyncPacketHandler::process(const threadpool::PacketData& packet_data, const std::shared_ptr<TaraxaPeer>& peer) {
+void DagSyncPacketHandler::process(const threadpool::PacketData& packet_data, const std::shared_ptr<EblaPeer>& peer) {
   // Decode packet rlp into packet object
   auto packet = decodePacketRlp<DagSyncPacket>(packet_data.rlp_);
 
@@ -107,4 +107,4 @@ void DagSyncPacketHandler::process(const threadpool::PacketData& packet_data, co
                << " Transactions: " << transactions_to_log << " from " << peer->getId();
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

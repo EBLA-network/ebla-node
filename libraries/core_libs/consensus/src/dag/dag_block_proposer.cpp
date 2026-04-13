@@ -9,7 +9,7 @@
 #include "transaction/transaction.hpp"
 #include "transaction/transaction_manager.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 using namespace vdf_sortition;
 
@@ -394,4 +394,4 @@ bool DagBlockProposer::isValidDposProposer(PbftPeriod propose_period, const addr
 
 void DagBlockProposer::setNetwork(std::weak_ptr<Network> network) { network_ = std::move(network); }
 
-}  // namespace taraxa
+}  // namespace ebla

@@ -1,6 +1,6 @@
 #include "network/tarcap/packets_handler.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 const std::shared_ptr<BasePacketHandler>& PacketsHandler::getSpecificHandler(SubprotocolPacketType packet_type) const {
   auto selected_handler = packets_handlers_.find(packet_type);
@@ -14,4 +14,4 @@ const std::shared_ptr<BasePacketHandler>& PacketsHandler::getSpecificHandler(Sub
   return selected_handler->second;
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

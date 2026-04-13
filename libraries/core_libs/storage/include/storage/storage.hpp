@@ -21,7 +21,7 @@
 #include "vote/pillar_vote.hpp"
 #include "vote_manager/verified_votes.hpp"
 
-namespace taraxa {
+namespace ebla {
 namespace fs = std::filesystem;
 struct SortitionParamsChange;
 
@@ -325,7 +325,7 @@ class DbStorage : public std::enable_shared_from_this<DbStorage> {
   // pbft_blocks (head)
   std::string getPbftHead(blk_hash_t const& hash);
   void savePbftHead(blk_hash_t const& hash, std::string const& pbft_chain_head_str);
-  void addPbftHeadToBatch(taraxa::blk_hash_t const& head_hash, std::string const& head_str, Batch& write_batch);
+  void addPbftHeadToBatch(ebla::blk_hash_t const& head_hash, std::string const& head_str, Batch& write_batch);
 
   // status
   uint64_t getStatusField(StatusDbField const& field);
@@ -349,8 +349,8 @@ class DbStorage : public std::enable_shared_from_this<DbStorage> {
   std::vector<std::shared_ptr<PbftVote>> getRewardVotes();
 
   // period_pbft_block
-  void addPbftBlockPeriodToBatch(PbftPeriod period, taraxa::blk_hash_t const& pbft_block_hash, Batch& write_batch);
-  std::pair<bool, PbftPeriod> getPeriodFromPbftHash(taraxa::blk_hash_t const& pbft_block_hash);
+  void addPbftBlockPeriodToBatch(PbftPeriod period, ebla::blk_hash_t const& pbft_block_hash, Batch& write_batch);
+  std::pair<bool, PbftPeriod> getPeriodFromPbftHash(ebla::blk_hash_t const& pbft_block_hash);
   // dag_block_period
   std::shared_ptr<std::pair<PbftPeriod, uint32_t>> getDagBlockPeriod(blk_hash_t const& hash);
   void addDagBlockPeriodToBatch(blk_hash_t const& hash, PbftPeriod period, uint32_t position, Batch& write_batch);
@@ -515,4 +515,4 @@ class DbStorage : public std::enable_shared_from_this<DbStorage> {
   void forEach(Column const& col, OnEntry const& f);
 };
 
-}  // namespace taraxa
+}  // namespace ebla

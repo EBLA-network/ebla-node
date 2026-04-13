@@ -4,7 +4,7 @@
 
 #include "common/types.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 class PbftVote;
 
@@ -30,4 +30,4 @@ struct VerifiedVotes {
   PbftStep network_half_five_of_eight_step{0};
 };
 
-}  // namespace taraxa
+}  // namespace ebla

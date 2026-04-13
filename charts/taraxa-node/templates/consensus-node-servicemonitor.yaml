@@ -3,11 +3,11 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name:  {{ include "taraxa-consensus-node.fullname" . }}
+  name:  {{ include "ebla-consensus-node.fullname" . }}
   labels:
     name: consensus-node
     app.kubernetes.io/name: consensus-node
-    helm.sh/chart: {{ include "taraxa-node.chart" . }}
+    helm.sh/chart: {{ include "ebla-node.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:

@@ -7,11 +7,11 @@
 #include "network/tarcap/packet_types.hpp"
 #include "network/threadpool/packet_data.hpp"
 
-namespace taraxa {
+namespace ebla {
 class PbftManager;
 }
 
-namespace taraxa::network::threadpool {
+namespace ebla::network::threadpool {
 
 class PacketsBlockingMask {
  public:
@@ -44,7 +44,7 @@ class PacketsBlockingMask {
   bool isDagBlockPacketBlockedBySameDagBlock(const PacketData& packet_data) const;
   dev::RLP dagBlockFromDagPacket(const PacketData& packet_data) const;
 
-  std::optional<taraxa::level_t> getSmallestDagLevelBeingProcessed() const;
+  std::optional<ebla::level_t> getSmallestDagLevelBeingProcessed() const;
 
  private:
   // Packets types that are currently hard blocked for processing in another threads due to dependencies,
@@ -72,12 +72,12 @@ class PacketsBlockingMask {
   //    list - list of "DagBlockPacket" packets (of the same dag block level) that are currently being processed
   //    concurrently
   // Order of levels must be preserved, therefore using std::map
-  std::map<taraxa::level_t, std::unordered_set<PacketData::PacketId>> processing_dag_levels_;
+  std::map<ebla::level_t, std::unordered_set<PacketData::PacketId>> processing_dag_levels_;
 
   // This "blocking dependency" is specific just for DagBlockPacket. Multiple nodes can send same dag blocks
   // concurrently, to reduce perofrmance impact only one packet/block will be processsed and others will be waiting.
   //  This map contains dag blocks that are currently processed with the associated packet id
-  std::map<taraxa::sig_t, PacketData::PacketId> processing_dag_blocks_;
+  std::map<ebla::sig_t, PacketData::PacketId> processing_dag_blocks_;
 
   std::shared_ptr<PbftManager> pbft_mgr_;
 
@@ -86,4 +86,4 @@ class PacketsBlockingMask {
   static constexpr size_t kRequiredDagPacketSizeV2 = 8;
 };
 
-}  // namespace taraxa::network::threadpool
+}  // namespace ebla::network::threadpool

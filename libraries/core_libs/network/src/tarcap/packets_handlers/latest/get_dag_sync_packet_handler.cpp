@@ -4,7 +4,7 @@
 #include "network/tarcap/packets/latest/dag_sync_packet.hpp"
 #include "transaction/transaction_manager.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 GetDagSyncPacketHandler::GetDagSyncPacketHandler(const FullNodeConfig &conf, std::shared_ptr<PeersState> peers_state,
                                                  std::shared_ptr<TimePeriodPacketsStats> packets_stats,
@@ -17,7 +17,7 @@ GetDagSyncPacketHandler::GetDagSyncPacketHandler(const FullNodeConfig &conf, std
       db_(std::move(db)) {}
 
 void GetDagSyncPacketHandler::process(const threadpool::PacketData &packet_data,
-                                      [[maybe_unused]] const std::shared_ptr<TaraxaPeer> &peer) {
+                                      [[maybe_unused]] const std::shared_ptr<EblaPeer> &peer) {
   // Decode packet rlp into packet object
   auto packet = decodePacketRlp<GetDagSyncPacket>(packet_data.rlp_);
 
@@ -69,4 +69,4 @@ void GetDagSyncPacketHandler::sendBlocks(const dev::p2p::NodeID &peer_id,
   sealAndSend(peer_id, SubprotocolPacketType::kDagSyncPacket, encodePacketRlp(dag_sync_packet));
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

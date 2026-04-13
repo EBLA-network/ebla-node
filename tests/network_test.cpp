@@ -25,7 +25,7 @@
 #include "test_util/samples.hpp"
 #include "test_util/test_util.hpp"
 
-namespace taraxa::core_tests {
+namespace ebla::core_tests {
 
 using dev::p2p::Host;
 using vrf_wrapper::VrfSortitionBase;
@@ -407,7 +407,7 @@ TEST_F(NetworkTest, node_chain_id) {
 
     auto nodes = create_nodes(node_cfgs, true /*start*/);
 
-    taraxa::thisThreadSleepForMilliSeconds(1000);
+    ebla::thisThreadSleepForMilliSeconds(1000);
     EXPECT_EQ(nodes[0]->getNetwork()->getPeerCount(), 0);
     EXPECT_EQ(nodes[1]->getNetwork()->getPeerCount(), 0);
   }
@@ -422,7 +422,7 @@ TEST_F(NetworkTest, node_sync) {
   node1->getPbftManager()->stop();
 
   // Allow node to start up
-  taraxa::thisThreadSleepForMilliSeconds(1000);
+  ebla::thisThreadSleepForMilliSeconds(1000);
 
   std::vector<std::pair<std::shared_ptr<DagBlock>, std::shared_ptr<Transaction>>> blks;
   // Generate DAG blocks
@@ -778,7 +778,7 @@ TEST_F(NetworkTest, node_pbft_sync_without_enough_votes) {
     if (node2->getPbftManager()->pbftSyncingPeriod() >= expect_pbft_chain_size) {
       break;
     }
-    taraxa::thisThreadSleepForMilliSeconds(100);
+    ebla::thisThreadSleepForMilliSeconds(100);
   }
   EXPECT_EQ(node2->getPbftManager()->pbftSyncingPeriod(), expect_pbft_chain_size);
 }
@@ -983,7 +983,7 @@ TEST_F(NetworkTest, node_sync_with_transactions) {
   EXPECT_EQ(node1->getDagManager()->verifyBlock(std::move(blk6)).first, DagManager::VerifyBlockReturnType::Verified);
   node1->getDagManager()->addDagBlock(blk6);
   // To make sure blocks are stored before starting node 2
-  taraxa::thisThreadSleepForMilliSeconds(1000);
+  ebla::thisThreadSleepForMilliSeconds(1000);
 
   EXPECT_GT(node1->getDagManager()->getNumVerticesInDag().first, 6);
   EXPECT_GT(node1->getDagManager()->getNumEdgesInDag().first, 7);
@@ -1196,7 +1196,7 @@ TEST_F(NetworkTest, node_transaction_sync) {
   for (auto t : *g_signed_trx_samples) node1->getTransactionManager()->insertValidatedTransaction(std::shared_ptr(t));
 
   std::cout << "Waiting Sync for 2000 milliseconds ..." << std::endl;
-  taraxa::thisThreadSleepForMilliSeconds(2000);
+  ebla::thisThreadSleepForMilliSeconds(2000);
 
   for (auto const& t : *g_signed_trx_samples) {
     EXPECT_TRUE(node2->getTransactionManager()->getTransaction(t->getHash()) != nullptr);
@@ -1212,7 +1212,7 @@ TEST_F(NetworkTest, transaction_gossip_selection) {
     TestTransactionPacketHandler(std::shared_ptr<network::tarcap::PeersState> peers_state)
         : TransactionPacketHandler({}, peers_state, {}, {}, {}) {}
     std::vector<
-        std::pair<std::shared_ptr<network::tarcap::TaraxaPeer>, std::pair<SharedTransactions, std::vector<trx_hash_t>>>>
+        std::pair<std::shared_ptr<network::tarcap::EblaPeer>, std::pair<SharedTransactions, std::vector<trx_hash_t>>>>
     public_transactionsToSendToPeers(std::vector<SharedTransactions> transactions) {
       auto res = transactionsToSendToPeers(std::move(transactions));
       for (auto account : res) {
@@ -1769,7 +1769,7 @@ TEST_F(NetworkTest, node_full_sync) {
 }
 
 TEST_F(NetworkTest, suspicious_packets) {
-  network::tarcap::TaraxaPeer peer;
+  network::tarcap::EblaPeer peer;
   // Verify that after 50000 reported suspicious packets true is returned
   for (int i = 0; i < 50000; i++) {
     EXPECT_FALSE(peer.reportSuspiciousPacket());
@@ -1787,7 +1787,7 @@ TEST_F(NetworkTest, suspicious_packets) {
 }
 
 TEST_F(NetworkTest, dag_syncing_limit) {
-  network::tarcap::TaraxaPeer peer1, peer2;
+  network::tarcap::EblaPeer peer1, peer2;
   const uint64_t dag_sync_limit = 60;
 
   EXPECT_TRUE(peer1.dagSyncingAllowed());
@@ -1871,11 +1871,11 @@ TEST_F(NetworkTest, pbft_sync_packet_rlp_encoding) {
   }
 }
 
-}  // namespace taraxa::core_tests
+}  // namespace ebla::core_tests
 
-using namespace taraxa;
+using namespace ebla;
 int main(int argc, char** argv) {
-  taraxa::static_init();
+  ebla::static_init();
   auto logging = logger::createDefaultLoggingConfig();
   logging.verbosity = logger::Verbosity::Error;
 

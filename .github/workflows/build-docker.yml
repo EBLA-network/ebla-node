@@ -20,7 +20,7 @@ on:
 env:
   REGISTRY: gcr.io
   GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
-  IMAGE_NAME: taraxa-node
+  IMAGE_NAME: ebla-node
   DOCKERFILE: Dockerfile
 
 jobs:

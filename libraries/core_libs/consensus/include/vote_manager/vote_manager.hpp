@@ -8,7 +8,7 @@
 #include "vote/pbft_vote.hpp"
 #include "vote_manager/verified_votes.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 /** @addtogroup Vote
  * @{
@@ -21,7 +21,7 @@ struct PbftConfig;
 struct FullNodeConfig;
 
 namespace network::tarcap {
-class TaraxaPeer;
+class EblaPeer;
 }
 
 /**
@@ -328,4 +328,4 @@ class VoteManager {
 
 /** @}*/
 
-}  // namespace taraxa
+}  // namespace ebla

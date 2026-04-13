@@ -5,7 +5,7 @@
 
 #include <vector>
 
-namespace taraxa {
+namespace ebla {
 
 class DagBlock;
 
@@ -41,4 +41,4 @@ std::shared_ptr<DagBlock> decodeDAGBlockBundleRlp(uint64_t index, const dev::RLP
 
 /** @}*/
 
-}  // namespace taraxa
+}  // namespace ebla

@@ -1,6 +1,6 @@
 #include "common/util.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 std::string jsonToUnstyledString(const Json::Value &value) {
   Json::StreamWriterBuilder builder;
@@ -38,4 +38,4 @@ std::vector<uint64_t> asUInt64Vector(const Json::Value &json) {
                  [](const Json::Value &item) { return item.asUInt64(); });
   return v;
 }
-}  // namespace taraxa
+}  // namespace ebla

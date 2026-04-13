@@ -5,7 +5,7 @@
 #include "common/types.hpp"
 #include "dag/dag_block.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 dev::bytes encodeDAGBlocksBundleRlp(const std::vector<std::shared_ptr<DagBlock>>& blocks) {
   if (blocks.empty()) {
@@ -104,4 +104,4 @@ std::shared_ptr<DagBlock> decodeDAGBlockBundleRlp(uint64_t index, const dev::RLP
 
 /** @}*/
 
-}  // namespace taraxa
+}  // namespace ebla

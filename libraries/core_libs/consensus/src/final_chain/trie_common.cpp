@@ -3,7 +3,7 @@
 #include <libdevcore/RLP.h>
 #include <libdevcore/SHA3.h>
 
-namespace taraxa::final_chain {
+namespace ebla::final_chain {
 using namespace ::dev;
 
 /*
@@ -113,4 +113,4 @@ h256 hash256(BytesMap const& _s) {
   return sha3(s.out());
 }
 
-}  // namespace taraxa::final_chain
+}  // namespace ebla::final_chain

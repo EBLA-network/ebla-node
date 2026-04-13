@@ -1,7 +1,7 @@
 #pragma once
 #include "storage/migration/migration_base.hpp"
 
-namespace taraxa::storage::migration {
+namespace ebla::storage::migration {
 class Manager {
  public:
   explicit Manager(std::shared_ptr<DbStorage> db, const addr_t& node_addr = {});
@@ -19,4 +19,4 @@ class Manager {
   std::vector<std::shared_ptr<migration::Base>> migrations_;
   LOG_OBJECTS_DEFINE
 };
-}  // namespace taraxa::storage::migration
+}  // namespace ebla::storage::migration

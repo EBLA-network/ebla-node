@@ -5,7 +5,7 @@
 #include <mutex>
 #include <type_traits>
 
-namespace taraxa::util::lazy {
+namespace ebla::util::lazy {
 using std::enable_if_t;
 using std::function;
 using std::is_invocable_v;
@@ -89,4 +89,4 @@ class Lazy {
 template <typename T>
 using LazyVal = Lazy<function<T()>>;
 
-}  // namespace taraxa::util::lazy
+}  // namespace ebla::util::lazy

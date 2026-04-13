@@ -7,7 +7,7 @@
 #include "common/types.hpp"
 #include "storage/storage.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 class PbftBlock;
 class Vote;
@@ -77,4 +77,4 @@ class ProposedBlocks {
   std::shared_ptr<DbStorage> db_;
 };
 
-}  // namespace taraxa
+}  // namespace ebla

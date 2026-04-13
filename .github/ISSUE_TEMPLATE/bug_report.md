@@ -42,10 +42,10 @@ Would be awesome to link screenshots here and/or error messages received.
 
 **Use docker command to find node image version:**
 
-> docker images --format '{{.ID}}' 'taraxa/taraxa-node:latest'
+> docker images --format '{{.ID}}' 'ebla/ebla-node:latest'
 
 #### Operating System details.
 
 #### CPU, memory, disk details. 
 
-**NOTE: In many cases log files are also useful to include. Since these files may be large, a Taraxa developer may request them later. These files may include public addresses that you're participating with. If that is a concern please be sure to scrub that data.**
+**NOTE: In many cases log files are also useful to include. Since these files may be large, a Ebla developer may request them later. These files may include public addresses that you're participating with. If that is a concern please be sure to scrub that data.**

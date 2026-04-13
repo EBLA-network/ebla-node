@@ -4,7 +4,7 @@
 
 #include "common/constants.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 struct VrfParams {
   uint16_t threshold_upper = 0;  // upper bound of selection
@@ -60,4 +60,4 @@ void dec_json(const Json::Value& json, SortitionParams& obj);
 Json::Value enc_json(const SortitionConfig& obj);
 void dec_json(const Json::Value& json, SortitionConfig& obj);
 
-}  // namespace taraxa
+}  // namespace ebla

@@ -2,7 +2,7 @@
 
 #include "vote/pillar_vote.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 PillarVotesBundlePacketHandler::PillarVotesBundlePacketHandler(
     const FullNodeConfig &conf, std::shared_ptr<PeersState> peers_state,
@@ -13,7 +13,7 @@ PillarVotesBundlePacketHandler::PillarVotesBundlePacketHandler(
                                  std::move(pillar_chain_manager), node_addr, logs_prefix + "PILLAR_VOTES_BUNDLE_PH") {}
 
 void PillarVotesBundlePacketHandler::process(const threadpool::PacketData &packet_data,
-                                             const std::shared_ptr<TaraxaPeer> &peer) {
+                                             const std::shared_ptr<EblaPeer> &peer) {
   // Decode packet rlp into packet object
   auto packet = decodePacketRlp<PillarVotesBundlePacket>(packet_data.rlp_);
 
@@ -38,4 +38,4 @@ void PillarVotesBundlePacketHandler::process(const threadpool::PacketData &packe
   }
 }
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

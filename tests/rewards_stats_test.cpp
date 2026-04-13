@@ -9,7 +9,7 @@
 #include "test_util/gtest.hpp"
 #include "test_util/samples.hpp"
 
-namespace taraxa::core_tests {
+namespace ebla::core_tests {
 
 auto g_secret = dev::Secret("3800b2875669d9b2053c1aff9224ecfdc411423aac5b5a73d7a45ced1c3b9dcd",
                             dev::Secret::ConstructFromStringType::FromHex);
@@ -363,11 +363,11 @@ TEST_F(RewardsStatsTest, dagBlockRewards) {
   ASSERT_EQ(post_stats_with_get->getValidatorStats().find(dev::toAddress(dag_key3.pub()))->second.fees_rewards_, 0);
 }
 
-}  // namespace taraxa::core_tests
+}  // namespace ebla::core_tests
 
-using namespace taraxa;
+using namespace ebla;
 int main(int argc, char** argv) {
-  taraxa::static_init();
+  ebla::static_init();
 
   auto logging = logger::createDefaultLoggingConfig();
   logging.verbosity = logger::Verbosity::Error;

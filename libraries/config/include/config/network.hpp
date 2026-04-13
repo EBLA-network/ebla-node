@@ -7,7 +7,7 @@
 #include "common/types.hpp"
 #include "libp2p/Common.h"
 
-namespace taraxa {
+namespace ebla {
 
 struct PrometheusConfig {
   std::string address;
@@ -92,4 +92,4 @@ struct NetworkConfig {
 
 void dec_json(const Json::Value &json, NetworkConfig &network);
 
-}  // namespace taraxa
+}  // namespace ebla

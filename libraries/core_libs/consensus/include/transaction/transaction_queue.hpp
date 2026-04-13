@@ -4,7 +4,7 @@
 #include "common/util.hpp"
 #include "transaction/transaction.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 /** @addtogroup Transaction
  * @{
@@ -164,8 +164,8 @@ class TransactionQueue {
    * @param transaction
    * @return true if removed
    */
-  std::unordered_map<taraxa::trx_hash_t, std::pair<uint64_t, taraxa::SharedTransaction>>::iterator removeTransaction(
-      std::unordered_map<taraxa::trx_hash_t, std::pair<uint64_t, taraxa::SharedTransaction>>::iterator transaction);
+  std::unordered_map<ebla::trx_hash_t, std::pair<uint64_t, ebla::SharedTransaction>>::iterator removeTransaction(
+      std::unordered_map<ebla::trx_hash_t, std::pair<uint64_t, ebla::SharedTransaction>>::iterator transaction);
 
   // Transactions in the queue per account ordered by nonce
   std::unordered_map<addr_t, std::map<val_t, std::shared_ptr<Transaction>>> account_nonce_transactions_;
@@ -218,4 +218,4 @@ class TransactionQueue {
 
 /** @}*/
 
-}  // namespace taraxa
+}  // namespace ebla

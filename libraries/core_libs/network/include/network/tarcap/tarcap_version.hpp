@@ -1,5 +1,5 @@
 #pragma once
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 using TarcapVersion = unsigned;
 }

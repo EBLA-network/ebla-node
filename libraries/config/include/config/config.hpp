@@ -5,7 +5,7 @@
 #include "config/network.hpp"
 #include "logger/logger_config.hpp"
 
-namespace taraxa {
+namespace ebla {
 
 struct DBConfig {
   uint32_t db_snapshot_each_n_pbft_block = 0;
@@ -103,4 +103,4 @@ std::ostream &operator<<(std::ostream &strm, NodeConfig const &conf);
 std::ostream &operator<<(std::ostream &strm, NetworkConfig const &conf);
 std::ostream &operator<<(std::ostream &strm, FullNodeConfig const &conf);
 
-}  // namespace taraxa
+}  // namespace ebla

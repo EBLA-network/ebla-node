@@ -3,12 +3,12 @@
 #include "network/tarcap/packets/latest/get_next_votes_bundle_packet.hpp"
 #include "network/tarcap/packets_handlers/interface/vote_packet_handler.hpp"
 
-namespace taraxa {
+namespace ebla {
 class PbftManager;
 class VoteManager;
-}  // namespace taraxa
+}  // namespace ebla
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 class GetNextVotesBundlePacketHandler : public IVotePacketHandler {
  public:
@@ -23,7 +23,7 @@ class GetNextVotesBundlePacketHandler : public IVotePacketHandler {
   static constexpr SubprotocolPacketType kPacketType_ = SubprotocolPacketType::kGetNextVotesSyncPacket;
 
  private:
-  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<TaraxaPeer>& peer) override;
+  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<EblaPeer>& peer) override;
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

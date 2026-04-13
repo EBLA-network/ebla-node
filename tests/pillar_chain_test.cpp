@@ -7,7 +7,7 @@
 #include "pillar_chain/pillar_chain_manager.hpp"
 #include "test_util/test_util.hpp"
 
-namespace taraxa::core_tests {
+namespace ebla::core_tests {
 
 struct PillarChainTest : NodesTest {};
 
@@ -548,7 +548,7 @@ TEST_F(PillarChainTest, finalize_root_in_pillar_block) {
         ASSERT_EQ(trxs.size(), 1);
         // check that this 1 transaction is system transaction
         const auto& trx = trxs.at(0);
-        ASSERT_EQ(trx->getSender(), kTaraxaSystemAccount);
+        ASSERT_EQ(trx->getSender(), kEblaSystemAccount);
         ASSERT_EQ(trx->getReceiver(), node_cfgs[0].genesis.state.hardforks.ficus_hf.bridge_contract_address);
         // check that correct hash is returned
         auto hashes = node->getFinalChain()->transactionHashes(period - 1);
@@ -563,9 +563,9 @@ TEST_F(PillarChainTest, finalize_root_in_pillar_block) {
         // check that we can get this transaction by hash
         const auto& trx_by_hash = node->getDB()->getTransaction(trx->getHash());
         ASSERT_TRUE(trx_by_hash != nullptr);
-        ASSERT_EQ(trx_by_hash->getSender(), kTaraxaSystemAccount);
+        ASSERT_EQ(trx_by_hash->getSender(), kEblaSystemAccount);
         ASSERT_EQ(trx_by_hash->getReceiver(), node_cfgs[0].genesis.state.hardforks.ficus_hf.bridge_contract_address);
-        ASSERT_EQ(trx_by_hash->getSender(), kTaraxaSystemAccount);
+        ASSERT_EQ(trx_by_hash->getSender(), kEblaSystemAccount);
         // check that receipt exists
         const auto& trx_receipt = node->getFinalChain()->transactionReceipt(trx_loc->period, trx_loc->position);
         ASSERT_TRUE(trx_receipt.has_value());
@@ -575,11 +575,11 @@ TEST_F(PillarChainTest, finalize_root_in_pillar_block) {
   }
 }
 
-}  // namespace taraxa::core_tests
+}  // namespace ebla::core_tests
 
-using namespace taraxa;
+using namespace ebla;
 int main(int argc, char** argv) {
-  taraxa::static_init();
+  ebla::static_init();
   auto logging = logger::createDefaultLoggingConfig();
   logging.verbosity = logger::Verbosity::Error;
 

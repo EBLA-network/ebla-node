@@ -6,7 +6,7 @@
 
 #include "network/http_server.hpp"
 
-namespace taraxa::net {
+namespace ebla::net {
 
 class JsonRpcHttpProcessor final : public HttpProcessor, public jsonrpc::AbstractServerConnector {
  public:
@@ -22,4 +22,4 @@ class JsonRpcHttpProcessor final : public HttpProcessor, public jsonrpc::Abstrac
   bool StopListening() override { return true; }
 };
 
-}  // namespace taraxa::net
+}  // namespace ebla::net

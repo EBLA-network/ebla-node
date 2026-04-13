@@ -18,11 +18,11 @@ using namespace std;
 using namespace dev;
 using namespace dev::p2p;
 
-Host::Host(std::string _clientVersion, KeyPair const& kp, NetworkConfig _n, TaraxaNetworkConfig taraxa_conf,
+Host::Host(std::string _clientVersion, KeyPair const& kp, NetworkConfig _n, EblaNetworkConfig ebla_conf,
            std::filesystem::path state_file_path)
-    : ioc_(taraxa_conf.expected_parallelism),
+    : ioc_(ebla_conf.expected_parallelism),
       ioc_w_(ba::make_work_guard(ioc_)),
-      session_ioc_(taraxa_conf.expected_parallelism),
+      session_ioc_(ebla_conf.expected_parallelism),
       session_ioc_w_(ba::make_work_guard(session_ioc_)),
       strand_(ioc_),
       m_tcp4Acceptor(session_ioc_),
@@ -30,15 +30,15 @@ Host::Host(std::string _clientVersion, KeyPair const& kp, NetworkConfig _n, Tara
       state_file_path_(std::move(state_file_path)),
       m_clientVersion(std::move(_clientVersion)),
       m_netConfig(std::move(_n)),
-      taraxa_conf_(std::move(taraxa_conf)),
-      m_idealPeerCount(taraxa_conf_.ideal_peer_count),
-      m_stretchPeers(taraxa_conf_.peer_stretch),
+      ebla_conf_(std::move(ebla_conf)),
+      m_idealPeerCount(ebla_conf_.ideal_peer_count),
+      m_stretchPeers(ebla_conf_.peer_stretch),
       m_listenPort(m_netConfig.listenPort),
       m_alias{kp},
       m_lastPing(chrono::steady_clock::time_point::min()),
       m_lastPeerLogMessage(chrono::steady_clock::time_point::min()) {
   assert(m_netConfig.listenPort);
-  assert(1 <= taraxa_conf.expected_parallelism);
+  assert(1 <= ebla_conf.expected_parallelism);
   // try to open acceptor (todo: ipv6)
   Network::tcp4Listen(m_tcp4Acceptor, m_netConfig);
   m_tcpPublic = determinePublic();
@@ -74,7 +74,7 @@ Host::Host(std::string _clientVersion, KeyPair const& kp, NetworkConfig _n, Tara
   m_nodeTable = make_unique<NodeTable>(
       ioc_, m_alias, NodeIPEndpoint(bi::make_address(listenAddress()), listenPort(), listenPort()),
       updateENR(enr, m_tcpPublic, listenPort()), m_netConfig.discovery, m_netConfig.allowLocalDiscovery,
-      taraxa_conf_.is_boot_node, taraxa_conf_.chain_id);
+      ebla_conf_.is_boot_node, ebla_conf_.chain_id);
   m_nodeTable->setEventHandler(new NodeTableEventHandler([this](auto const&... args) { onNodeTableEvent(args...); }));
   if (restored_state) {
     for (auto const& node : restored_state->known_nodes) {
@@ -97,10 +97,10 @@ Host::Host(std::string _clientVersion, KeyPair const& kp, NetworkConfig _n, Tara
 }
 
 std::shared_ptr<Host> Host::make(std::string _clientVersion, CapabilitiesFactory const& cap_factory, KeyPair const& kp,
-                                 NetworkConfig _n, TaraxaNetworkConfig taraxa_conf,
+                                 NetworkConfig _n, EblaNetworkConfig ebla_conf,
                                  std::filesystem::path state_file_path) {
   shared_ptr<Host> self(
-      new Host(std::move(_clientVersion), kp, std::move(_n), taraxa_conf, std::move(state_file_path)));
+      new Host(std::move(_clientVersion), kp, std::move(_n), ebla_conf, std::move(state_file_path)));
   for (const auto& cap : cap_factory(self)) {
     CapabilityNameAndVersion cap_id{cap->name(), cap->version()};
     self->m_capabilities.emplace(cap_id, Capability(cap, cap->messageCount()));
@@ -556,12 +556,12 @@ void Host::main_loop_body() {
 
   peer_count_snapshot_ = peer_count_();
 
-  m_runTimer.expires_after(taraxa_conf_.main_loop_interval);
+  m_runTimer.expires_after(ebla_conf_.main_loop_interval);
   m_runTimer.async_wait(ba::bind_executor(strand_, [this](...) { main_loop_body(); }));
 }
 
 void Host::keepAlivePeers() {
-  if (chrono::steady_clock::now() - taraxa_conf_.peer_healthcheck_interval < m_lastPing) {
+  if (chrono::steady_clock::now() - ebla_conf_.peer_healthcheck_interval < m_lastPing) {
     return;
   }
   for (auto it = m_sessions.begin(); it != m_sessions.end();) {
@@ -577,7 +577,7 @@ void Host::keepAlivePeers() {
 }
 
 void Host::logActivePeers() {
-  if (chrono::steady_clock::now() - taraxa_conf_.log_active_peers_interval < m_lastPeerLogMessage) {
+  if (chrono::steady_clock::now() - ebla_conf_.log_active_peers_interval < m_lastPeerLogMessage) {
     return;
   }
 

@@ -1,4 +1,4 @@
-# Default values for taraxa-node.
+# Default values for ebla-node.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -11,7 +11,7 @@ serviceAccounts:
     name:
 
 image:
-  repository: gcr.io/jovial-meridian-249123/taraxa-node
+  repository: gcr.io/jovial-meridian-249123/ebla-node
   tag: latest
   pullPolicy: IfNotPresent
 
@@ -55,7 +55,7 @@ slack:
   enabled: false
   token: xoxb-XXXXXX-XXXXXX-XXXXXX
   channel: channel
-  k8s_cluster: taraxa
+  k8s_cluster: ebla
 
 transactionGeneration:
   enabled: true
@@ -90,13 +90,13 @@ node:
     enabled: true
   debug: 0
   args:
-    - "taraxad"
+    - "eblad"
     - "--config"
-    - "/root/.taraxa/conf_taraxa.json"
+    - "/root/.ebla/conf_ebla.json"
     - "--genesis"
-    - "/root/.taraxa/genesis_taraxa.json"
+    - "/root/.ebla/genesis_ebla.json"
     - "--wallet"
-    - "/root/.taraxa/wallet_taraxa.json"
+    - "/root/.ebla/wallet_ebla.json"
   ingress:
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
     # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
@@ -190,7 +190,7 @@ node:
         nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS, DELETE"
         nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization,Range,Content-Range,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Access-Control-Allow-Origin"
     image:
-      repository: gcr.io/jovial-meridian-249123/taraxa-indexer
+      repository: gcr.io/jovial-meridian-249123/ebla-indexer
       tag: latest
       pullPolicy: Always
     persistence:
@@ -214,7 +214,7 @@ bootnode:
     enabled: true
   debug: 0
   args:
-    - "taraxa-bootnode"
+    - "ebla-bootnode"
     - "--number-of-threads"
     - "10"
     - "--listen-ip"
@@ -222,7 +222,7 @@ bootnode:
     - "--listen"
     - "10002"
     - "--wallet"
-    - "/root/.taraxa/wallet_taraxa.json"
+    - "/root/.ebla/wallet_ebla.json"
   ports:
     - name: udp-listen-port
       containerPort: 10002
@@ -258,13 +258,13 @@ consensusnode:
     enabled: true
   debug: 0
   args:
-    - "taraxad"
+    - "eblad"
     - "--config"
-    - "/root/.taraxa/conf_taraxa.json"
+    - "/root/.ebla/conf_ebla.json"
     - "--genesis"
-    - "/root/.taraxa/genesis_taraxa.json"
+    - "/root/.ebla/genesis_ebla.json"
     - "--wallet"
-    - "/root/.taraxa/wallet_taraxa.json"
+    - "/root/.ebla/wallet_ebla.json"
   ports:
     - name: rest
       containerPort: 7777
@@ -315,13 +315,13 @@ consensusnodeLight:
     enabled: true
   debug: 0
   args:
-    - "taraxad"
+    - "eblad"
     - "--config"
-    - "/root/.taraxa/conf_taraxa.json"
+    - "/root/.ebla/conf_ebla.json"
     - "--genesis"
-    - "/root/.taraxa/genesis_taraxa.json"
+    - "/root/.ebla/genesis_ebla.json"
     - "--wallet"
-    - "/root/.taraxa/wallet_taraxa.json"
+    - "/root/.ebla/wallet_ebla.json"
     - "--light"
   ports:
     - name: rest

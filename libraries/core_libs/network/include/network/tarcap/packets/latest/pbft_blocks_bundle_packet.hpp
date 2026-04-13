@@ -3,7 +3,7 @@
 #include "pbft/pbft_block.hpp"
 #include "vote/pbft_vote.hpp"
 
-namespace taraxa::network::tarcap {
+namespace ebla::network::tarcap {
 
 struct PbftBlocksBundlePacket {
   std::vector<std::shared_ptr<PbftBlock>> pbft_blocks;
@@ -11,4 +11,4 @@ struct PbftBlocksBundlePacket {
   RLP_FIELDS_DEFINE_INPLACE(pbft_blocks)
 };
 
-}  // namespace taraxa::network::tarcap
+}  // namespace ebla::network::tarcap

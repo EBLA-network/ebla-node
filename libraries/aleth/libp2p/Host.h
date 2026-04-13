@@ -22,7 +22,7 @@
 #include "Peer.h"
 #include "RLPxHandshake.h"
 #include "Session.h"
-#include "taraxa.hpp"
+#include "ebla.hpp"
 
 namespace std {
 template <>
@@ -71,12 +71,12 @@ struct Host final : std::enable_shared_from_this<Host> {
   using CapabilitiesFactory = std::function<CapabilityList(std::weak_ptr<Host>)>;
 
  private:
-  Host(std::string _clientVersion, KeyPair const& kp, NetworkConfig _n, TaraxaNetworkConfig taraxa_conf,
+  Host(std::string _clientVersion, KeyPair const& kp, NetworkConfig _n, EblaNetworkConfig ebla_conf,
        std::filesystem::path state_file_path);
 
  public:
   static std::shared_ptr<Host> make(std::string _clientVersion, CapabilitiesFactory const& cap_factory,
-                                    KeyPair const& kp, NetworkConfig _n, TaraxaNetworkConfig taraxa_conf = {},
+                                    KeyPair const& kp, NetworkConfig _n, EblaNetworkConfig ebla_conf = {},
                                     std::filesystem::path state_file_path = {});
 
   Capabilities getSupportedCapabilities() { return m_capabilities; }
@@ -268,7 +268,7 @@ struct Host final : std::enable_shared_from_this<Host> {
   std::filesystem::path state_file_path_;
   std::string m_clientVersion;  ///< Our version string.
   NetworkConfig m_netConfig;    ///< Network settings.
-  TaraxaNetworkConfig taraxa_conf_;
+  EblaNetworkConfig ebla_conf_;
   unsigned m_idealPeerCount = 0;  ///< Ideal number of peers to be connected to.
   unsigned m_stretchPeers = 0;    ///< Accepted connection multiplier (max peers = ideal*stretch).
   /// Each of the capabilities we support.

@@ -94,14 +94,14 @@ add_test(rpc_test ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/rpc_test)
 # add_custom_command(
 #     TARGET py_test
 #     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/py
-#     COMMAND ./run.sh -s --tb=short --node_executable_path=${CMAKE_BINARY_DIR}/bin/taraxad
+#     COMMAND ./run.sh -s --tb=short --node_executable_path=${CMAKE_BINARY_DIR}/bin/eblad
 #     COMMENT "Running Python tests")
 
 # add_test(py_test
 #   ${CMAKE_CURRENT_SOURCE_DIR}/py/run.sh
 #   -s
 #   --tb=short
-#   --node_executable_path=${CMAKE_BINARY_DIR}/bin/taraxad
+#   --node_executable_path=${CMAKE_BINARY_DIR}/bin/eblad
 # )
 
 set(GO_TEST_SCRIPT ${CMAKE_BINARY_DIR}/bin/go_test.sh)
@@ -115,7 +115,7 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${GO_TEST_SCRIPT}
 # we need to write this command to file because add_test can't accept command
 file(WRITE ${GO_TEST_SCRIPT}
 "#!/bin/bash
-cd ${CMAKE_SOURCE_DIR}/submodules/taraxa-evm/
+cd ${CMAKE_SOURCE_DIR}/submodules/ebla-evm/
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CMAKE_BINARY_DIR}/lib
 export ${EVM_BUILD_ENV_STRING}
 go test ./..."
