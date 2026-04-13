@@ -35,9 +35,9 @@ DbStorage::DbStorage(const fs::path& path, uint32_t db_snapshot_each_n_pbft_bloc
                      bool enable_compression)
     : path_(path),
       handles_(Columns::all.size()),
+      compression_enabled_(enable_compression),
       kDbSnapshotsEachNblock(db_snapshot_each_n_pbft_block),
-      kDbSnapshotsMaxCount(db_max_snapshots),
-      compression_enabled_(enable_compression) {
+      kDbSnapshotsMaxCount(db_max_snapshots) {
   db_path_ = (path / kDbDir);
   state_db_path_ = (path / kStateDbDir);
   async_write_.sync = false;
