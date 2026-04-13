@@ -115,10 +115,10 @@ class DbStorage : public std::enable_shared_from_this<DbStorage> {
     COLUMN(cert_voted_block_in_round);  // Cert voted block + round -> node voted for this block
     COLUMN(proposed_pbft_blocks);       // Proposed pbft blocks
     COLUMN(pbft_head);
-    COLUMN(latest_round_own_votes);             // own votes of any type for the latest round
+    COLUMN(latest_round_own_votes);            // own votes of any type for the latest round
     COLUMN(latest_round_five_of_eight_votes);  // 5/8 votes bundles of any type for the latest round
-    COLUMN(extra_reward_votes);                 // extra reward votes on top of 5/8 cert votes bundle from
-                                                // latest_round_five_of_eight_votes
+    COLUMN(extra_reward_votes);                // extra reward votes on top of 5/8 cert votes bundle from
+                                               // latest_round_five_of_eight_votes
     COLUMN(pbft_block_period);
     COLUMN(dag_block_period);
     COLUMN_W_COMP(proposal_period_levels_map, getIntComparator<uint64_t>());

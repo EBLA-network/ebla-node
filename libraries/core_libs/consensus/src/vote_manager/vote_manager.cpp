@@ -132,8 +132,7 @@ void VoteManager::setCurrentPbftPeriodAndRound(PbftPeriod pbft_period, PbftRound
     const FiveOfEightVotedBlockType five_of_eight_voted_block_type = five_of_eight_voted_block.first;
     // 2t+1 cert voted blocks are only saved to the database in a db batch when block is pushed to the chain
     if (five_of_eight_voted_block_type != FiveOfEightVotedBlockType::CertVotedBlock) {
-      const auto& [five_of_eight_voted_block_hash, five_of_eight_voted_block_step] =
-          five_of_eight_voted_block.second;
+      const auto& [five_of_eight_voted_block_hash, five_of_eight_voted_block_step] = five_of_eight_voted_block.second;
 
       const auto found_step_votes_it = found_round_it->second.step_votes.find(five_of_eight_voted_block_step);
       if (found_step_votes_it == found_round_it->second.step_votes.end()) {
@@ -561,8 +560,8 @@ std::optional<PbftRound> VoteManager::determineNewRound(PbftPeriod current_pbft_
 
     if (found_five_of_eight_voted_block != round_rit->second.five_of_eight_voted_blocks_.end()) {
       LOG(log_nf_) << "New round " << round_rit->first + 1 << " determined for period " << current_pbft_period
-                   << ". Found 5/8 quorum votes for block " << found_five_of_eight_voted_block->second.first << " in round "
-                   << round_rit->first << ", step " << found_five_of_eight_voted_block->second.second;
+                   << ". Found 5/8 quorum votes for block " << found_five_of_eight_voted_block->second.first
+                   << " in round " << round_rit->first << ", step " << found_five_of_eight_voted_block->second.second;
 
       return round_rit->first + 1;
     }
@@ -613,8 +612,8 @@ void VoteManager::resetRewardVotes(PbftPeriod period, PbftRound round, PbftStep 
     return;
   }
   if (found_five_of_eight_voted_block->second.first != block_hash) {
-    LOG(log_er_) << "resetRewardVotes incorrect block " << found_five_of_eight_voted_block->second.first
-                 << " expected " << block_hash;
+    LOG(log_er_) << "resetRewardVotes incorrect block " << found_five_of_eight_voted_block->second.first << " expected "
+                 << block_hash;
     assert(false);
     return;
   }
