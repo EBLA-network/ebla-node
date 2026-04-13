@@ -250,18 +250,19 @@ void DbStorage::rebuildColumns(const rocksdb::Options& options) {
   descriptors.reserve(column_families.size());
   std::vector<rocksdb::ColumnFamilyHandle*> handles;
   handles.reserve(column_families.size());
-  std::transform(column_families.begin(), column_families.end(), std::back_inserter(descriptors), [this](const auto& name) {
-    const auto it = std::find_if(Columns::all.begin(), Columns::all.end(), [&name](const Column& col) {
-      // "-copy" is there, so we will removed unsuccessful migrations
-      return col.name() == name || col.name() + "-copy" == name;
-    });
-    auto options = rocksdb::ColumnFamilyOptions();
-    if (compression_enabled_) {
-      options.compression = rocksdb::CompressionType::kLZ4Compression;
-    }
-    if (it != Columns::all.end() && it->comparator_) options.comparator = it->comparator_;
-    return rocksdb::ColumnFamilyDescriptor(name, options);
-  });
+  std::transform(column_families.begin(), column_families.end(), std::back_inserter(descriptors),
+                 [this](const auto& name) {
+                   const auto it = std::find_if(Columns::all.begin(), Columns::all.end(), [&name](const Column& col) {
+                     // "-copy" is there, so we will removed unsuccessful migrations
+                     return col.name() == name || col.name() + "-copy" == name;
+                   });
+                   auto options = rocksdb::ColumnFamilyOptions();
+                   if (compression_enabled_) {
+                     options.compression = rocksdb::CompressionType::kLZ4Compression;
+                   }
+                   if (it != Columns::all.end() && it->comparator_) options.comparator = it->comparator_;
+                   return rocksdb::ColumnFamilyDescriptor(name, options);
+                 });
   rocksdb::DB* db_ptr = nullptr;
   checkStatus(rocksdb::DB::Open(options, db_path_.string(), descriptors, &handles, &db_ptr));
   assert(db_ptr);

@@ -2232,8 +2232,8 @@ bool PbftManager::validatePbftBlockCertVotes(const std::shared_ptr<PbftBlock> pb
   }
 
   if (votes_weight < *two_t_plus_one) {
-    LOG(log_wr_) << "Invalid votes weight " << votes_weight << " < five_of_eight " << *two_t_plus_one
-                 << ", pbft block " << pbft_block->getBlockHash();
+    LOG(log_wr_) << "Invalid votes weight " << votes_weight << " < five_of_eight " << *two_t_plus_one << ", pbft block "
+                 << pbft_block->getBlockHash();
     return false;
   }
 
