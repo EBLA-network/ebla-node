@@ -20,6 +20,8 @@
     "commission_change_delta": "0x0",
     "commission_change_frequency": "0x0",
     "yield_percentage": "0x07",
+    "trx_min_gas_price": "0x3B9ACA00",
+    "trx_max_gas_limit": "0x1E0A6E0",
     "initial_validators": [
       {
         "address": "0x780fe8b2226cf212c55635de399ee4c2a860810c",
@@ -125,11 +127,6 @@
       "delegation_locking_period": 5,
       "dag_gas_limit": "0x1908B100",
       "pbft_gas_limit": "0x7d2b7500"
-    },
-    "soleirolia_hf": {
-      "block_num": 0,
-      "trx_min_gas_price": "0x3B9ACA00",
-      "trx_max_gas_limit": "0x1E0A6E0"
     }
   }
 }

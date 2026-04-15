@@ -83,15 +83,6 @@ struct CornusHardforkConfig {
 Json::Value enc_json(const CornusHardforkConfig& obj);
 void dec_json(const Json::Value& json, CornusHardforkConfig& obj);
 
-struct SoleiroliaHardforkConfig {
-  uint64_t block_num = -1;
-  uint64_t trx_min_gas_price = 1000000000;  // [wei]
-  uint64_t trx_max_gas_limit = 31500000;
-
-  HAS_RLP_FIELDS
-};
-Json::Value enc_json(const SoleiroliaHardforkConfig& obj);
-void dec_json(const Json::Value& json, SoleiroliaHardforkConfig& obj);
 
 // Keeping it for next HF
 // struct BambooRedelegation {
@@ -157,9 +148,6 @@ struct HardforksConfig {
   CornusHardforkConfig cornus_hf;
   bool isOnCornusHardfork(uint64_t block_number) const { return block_number >= cornus_hf.block_num; }
 
-  // Soleirolia hf - increase trx gas minimum price
-  //               - limit max trx gas
-  SoleiroliaHardforkConfig soleirolia_hf;
 
   HAS_RLP_FIELDS
 };

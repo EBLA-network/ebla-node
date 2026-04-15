@@ -666,7 +666,7 @@ TEST_F(TransactionTest, zero_gas_price_limit) {
 TEST_F(TransactionTest, gas_price_limiting) {
   auto db = std::make_shared<DbStorage>(data_dir);
   auto cfg = node_cfgs.front();
-  auto minimum_price = cfg.genesis.state.hardforks.soleirolia_hf.trx_min_gas_price = 10;
+  auto minimum_price = cfg.genesis.state.dpos.trx_min_gas_price = 10;
   auto final_chain = std::make_shared<final_chain::FinalChain>(db, cfg, addr_t{});
   TransactionManager trx_mgr(cfg, db, final_chain, addr_t());
   auto make_trx_with_price = [](uint64_t price) {

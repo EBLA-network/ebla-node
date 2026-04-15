@@ -1420,7 +1420,7 @@ TEST_F(FullNodeTest, transaction_pool_overflow) {
   EXPECT_TRUE(node0->getTransactionManager()->transactionsDropped());
 }
 
-TEST_F(FullNodeTest, SoleiroliaHardfork) {
+TEST_F(FullNodeTest, GasLimitEnforcement) {
   const auto call_data = "0xabbb061e000000000000000000000000000000000000000000000000000000000005a768";
   const auto receiver_contract_code =
       "6080604052348015600f57600080fd5b5063045d9f3b424302601081901c1802600155610578806100316000396000f3fe6080604052"
@@ -1477,10 +1477,9 @@ TEST_F(FullNodeTest, SoleiroliaHardfork) {
   {
     auto node_cfgs = make_node_cfgs(1, 1, 5);
     for (auto &cfg : node_cfgs) {
-      cfg.genesis.state.hardforks.soleirolia_hf.block_num = 0;
       cfg.genesis.dag.gas_limit = 31500000;
-      cfg.genesis.state.hardforks.soleirolia_hf.trx_max_gas_limit = 31500000;
-      cfg.genesis.state.hardforks.soleirolia_hf.trx_min_gas_price = 999;
+      cfg.genesis.state.dpos.trx_max_gas_limit = 31500000;
+      cfg.genesis.state.dpos.trx_min_gas_price = 999;
     }
     auto nodes = launch_nodes(node_cfgs);
 

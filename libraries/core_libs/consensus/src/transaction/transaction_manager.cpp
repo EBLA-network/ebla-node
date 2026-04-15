@@ -88,7 +88,7 @@ std::pair<bool, std::string> TransactionManager::verifyTransaction(const std::sh
 
   const int64_t block_num = final_chain_->lastBlockNumber();
   // Ensure the transaction doesn't exceed the current block limit gas.
-  if (kConf.genesis.state.hardforks.soleirolia_hf.trx_max_gas_limit < trx->getGas()) {
+  if (kConf.genesis.state.dpos.trx_max_gas_limit < trx->getGas()) {
     return {false, "invalid gas"};
   }
 
@@ -105,7 +105,7 @@ std::pair<bool, std::string> TransactionManager::verifyTransaction(const std::sh
   }
 
   // gas_price in transaction must be greater than or equal to minimum value from config
-  if (kConf.genesis.state.hardforks.soleirolia_hf.trx_min_gas_price > trx->getGasPrice()) {
+  if (kConf.genesis.state.dpos.trx_min_gas_price > trx->getGasPrice()) {
     return {false, "gas_price too low"};
   }
 

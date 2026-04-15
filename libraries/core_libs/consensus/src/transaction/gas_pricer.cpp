@@ -8,7 +8,7 @@ namespace ebla {
 GasPricer::GasPricer(const GenesisConfig& config, bool is_light_node, bool is_blocks_gas_pricer,
                      std::shared_ptr<TransactionManager> trx_mgr, std::shared_ptr<DbStorage> db)
     : kPercentile(config.gas_price.percentile),
-      kMinimumPrice(config.state.hardforks.soleirolia_hf.trx_min_gas_price),
+      kMinimumPrice(config.state.dpos.trx_min_gas_price),
       kIsLightNode(is_light_node),
       latest_price_(kMinimumPrice),
       price_list_(config.gas_price.blocks),

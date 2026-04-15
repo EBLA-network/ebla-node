@@ -49,9 +49,12 @@ struct DPOSConfig {
   uint32_t delegation_locking_period = 5;    // number of blocks
   uint32_t blocks_per_year = 0;              // number of blocks - it is calculated from lambda_ms
   uint16_t yield_percentage = 0;             // [%]
+  uint64_t trx_min_gas_price = 1000000000;   // [wei] 1 Gwei minimum
+  uint64_t trx_max_gas_limit = 31500000;      // max gas per transaction
   std::vector<ValidatorInfo> initial_validators;
 
   HAS_RLP_FIELDS
+
 };
 Json::Value enc_json(const DPOSConfig& obj);
 void dec_json(const Json::Value& json, DPOSConfig& obj);
