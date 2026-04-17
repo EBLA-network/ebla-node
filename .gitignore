@@ -44,3 +44,7 @@ doxygen_docs
 CMakeUserPresets.json
 # default build dir 
 build
+
+# Doxygen generated folders
+html/
+latex/

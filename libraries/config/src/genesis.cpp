@@ -130,9 +130,6 @@ bytes GenesisConfig::rlp() const {
 blk_hash_t GenesisConfig::genesisHash() const { return dev::sha3(rlp()); }
 
 std::pair<uint64_t, uint64_t> GenesisConfig::getGasLimits(uint64_t block_number) const {
-  if (state.hardforks.isOnCornusHardfork(block_number)) {
-    return {state.hardforks.cornus_hf.dag_gas_limit, state.hardforks.cornus_hf.pbft_gas_limit};
-  }
   return {dag.gas_limit, pbft.gas_limit};
 }
 

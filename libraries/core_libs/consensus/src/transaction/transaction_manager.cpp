@@ -92,10 +92,8 @@ std::pair<bool, std::string> TransactionManager::verifyTransaction(const std::sh
     return {false, "invalid gas"};
   }
 
-  if (kConf.genesis.state.hardforks.isOnCornusHardfork(block_num)) {
-    if (!trx->intrinsicGasCovered()) {
-      return {false, "intrinsic gas too low"};
-    }
+  if (!trx->intrinsicGasCovered()) {
+    return {false, "intrinsic gas too low"};
   }
 
   try {
