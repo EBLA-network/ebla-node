@@ -121,8 +121,6 @@ struct HardforksConfig {
 
   // disable it by default (set to max uint64)
   uint64_t phalaenopsis_hf_block_num = -1;
-  // disable it by default (set to max uint64)
-  uint64_t fix_claim_all_block_num = -1;
 
   // Aspen hardfork implements new yield curve
   AspenHardfork aspen_hf;

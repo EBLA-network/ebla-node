@@ -146,7 +146,6 @@ RLP_FIELDS_DEFINE(FicusHardforkConfig, block_num, pillar_blocks_interval, bridge
 Json::Value enc_json(const HardforksConfig& obj) {
   Json::Value json(Json::objectValue);
   json["fix_redelegate_block_num"] = dev::toJS(obj.fix_redelegate_block_num);
-  json["fix_claim_all_block_num"] = dev::toJS(obj.fix_claim_all_block_num);
   json["phalaenopsis_hf_block_num"] = dev::toJS(obj.phalaenopsis_hf_block_num);
   json["initial_validators"] = Json::Value(Json::arrayValue);
   for (const auto& v : obj.redelegations) {
@@ -171,8 +170,6 @@ Json::Value enc_json(const HardforksConfig& obj) {
 void dec_json(const Json::Value& json, HardforksConfig& obj) {
   obj.fix_redelegate_block_num =
       json["fix_redelegate_block_num"].isUInt64() ? dev::getUInt(json["fix_redelegate_block_num"]) : uint64_t(-1);
-  obj.fix_claim_all_block_num =
-      json["fix_claim_all_block_num"].isUInt64() ? dev::getUInt(json["fix_claim_all_block_num"]) : uint64_t(-1);
   obj.phalaenopsis_hf_block_num =
       json["phalaenopsis_hf_block_num"].isUInt64() ? dev::getUInt(json["phalaenopsis_hf_block_num"]) : uint64_t(-1);
 
@@ -200,5 +197,5 @@ void dec_json(const Json::Value& json, HardforksConfig& obj) {
 }
 
 RLP_FIELDS_DEFINE(HardforksConfig, fix_redelegate_block_num, redelegations, rewards_distribution_frequency, magnolia_hf,
-                  phalaenopsis_hf_block_num, fix_claim_all_block_num, aspen_hf, ficus_hf)              
+                  phalaenopsis_hf_block_num, aspen_hf, ficus_hf)              
 }  // namespace ebla
