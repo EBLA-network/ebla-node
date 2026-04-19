@@ -263,18 +263,6 @@ class FinalChain {
    */
   u256 dposTotalSupply(EthBlockNumber blk_num) const;
 
-  /**
-   * @param blk_num
-   * @return bridge root
-   */
-  h256 getBridgeRoot(EthBlockNumber blk_num) const;
-
-  /**
-   * @param blk_num
-   * @return bridge epoch
-   */
-  h256 getBridgeEpoch(EthBlockNumber blk_num) const;
-
   // TODO move out of here:
   std::pair<val_t, bool> getBalance(addr_t const& addr) const;
   std::shared_ptr<const FinalizationResult> finalize_(PeriodData&& new_blk,
@@ -296,10 +284,6 @@ class FinalChain {
   static h256 blockBloomsChunkId(EthBlockNumber level, EthBlockNumber index);
   std::vector<EthBlockNumber> withBlockBloom(const LogBloom& b, EthBlockNumber from, EthBlockNumber to,
                                              EthBlockNumber level, EthBlockNumber index) const;
-  bool isNeedToFinalize(EthBlockNumber blk_num) const;
-
-  SharedTransaction makeBridgeFinalizationTransaction();
-  std::vector<SharedTransaction> makeSystemTransactions(PbftPeriod blk_num);
 
   std::shared_ptr<BlockHeader> makeGenesisHeader(std::string&& raw_header) const;
   std::shared_ptr<BlockHeader> makeGenesisHeader(const h256& state_root) const;

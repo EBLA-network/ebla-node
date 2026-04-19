@@ -110,43 +110,6 @@ std::future<std::shared_ptr<const FinalizationResult>> FinalChain::finalize(
 
 EthBlockNumber FinalChain::delegationDelay() const { return delegation_delay_; }
 
-SharedTransaction FinalChain::makeBridgeFinalizationTransaction() {
-  const static auto finalize_method = util::EncodingSolidity::packFunctionCall("finalizeEpoch()");
-  auto account = getAccount(kEblaSystemAccount).value_or(state_api::ZeroAccount);
-
-  auto trx = std::make_shared<SystemTransaction>(account.nonce, 0, 0, kBlockGasLimit, finalize_method,
-                                                 kConfig.genesis.state.hardforks.ficus_hf.bridge_contract_address);
-  return trx;
-}
-
-bool FinalChain::isNeedToFinalize(EthBlockNumber blk_num) const {
-  const static auto get_bridge_root_method = util::EncodingSolidity::packFunctionCall("shouldFinalizeEpoch()");
-  return u256(call(state_api::EVMTransaction{dev::ZeroAddress, 1,
-                                             kConfig.genesis.state.hardforks.ficus_hf.bridge_contract_address,
-                                             state_api::ZeroAccount.nonce, 0, 10000000, get_bridge_root_method},
-                   blk_num)
-                  .code_retval)
-      .convert_to<bool>();
-}
-
-std::vector<SharedTransaction> FinalChain::makeSystemTransactions(PbftPeriod blk_num) {
-  std::vector<SharedTransaction> system_transactions;
-  // Make system transactions <delegationDelay()> blocks sooner than next pillar block period,
-  // e.g.: if pillar block period is 100, this will return true for period 100 - delegationDelay() == 95, 195, 295,
-  // etc...
-  if (kConfig.genesis.state.hardforks.ficus_hf.isPillarBlockPeriod(blk_num + delegationDelay())) {
-    if (const auto bridge_contract = getAccount(kConfig.genesis.state.hardforks.ficus_hf.bridge_contract_address);
-        bridge_contract) {
-      if (bridge_contract->code_size && isNeedToFinalize(blk_num - 1)) {
-        auto finalize_trx = makeBridgeFinalizationTransaction();
-        system_transactions.push_back(finalize_trx);
-      }
-    }
-  }
-
-  return system_transactions;
-}
-
 std::shared_ptr<const FinalizationResult> FinalChain::finalize_(PeriodData&& new_blk,
                                                                 std::vector<h256>&& finalized_dag_blk_hashes,
                                                                 std::shared_ptr<DagBlock>&& anchor) {
@@ -174,7 +137,6 @@ std::shared_ptr<const FinalizationResult> FinalChain::finalize_(PeriodData&& new
   auto system_transactions = makeSystemTransactions(new_blk.pbft_blk->getPeriod());
 
   auto all_transactions = new_blk.transactions;
-  all_transactions.insert(all_transactions.end(), system_transactions.begin(), system_transactions.end());
   std::vector<state_api::EVMTransaction> evm_trxs;
   appendEvmTransactions(evm_trxs, all_transactions);
 
@@ -221,19 +183,6 @@ std::shared_ptr<const FinalizationResult> FinalChain::finalize_(PeriodData&& new
   if (anchor) {
     db_->addProposalPeriodDagLevelsMapToBatch(anchor->getLevel() + kMaxLevelsPerPeriod, new_blk.pbft_blk->getPeriod(),
                                               batch);
-  }
-  ////
-
-  //// Commit system transactions
-  if (!system_transactions.empty()) {
-    db_->addPeriodSystemTransactions(batch, system_transactions, new_blk.pbft_blk->getPeriod());
-    auto position = new_blk.transactions.size();
-    for (const auto& trx : system_transactions) {
-      db_->addSystemTransactionToBatch(batch, trx);
-      db_->addTransactionLocationToBatch(batch, trx->getHash(), new_blk.pbft_blk->getPeriod(), position,
-                                         true /*system_trx*/);
-      position++;
-    }
   }
   ////
 
@@ -535,24 +484,6 @@ void FinalChain::waitForFinalized() {
 uint64_t FinalChain::dposYield(EthBlockNumber blk_num) const { return state_api_.dpos_yield(blk_num); }
 
 u256 FinalChain::dposTotalSupply(EthBlockNumber blk_num) const { return state_api_.dpos_total_supply(blk_num); }
-
-h256 FinalChain::getBridgeRoot(EthBlockNumber blk_num) const {
-  const static auto get_bridge_root_method = util::EncodingSolidity::packFunctionCall("getBridgeRoot()");
-  return h256(call(state_api::EVMTransaction{dev::ZeroAddress, 1,
-                                             kConfig.genesis.state.hardforks.ficus_hf.bridge_contract_address,
-                                             state_api::ZeroAccount.nonce, 0, 10000000, get_bridge_root_method},
-                   blk_num)
-                  .code_retval);
-}
-
-h256 FinalChain::getBridgeEpoch(EthBlockNumber blk_num) const {
-  const static auto getBridgeEpoch_method = util::EncodingSolidity::packFunctionCall("finalizedEpoch()");
-  return h256(call(state_api::EVMTransaction{dev::ZeroAddress, 1,
-                                             kConfig.genesis.state.hardforks.ficus_hf.bridge_contract_address,
-                                             state_api::ZeroAccount.nonce, 0, 10000000, getBridgeEpoch_method},
-                   blk_num)
-                  .code_retval);
-}
 
 std::pair<val_t, bool> FinalChain::getBalance(addr_t const& addr) const {
   if (auto acc = getAccount(addr)) {
