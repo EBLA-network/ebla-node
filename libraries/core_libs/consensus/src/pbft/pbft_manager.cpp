@@ -11,7 +11,6 @@
 #include "dag/dag_manager.hpp"
 #include "final_chain/final_chain.hpp"
 #include "pbft/period_data.hpp"
-#include "pillar_chain/pillar_chain_manager.hpp"
 #include "vote_manager/vote_manager.hpp"
 
 namespace ebla {
@@ -23,15 +22,13 @@ constexpr PbftStep kMaxSteps{13};  // Need to be a odd number
 PbftManager::PbftManager(const FullNodeConfig &conf, std::shared_ptr<DbStorage> db,
                          std::shared_ptr<PbftChain> pbft_chain, std::shared_ptr<VoteManager> vote_mgr,
                          std::shared_ptr<DagManager> dag_mgr, std::shared_ptr<TransactionManager> trx_mgr,
-                         std::shared_ptr<final_chain::FinalChain> final_chain,
-                         std::shared_ptr<pillar_chain::PillarChainManager> pillar_chain_mgr)
+                         std::shared_ptr<final_chain::FinalChain> final_chain)
     : db_(std::move(db)),
       pbft_chain_(std::move(pbft_chain)),
       vote_mgr_(std::move(vote_mgr)),
       dag_mgr_(std::move(dag_mgr)),
       trx_mgr_(std::move(trx_mgr)),
       final_chain_(std::move(final_chain)),
-      pillar_chain_mgr_(std::move(pillar_chain_mgr)),
       kConfig(conf),
       kSyncingThreadPoolSize(std::thread::hardware_concurrency() / 2),
       sync_thread_pool_(std::make_shared<util::ThreadPool>(kSyncingThreadPoolSize)),
@@ -87,18 +84,6 @@ PbftManager::PbftManager(const FullNodeConfig &conf, std::shared_ptr<DbStorage> 
 
   // Update wallets eligibility, call after initialState (waitForPeriodFinalization)
   eligible_wallets_.updateWalletsEligibility(pbft_chain_->getPbftChainSize(), final_chain_);
-
-  // Note: processPillarBlock must be called after eligible_wallets_.updateWalletsEligibility
-  auto current_pbft_period = pbft_chain_->getPbftChainSize();
-  if (kGenesisConfig.state.hardforks.ficus_hf.isPillarBlockPeriod(current_pbft_period)) {
-    const auto current_pillar_block = pillar_chain_mgr_->getCurrentPillarBlock();
-    // There is a race condition where pbt block could have been saved and node stopped before saving pillar block
-    if (current_pbft_period ==
-        current_pillar_block->getPeriod() + kGenesisConfig.state.hardforks.ficus_hf.pillar_blocks_interval)
-      LOG(log_er_) << "Pillar block was not processed before restart, current period: " << current_pbft_period
-                   << ", current pillar block period: " << current_pillar_block->getPeriod();
-    processPillarBlock(current_pbft_period);
-  }
 }
 
 PbftManager::~PbftManager() { stop(); }
@@ -607,7 +592,7 @@ void PbftManager::broadcastVotes() {
     }
   };
 
-  // (Re)broadcast reward votes + all own pbft and pillar votes
+  // (Re)broadcast reward votes + all own pbft votes
   auto stuckPeriodBroadcastVotes = [this, &net, &gossipVotes](bool rebroadcast) {
     auto [round, period] = getPbftRoundAndPeriod();
 
@@ -623,10 +608,6 @@ void PbftManager::broadcastVotes() {
                    << rebroadcast;
     }
 
-    // Broadcast own pillar vote
-    if (const auto &own_pillar_vote = db_->getOwnPillarBlockVote(); own_pillar_vote) {
-      net->gossipPillarBlockVote(own_pillar_vote, rebroadcast);
-    }
   };
 
   // (Re)broadcast 2t+1 soft/reward/previous round next votes + all own votes
@@ -776,23 +757,6 @@ bool PbftManager::genAndPlaceVote(PbftVoteTypes vote_type, PbftPeriod period, Pb
     assert(pbft_block->getBlockHash() == block_hash);
   }
 
-  // In case it is pbft with pillar block period and we have not voted yet, place a pillar vote (can be placed during
-  // any pbft step)
-  std::optional<blk_hash_t> place_pillar_vote_for_block;
-  if (kGenesisConfig.state.hardforks.ficus_hf.isPbftWithPillarBlockPeriod(period) &&
-      last_placed_pillar_vote_period_ < period) {
-    if (pbft_block) {
-      // No need to check presence of extra data and pillar block hash - this was already validated in validatePbftBlock
-      place_pillar_vote_for_block = pbft_block->getExtraData()->getPillarBlockHash();
-    } else {
-      const auto current_pillar_block = pillar_chain_mgr_->getCurrentPillarBlock();
-      // Check if the latest pillar block was created
-      if (current_pillar_block && current_pillar_block->getPeriod() == period - 1) {
-        place_pillar_vote_for_block = current_pillar_block->getHash();
-      }
-    }
-  }
-
   bool success = false;
   std::vector<std::shared_ptr<PbftVote>> valid_votes;
   uint64_t valid_votes_weight = 0;
@@ -833,14 +797,6 @@ bool PbftManager::genAndPlaceVote(PbftVoteTypes vote_type, PbftPeriod period, Pb
 
     // Save own verified vote
     vote_mgr_->saveOwnVerifiedVote(vote);
-
-    if (place_pillar_vote_for_block.has_value()) {
-      const auto pillar_vote = pillar_chain_mgr_->genAndPlacePillarVote(period, *place_pillar_vote_for_block,
-                                                                        wallet.second.node_secret, true);
-      if (pillar_vote) {
-        last_placed_pillar_vote_period_ = pillar_vote->getPeriod();
-      }
-    }
     success = true;
   }
 
@@ -1386,16 +1342,8 @@ std::optional<PbftManager::ProposedBlockData> PbftManager::proposePbftBlock() {
     last_period_dag_anchor_block_hash = dag_genesis_block_hash_;
   }
 
-  // Creates pbft block's extra data
+  // EBLA PBFT blocks have no extra data (pillar chain removed in Phase 12)
   std::optional<PbftBlockExtraData> extra_data;
-  if (kGenesisConfig.state.hardforks.ficus_hf.isFicusHardfork(current_pbft_period)) {
-    extra_data = createPbftBlockExtraData(current_pbft_period);
-    if (!extra_data.has_value()) {
-      LOG(log_er_) << "Unable to propose block for period " << current_pbft_period << ", round " << current_pbft_round
-                   << ". Empty extra data";
-      return {};
-    }
-  }
 
   auto ghost = dag_mgr_->getGhostPath(last_period_dag_anchor_block_hash);
   LOG(log_dg_) << "GHOST size " << ghost.size();
@@ -1496,28 +1444,6 @@ std::optional<PbftManager::ProposedBlockData> PbftManager::proposePbftBlock() {
   return {};
 }
 
-std::optional<PbftBlockExtraData> PbftManager::createPbftBlockExtraData(PbftPeriod pbft_period) const {
-  std::optional<blk_hash_t> pillar_block_hash;
-  if (kGenesisConfig.state.hardforks.ficus_hf.isPbftWithPillarBlockPeriod(pbft_period)) {
-    // Anchor pillar block hash into the pbft block
-    const auto pillar_block = pillar_chain_mgr_->getCurrentPillarBlock();
-    if (!pillar_block) {
-      LOG(log_er_) << "Missing pillar block, pbft period " << pbft_period;
-      return {};
-    }
-
-    if (pillar_block->getPeriod() != pbft_period - 1) {
-      LOG(log_er_) << "Wrong pillar block period: " << pillar_block->getPeriod() << ", pbft period: " << pbft_period;
-      return {};
-    }
-
-    pillar_block_hash = pillar_block->getHash();
-  }
-
-  return PbftBlockExtraData{EBLA_MAJOR_VERSION, EBLA_MINOR_VERSION, EBLA_PATCH_VERSION, EBLA_NET_VERSION, "E",
-                            pillar_block_hash};
-}
-
 h256 PbftManager::getProposal(const std::shared_ptr<PbftVote> &vote) const {
   auto lowest_hash = getVoterIndexHash(vote->getCredential(), vote->getVoter(), 1);
   for (uint64_t i = 2; i <= vote->getWeight(); ++i) {
@@ -1596,58 +1522,12 @@ PbftStateRootValidation PbftManager::validateFinalChainHash(const std::shared_pt
 }
 
 bool PbftManager::validatePbftBlockExtraData(const std::shared_ptr<PbftBlock> &pbft_block) const {
-  const auto extra_data = pbft_block->getExtraData();
-  const auto block_period = pbft_block->getPeriod();
-  if (kGenesisConfig.state.hardforks.ficus_hf.isFicusHardfork(block_period)) {
-    if (!extra_data.has_value()) {
-      LOG(log_er_) << "PBFT block " << pbft_block->getBlockHash() << ", period " << block_period
-                   << " does not contain extra data";
-      return false;
-    }
-
-    // Validate optional pillar block hash
-    const auto pillar_block_hash = extra_data->getPillarBlockHash();
-    if (kGenesisConfig.state.hardforks.ficus_hf.isPbftWithPillarBlockPeriod(block_period)) {
-      if (!pillar_block_hash.has_value()) {
-        LOG(log_er_) << "PBFT block " << pbft_block->getBlockHash() << ", period " << block_period
-                     << " does not contain pillar block hash";
-        return false;
-      }
-    } else if (pillar_block_hash.has_value()) {
-      LOG(log_er_) << "PBFT block " << pbft_block->getBlockHash() << ", period " << block_period
-                   << " contains pillar block hash even though it should not";
-      return false;
-    }
-
-  } else if (extra_data.has_value()) {
-    LOG(log_er_) << "PBFT block " << pbft_block->getBlockHash() << ", period " << block_period
+  // EBLA PBFT blocks must have no extra data (pillar chain removed in Phase 12)
+  if (pbft_block->getExtraData().has_value()) {
+    LOG(log_er_) << "PBFT block " << pbft_block->getBlockHash() << ", period " << pbft_block->getPeriod()
                  << " contains extra data even though it should not";
     return false;
   }
-
-  return true;
-}
-
-bool PbftManager::validatePillarDataInPeriodData(const PeriodData &period_data) const {
-  if (!validatePbftBlockExtraData(period_data.pbft_blk)) {
-    return false;
-  }
-
-  const auto block_period = period_data.pbft_blk->getPeriod();
-
-  // Validate optional pillar votes presence
-  if (kGenesisConfig.state.hardforks.ficus_hf.isPbftWithPillarBlockPeriod(block_period)) {
-    if (!period_data.pillar_votes_.has_value()) {
-      LOG(log_er_) << "Sync PBFT block " << period_data.pbft_blk->getBlockHash() << ", period " << block_period
-                   << " does not contain pillar votes";
-      return false;
-    }
-  } else if (period_data.pillar_votes_.has_value()) {
-    LOG(log_er_) << "Sync PBFT block " << period_data.pbft_blk->getBlockHash() << ", period "
-                 << period_data.pbft_blk->getPeriod() << " contains pillar votes even though it should not";
-    return false;
-  }
-
   return true;
 }
 
@@ -1678,26 +1558,7 @@ bool PbftManager::validatePbftBlock(const std::shared_ptr<PbftBlock> &pbft_block
     return false;
   }
 
-  // Validate optional pillar block hash
   const auto block_period = pbft_block->getPeriod();
-  if (kGenesisConfig.state.hardforks.ficus_hf.isPbftWithPillarBlockPeriod(block_period)) {
-    const auto current_pillar_block = pillar_chain_mgr_->getCurrentPillarBlock();
-    if (!current_pillar_block) {
-      // This should never happen
-      LOG(log_er_) << "Unable to validate PBFT block " << pbft_block_hash << ", period " << block_period
-                   << ". No current pillar block present in node";
-      return false;
-    }
-
-    if (*pbft_block->getExtraData()->getPillarBlockHash() != current_pillar_block->getHash()) {
-      LOG(log_er_) << "PBFT block " << pbft_block_hash << " with period " << pbft_block->getPeriod()
-                   << " contains pillar block hash " << *pbft_block->getExtraData()->getPillarBlockHash()
-                   << ", which is different than the local current pillar block" << current_pillar_block->getHash()
-                   << " with period " << current_pillar_block->getPeriod();
-      return false;
-    }
-  }
-
   auto const &anchor_hash = pbft_block->getPivotDagBlockHash();
   if (anchor_hash == kNullBlockHash) {
     return true;
@@ -1895,23 +1756,6 @@ bool PbftManager::pushPbftBlock_(PeriodData &&period_data, std::vector<std::shar
 
   auto pbft_period = period_data.pbft_blk->getPeriod();
 
-  // To finalize the pbft block that includes pillar block hash, pillar block needs to be finalized first
-  if (kGenesisConfig.state.hardforks.ficus_hf.isPbftWithPillarBlockPeriod(pbft_period)) {
-    // Note: presence of pillar block hash in extra data was already validated in validatePbftBlock
-    const auto pillar_block_hash = period_data.pbft_blk->getExtraData()->getPillarBlockHash();
-
-    // Finalize included pillar block
-    auto above_threshold_pillar_votes = pillar_chain_mgr_->finalizePillarBlock(*pillar_block_hash);
-    if (above_threshold_pillar_votes.empty()) {
-      LOG(log_er_) << "Cannot push PBFT block " << period_data.pbft_blk->getBlockHash() << ", period " << pbft_period
-                   << ": Unable to finalize included pillar block " << *pillar_block_hash;
-      return false;
-    }
-
-    // Save pillar votes into period data
-    period_data.pillar_votes_ = std::move(above_threshold_pillar_votes);
-  }
-
   assert(cert_votes.empty() == false);
   assert(pbft_block_hash == cert_votes[0]->getBlockHash());
 
@@ -1976,49 +1820,7 @@ bool PbftManager::pushPbftBlock_(PeriodData &&period_data, std::vector<std::shar
   // Advance pbft consensus period
   advancePeriod();
 
-  // Create new pillar block
-  // !!! Important: processPillarBlock must be called only after advancePeriod()
-  if (kGenesisConfig.state.hardforks.ficus_hf.isPillarBlockPeriod(pbft_period)) {
-    assert(pbft_period == pbft_chain_->getPbftChainSize());
-    processPillarBlock(pbft_period);
-  }
-
   return true;
-}
-
-void PbftManager::processPillarBlock(PbftPeriod current_pbft_chain_size) {
-  // Pillar block use state from current_pbft_chain_size - final_chain_->delegationDelay(), e.g. block with period 32
-  // uses state from period 27.
-  PbftPeriod request_period = current_pbft_chain_size - final_chain_->delegationDelay();
-  // advancePeriod() -> resetConsensus() -> waitForPeriodFinalization() makes sure block request_period was already
-  // finalized
-  assert(final_chain_->lastBlockNumber() >= request_period);
-
-  const auto block_header = final_chain_->blockHeader(request_period);
-  const auto bridge_root = final_chain_->getBridgeRoot(request_period);
-  const auto bridge_epoch = final_chain_->getBridgeEpoch(request_period);
-
-  // Create pillar block
-  const auto pillar_block =
-      pillar_chain_mgr_->createPillarBlock(current_pbft_chain_size, block_header, bridge_root, bridge_epoch);
-
-  // Optimization - creates pillar vote right after pillar block was created, otherwise pillar votes are created during
-  // next period pbft voting
-  if (pillar_block) {
-    for (const auto &wallet : eligible_wallets_.getWallets(current_pbft_chain_size + 1)) {
-      // Wallet is not dpos eligible - do no vote
-      if (!wallet.first) {
-        continue;
-      }
-
-      // Pillar votes are created in the next period, this is optimization to create & broadcast it a bit faster
-      const auto pillar_vote = pillar_chain_mgr_->genAndPlacePillarVote(
-          current_pbft_chain_size + 1, pillar_block->getHash(), wallet.second.node_secret, periodDataQueueEmpty());
-      if (pillar_vote) {
-        last_placed_pillar_vote_period_ = pillar_vote->getPeriod();
-      }
-    }
-  }
 }
 
 PbftPeriod PbftManager::pbftSyncingPeriod() const {
@@ -2136,18 +1938,7 @@ std::optional<std::pair<PeriodData, std::vector<std::shared_ptr<PbftVote>>>> Pbf
     LOG(log_er_) << "Synced PBFT block " << pbft_block_hash << " has finalized transactions";
   }
 
-  if (!validatePillarDataInPeriodData(period_data)) {
-    sync_queue_.clear();
-    net->handleMaliciousSyncPeer(node_id);
-    return std::nullopt;
-  }
-
-  const auto block_period = period_data.pbft_blk->getPeriod();
-  // Validate pillar votes
-  if (kGenesisConfig.state.hardforks.ficus_hf.isPbftWithPillarBlockPeriod(block_period) &&
-      !validatePbftBlockPillarVotes(period_data)) {
-    LOG(log_er_) << "Synced PBFT block " << pbft_block_hash << ", period " << block_period
-                 << " doesn't have enough valid pillar votes. Clear synced PBFT blocks!";
+  if (!validatePbftBlockExtraData(period_data.pbft_blk)) {
     sync_queue_.clear();
     net->handleMaliciousSyncPeer(node_id);
     return std::nullopt;
@@ -2234,69 +2025,6 @@ bool PbftManager::validatePbftBlockCertVotes(const std::shared_ptr<PbftBlock> pb
   if (votes_weight < *two_t_plus_one) {
     LOG(log_wr_) << "Invalid votes weight " << votes_weight << " < five_of_eight " << *two_t_plus_one << ", pbft block "
                  << pbft_block->getBlockHash();
-    return false;
-  }
-
-  return true;
-}
-
-bool PbftManager::validatePbftBlockPillarVotes(const PeriodData &period_data) const {
-  if (!period_data.pillar_votes_.has_value() || period_data.pillar_votes_->empty()) {
-    LOG(log_er_) << "No pillar votes provided, pbft block period " << period_data.pbft_blk->getPeriod()
-                 << ". The synced PBFT block comes from a malicious player";
-    return false;
-  }
-
-  const auto &pbft_block_hash = period_data.pbft_blk->getBlockHash();
-  const auto required_votes_period = period_data.pbft_blk->getPeriod();
-
-  const auto current_pillar_block = pillar_chain_mgr_->getCurrentPillarBlock();
-  if (current_pillar_block->getPeriod() + 1 != required_votes_period) {
-    LOG(log_er_) << "Sync pillar votes required period " << required_votes_period
-                 << " != " << " current pillar block period " << current_pillar_block->getPeriod() << " + 1";
-    return false;
-  }
-
-  uint64_t votes_weight = 0;
-  for (auto &vote : *period_data.pillar_votes_) {
-    // Any info is wrong that can determine the synced PBFT block comes from a malicious player
-    if (vote->getPeriod() != required_votes_period) {
-      LOG(log_er_) << "Invalid sync pillar vote " << vote->getHash() << " period " << vote->getPeriod()
-                   << ", PBFT block " << pbft_block_hash << ", kRequiredVotesPeriod " << required_votes_period;
-      return false;
-    }
-
-    if (vote->getBlockHash() != current_pillar_block->getHash()) {
-      LOG(log_er_) << "Invalid sync pillar vote " << vote->getHash() << ", vote period " << vote->getPeriod()
-                   << ", vote pillar block hash " << vote->getBlockHash()
-                   << ", current pillar block hash: " << current_pillar_block->getHash()
-                   << ", current pillar block period " << current_pillar_block->getPeriod()
-                   << ", full data: " << current_pillar_block->getJson();
-      return false;
-    }
-
-    if (!pillar_chain_mgr_->validatePillarVote(vote)) {
-      LOG(log_er_) << "Invalid sync pillar vote " << vote->getHash();
-      return false;
-    }
-
-    if (const auto vote_weight = pillar_chain_mgr_->addVerifiedPillarVote(vote); vote_weight) {
-      votes_weight += vote_weight;
-    } else {
-      LOG(log_er_) << "Unable to add sync pillar vote " << vote->getHash();
-      return false;
-    }
-  }
-
-  const auto pillar_consensus_threshold = pillar_chain_mgr_->getPillarConsensusThreshold(required_votes_period - 1);
-  if (!pillar_consensus_threshold.has_value()) {
-    LOG(log_er_) << "Unable to obtain pillar consensus threshold for period " << required_votes_period - 1;
-    return false;
-  }
-
-  if (votes_weight < *pillar_consensus_threshold) {
-    LOG(log_wr_) << "Invalid sync pillar votes weight " << votes_weight << " < threshold "
-                 << *pillar_consensus_threshold << ", period " << required_votes_period - 1;
     return false;
   }
 
