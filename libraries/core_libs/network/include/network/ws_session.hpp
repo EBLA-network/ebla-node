@@ -46,7 +46,6 @@ class WsSession : public std::enable_shared_from_this<WsSession> {
   void newDagBlockFinalized(const Json::Value& payload);
   void newPbftBlockExecuted(const Json::Value& payload);
   void newPendingTransaction(const Json::Value& payload);
-  void newPillarBlockData(const Json::Value& payload);
   void newLogs(const final_chain::BlockHeader& header, TransactionHashes trx_hashes,
                const TransactionReceipts& receipts);
 

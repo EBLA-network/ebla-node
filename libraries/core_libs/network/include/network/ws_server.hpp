@@ -7,7 +7,6 @@
 #include "metrics/jsonrpc_metrics.hpp"
 #include "network/ws_session.hpp"
 #include "pbft/pbft_chain.hpp"
-#include "pillar_chain/pillar_block.hpp"
 #include "transaction/transaction.hpp"
 
 namespace ebla::net {
@@ -31,7 +30,6 @@ class WsServer : public std::enable_shared_from_this<WsServer>, public jsonrpc::
   void newDagBlockFinalized(const blk_hash_t& blk, uint64_t period);
   void newPbftBlockExecuted(const PbftBlock& blk, const std::vector<blk_hash_t>& finalized_dag_blk_hashes);
   void newPendingTransaction(const trx_hash_t& trx_hash);
-  void newPillarBlockData(const pillar_chain::PillarBlockData& pillar_block_data);
   uint32_t numberOfSessions();
 
   virtual std::shared_ptr<WsSession> createSession(tcp::socket&& socket) = 0;

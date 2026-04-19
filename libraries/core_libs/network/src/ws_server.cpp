@@ -177,10 +177,6 @@ void WsSession::newPbftBlockExecuted(const Json::Value &payload) {
   subscriptions_.process(SubscriptionType::PBFT_BLOCK_EXECUTED, payload);
 }
 
-void WsSession::newPillarBlockData(const Json::Value &payload) {
-  subscriptions_.process(SubscriptionType::PILLAR_BLOCK, payload);
-}
-
 void WsSession::newPendingTransaction(const Json::Value &payload) {
   subscriptions_.process(SubscriptionType::TRANSACTIONS, payload);
 }
@@ -339,17 +335,6 @@ void WsServer::newPendingTransaction(const trx_hash_t &trx_hash) {
 
   for (auto const &session : sessions_) {
     if (!session->is_closed()) session->newPendingTransaction(payload);
-  }
-}
-
-void WsServer::newPillarBlockData(const pillar_chain::PillarBlockData &pillar_block_data) {
-  boost::shared_lock<boost::shared_mutex> lock(sessions_mtx_);
-  if (sessions_.empty()) return;
-
-  auto payload = pillar_block_data.getJson(true);
-
-  for (auto const &session : sessions_) {
-    if (!session->is_closed()) session->newPillarBlockData(payload);
   }
 }
 

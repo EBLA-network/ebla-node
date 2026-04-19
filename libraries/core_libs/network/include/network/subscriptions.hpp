@@ -15,7 +15,6 @@ enum class SubscriptionType {
   TRANSACTIONS,
   DAG_BLOCK_FINALIZED,
   PBFT_BLOCK_EXECUTED,
-  PILLAR_BLOCK,
   LOGS,
 };
 
@@ -78,18 +77,6 @@ class PbftBlockExecutedSubscription : public Subscription {
 
  private:
   bool full_block_ = false;
-};
-
-class PillarBlockSubscription : public Subscription {
- public:
-  explicit PillarBlockSubscription(int id, bool include_signatures = false)
-      : Subscription(id), include_signatures_(include_signatures) {}
-  static constexpr SubscriptionType type = SubscriptionType::PILLAR_BLOCK;
-  SubscriptionType getType() const override { return type; }
-  std::string processPayload(Json::Value payload) const override;
-
- private:
-  bool include_signatures_ = false;
 };
 
 class LogsSubscription : public Subscription {

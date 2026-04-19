@@ -55,10 +55,6 @@ class EblaFace : public ServerInterface<EblaFace> {
     this->bindAndAddMethod(jsonrpc::Procedure("ebla_totalSupply", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_STRING,
                                               "param1", JSON_ANY, NULL),
                            &ebla::net::EblaFace::ebla_totalSupplyI);
-    this->bindAndAddMethod(
-        jsonrpc::Procedure("ebla_getPillarBlockData", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_OBJECT, "param1",
-                           JSON_ANY, "param2", jsonrpc::JSON_BOOLEAN, NULL),
-        &ebla::net::EblaFace::ebla_getPillarBlockDataI);
   }
 
   inline virtual void ebla_protocolVersionI(const Json::Value &request, Json::Value &response) {
@@ -109,10 +105,6 @@ class EblaFace : public ServerInterface<EblaFace> {
     (void)request;
     response = this->ebla_totalSupply(request[0u].asString());
   }
-  inline virtual void ebla_getPillarBlockDataI(const Json::Value &request, Json::Value &response) {
-    (void)request;
-    response = this->ebla_getPillarBlockData(request[0u].asString(), request[1u].asBool());
-  }
 
   virtual std::string ebla_protocolVersion() = 0;
   virtual Json::Value ebla_getVersion() = 0;
@@ -127,7 +119,6 @@ class EblaFace : public ServerInterface<EblaFace> {
   virtual std::string ebla_pbftBlockHashByPeriod(const std::string &param1) = 0;
   virtual std::string ebla_yield(const std::string &param1) = 0;
   virtual std::string ebla_totalSupply(const std::string &param1) = 0;
-  virtual Json::Value ebla_getPillarBlockData(const std::string &param1, bool param2) = 0;
 };
 
 }  // namespace net

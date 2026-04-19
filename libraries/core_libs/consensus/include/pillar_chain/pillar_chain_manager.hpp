@@ -5,7 +5,6 @@
 #include "common/event.hpp"
 #include "final_chain/data.hpp"
 #include "logger/logger.hpp"
-#include "pillar_chain/pillar_block.hpp"
 #include "pillar_chain/pillar_votes.hpp"
 
 namespace ebla {

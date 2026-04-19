@@ -135,17 +135,6 @@ class EblaClient : public jsonrpc::Client {
     else
       throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
   }
-
-  Json::Value ebla_getPillarBlockData(const std::string& param1, bool param2) throw(jsonrpc::JsonRpcException) {
-    Json::Value p;
-    p.append(param1);
-    p.append(param2);
-    Json::Value result = this->CallMethod("ebla_getPillarBlockData", p);
-    if (result.isObject())
-      return result;
-    else
-      throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
-  }
 };
 
 }  // namespace net

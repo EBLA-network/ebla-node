@@ -93,13 +93,6 @@ std::string PbftBlockExecutedSubscription::processPayload(Json::Value payload) c
   return makeEthSubscriptionResponse(id_, payload);
 }
 
-std::string PillarBlockSubscription::processPayload(Json::Value payload) const {
-  if (!include_signatures_) {
-    payload.removeMember("signatures");
-  }
-  return makeEthSubscriptionResponse(id_, payload);
-}
-
 std::string LogsSubscription::processPayload(Json::Value payload) const {
   return makeEthSubscriptionResponse(id_, payload);
 }

@@ -231,32 +231,5 @@ std::string Ebla::ebla_totalSupply(const std::string& _period) {
   }
 }
 
-Json::Value Ebla::ebla_getPillarBlockData(const std::string& pillar_block_period, bool include_signatures) {
-  try {
-    auto app = app_.lock();
-    if (!app) {
-      BOOST_THROW_EXCEPTION(JsonRpcException(Errors::ERROR_RPC_INTERNAL_ERROR));
-    }
-
-    const auto pbft_period = dev::jsToInt(pillar_block_period);
-    if (!app->getConfig().genesis.state.hardforks.ficus_hf.isPillarBlockPeriod(pbft_period)) {
-      return {};
-    }
-
-    const auto pillar_block = app->getDB()->getPillarBlock(pbft_period);
-    if (!pillar_block) {
-      return {};
-    }
-
-    const auto& pillar_votes = app->getDB()->getPeriodPillarVotes(pbft_period + 1);
-    if (pillar_votes.empty()) {
-      return {};
-    }
-
-    return pillar_chain::PillarBlockData{pillar_block, pillar_votes}.getJson(include_signatures);
-  } catch (...) {
-    BOOST_THROW_EXCEPTION(JsonRpcException(Errors::ERROR_RPC_INVALID_PARAMS));
-  }
-}
-
-}  // namespace ebla::net
+}  
+// namespace ebla::net

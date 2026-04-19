@@ -31,8 +31,6 @@ class Ebla : public EblaFace {
   virtual Json::Value ebla_getChainStats() override;
   virtual std::string ebla_yield(const std::string& _period) override;
   virtual std::string ebla_totalSupply(const std::string& _period) override;
-  virtual Json::Value ebla_getPillarBlockData(const std::string& pillar_block_period,
-                                                bool include_signatures) override;
 
  protected:
   std::weak_ptr<ebla::AppBase> app_;
