@@ -20,7 +20,6 @@
 #include "metrics/pbft_metrics.hpp"
 #include "metrics/transaction_queue_metrics.hpp"
 #include "pbft/pbft_manager.hpp"
-#include "pillar_chain/pillar_chain_manager.hpp"
 #include "slashing_manager/slashing_manager.hpp"
 #include "storage/migration/migration_manager.hpp"
 #include "transaction/gas_pricer.hpp"
@@ -156,14 +155,12 @@ void App::init(const cli::Config &cli_conf) {
   dag_mgr_ = std::make_shared<DagManager>(conf_, node_addr, trx_mgr_, pbft_chain_, final_chain_, db_, key_manager_);
   auto slashing_manager = std::make_shared<SlashingManager>(conf_, final_chain_, trx_mgr_, gas_pricer_);
   vote_mgr_ = std::make_shared<VoteManager>(conf_, db_, pbft_chain_, final_chain_, key_manager_, slashing_manager);
-  pillar_chain_mgr_ = std::make_shared<pillar_chain::PillarChainManager>(conf_.genesis.state.hardforks.ficus_hf, db_,
-                                                                         final_chain_, key_manager_, node_addr);
   pbft_mgr_ = std::make_shared<PbftManager>(conf_, db_, pbft_chain_, vote_mgr_, dag_mgr_, trx_mgr_, final_chain_,
-                                            pillar_chain_mgr_);
+                                            nullptr);
   dag_block_proposer_ = std::make_shared<DagBlockProposer>(conf_, dag_mgr_, trx_mgr_, final_chain_, db_, key_manager_);
 
   network_ = std::make_shared<Network>(conf_, genesis_hash, conf_.net_file_path().string(), db_, pbft_mgr_, pbft_chain_,
-                                       vote_mgr_, dag_mgr_, trx_mgr_, std::move(slashing_manager), pillar_chain_mgr_,
+                                       vote_mgr_, dag_mgr_, trx_mgr_, std::move(slashing_manager), nullptr,
                                        final_chain_);
   auto cli_options = cli_conf.getCliOptions();
   for (auto &plugin : active_plugins_) {
@@ -200,7 +197,6 @@ void App::start() {
   vote_mgr_->setNetwork(network_);
   pbft_mgr_->setNetwork(network_);
   dag_mgr_->setNetwork(network_);
-  pillar_chain_mgr_->setNetwork(network_);
 
   if (conf_.db_config.rebuild_db) {
     rebuildDb();

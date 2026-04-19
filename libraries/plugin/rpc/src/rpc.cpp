@@ -12,7 +12,6 @@
 #include "network/rpc/eth/Eth.h"
 #include "network/rpc/jsonrpc_http_processor.hpp"
 #include "network/rpc/jsonrpc_ws_server.hpp"
-#include "pillar_chain/pillar_chain_manager.hpp"
 
 namespace ebla::plugin {
 
@@ -156,14 +155,6 @@ void Rpc::start() {
         [eth_json_rpc = as_weak(eth_json_rpc), ws = as_weak(jsonrpc_ws_)](const auto &dag_block) {
           if (auto _ws = ws.lock()) {
             _ws->newDagBlock(dag_block);
-          }
-        },
-        rpc_thread_pool_);
-
-    app()->getPillarChainManager()->pillar_block_finalized_.subscribe(
-        [ws_weak = as_weak(jsonrpc_ws_)](const auto &pillar_block_data) {
-          if (auto ws = ws_weak.lock()) {
-            ws->newPillarBlockData(pillar_block_data);
           }
         },
         rpc_thread_pool_);

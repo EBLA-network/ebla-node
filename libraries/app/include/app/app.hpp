@@ -42,7 +42,6 @@ class App : public std::enable_shared_from_this<App>, public AppBase {
   // used only in tests
   std::shared_ptr<DagBlockProposer> getDagBlockProposer() const { return dag_block_proposer_; }
   std::shared_ptr<GasPricer> getGasPricer() const { return gas_pricer_; }
-  std::shared_ptr<pillar_chain::PillarChainManager> getPillarChainManager() const { return pillar_chain_mgr_; }
 
   void rebuildDb();
 
@@ -102,7 +101,6 @@ class App : public std::enable_shared_from_this<App>, public AppBase {
   std::shared_ptr<VoteManager> vote_mgr_;
   std::shared_ptr<PbftManager> pbft_mgr_;
   std::shared_ptr<PbftChain> pbft_chain_;
-  std::shared_ptr<pillar_chain::PillarChainManager> pillar_chain_mgr_;
   std::shared_ptr<KeyManager> key_manager_;
   std::shared_ptr<final_chain::FinalChain> final_chain_;
   std::shared_ptr<metrics::MetricsService> metrics_;
