@@ -25,8 +25,7 @@ DagBlockProposer::DagBlockProposer(const FullNodeConfig& config, std::shared_ptr
       key_manager_(std::move(key_manager)),
       db_(std::move(db)),
       nodes_dag_proposers_data_(),
-      kDagProposeGasLimit(
-          std::min(config.propose_dag_gas_limit, config.genesis.getGasLimits().first)),
+      kDagProposeGasLimit(std::min(config.propose_dag_gas_limit, config.genesis.getGasLimits().first)),
       kPbftGasLimit(config.genesis.getGasLimits().second),
       kDagGasLimit(config.genesis.getGasLimits().first),
       kHardforks(config.genesis.state.hardforks),
