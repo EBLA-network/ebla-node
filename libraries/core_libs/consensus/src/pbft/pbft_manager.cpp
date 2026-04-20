@@ -1557,7 +1557,6 @@ bool PbftManager::validatePbftBlock(const std::shared_ptr<PbftBlock> &pbft_block
     return false;
   }
 
-  const auto block_period = pbft_block->getPeriod();
   auto const &anchor_hash = pbft_block->getPivotDagBlockHash();
   if (anchor_hash == kNullBlockHash) {
     return true;

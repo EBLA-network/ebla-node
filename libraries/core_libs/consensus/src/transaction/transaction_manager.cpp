@@ -86,7 +86,6 @@ std::pair<bool, std::string> TransactionManager::verifyTransaction(const std::sh
             "chain_id mismatch " + std::to_string(trx->getChainID()) + " " + std::to_string(kConf.genesis.chain_id)};
   }
 
-  const int64_t block_num = final_chain_->lastBlockNumber();
   // Ensure the transaction doesn't exceed the current block limit gas.
   if (kConf.genesis.state.dpos.trx_max_gas_limit < trx->getGas()) {
     return {false, "invalid gas"};
