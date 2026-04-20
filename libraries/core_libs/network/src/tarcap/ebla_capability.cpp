@@ -10,11 +10,8 @@
 #include "network/tarcap/packets_handlers/latest/get_dag_sync_packet_handler.hpp"
 #include "network/tarcap/packets_handlers/latest/get_next_votes_bundle_packet_handler.hpp"
 #include "network/tarcap/packets_handlers/latest/get_pbft_sync_packet_handler.hpp"
-#include "network/tarcap/packets_handlers/latest/get_pillar_votes_bundle_packet_handler.hpp"
 #include "network/tarcap/packets_handlers/latest/pbft_blocks_bundle_packet_handler.hpp"
 #include "network/tarcap/packets_handlers/latest/pbft_sync_packet_handler.hpp"
-#include "network/tarcap/packets_handlers/latest/pillar_vote_packet_handler.hpp"
-#include "network/tarcap/packets_handlers/latest/pillar_votes_bundle_packet_handler.hpp"
 #include "network/tarcap/packets_handlers/latest/status_packet_handler.hpp"
 #include "network/tarcap/packets_handlers/latest/transaction_packet_handler.hpp"
 #include "network/tarcap/packets_handlers/latest/vote_packet_handler.hpp"
@@ -23,7 +20,6 @@
 #include "network/tarcap/shared_states/pbft_syncing_state.hpp"
 #include "pbft/pbft_chain.hpp"
 #include "pbft/pbft_manager.hpp"
-#include "pillar_chain/pillar_chain_manager.hpp"
 #include "slashing_manager/slashing_manager.hpp"
 #include "transaction/transaction_manager.hpp"
 
@@ -36,7 +32,6 @@ EblaCapability::EblaCapability(
     std::shared_ptr<DbStorage> db, std::shared_ptr<PbftManager> pbft_mgr, std::shared_ptr<PbftChain> pbft_chain,
     std::shared_ptr<VoteManager> vote_mgr, std::shared_ptr<DagManager> dag_mgr,
     std::shared_ptr<TransactionManager> trx_mgr, std::shared_ptr<SlashingManager> slashing_manager,
-    std::shared_ptr<pillar_chain::PillarChainManager> pillar_chain_mgr,
     std::shared_ptr<final_chain::FinalChain> final_chain, InitPacketsHandlers init_packets_handlers)
     : version_(version),
       all_packets_stats_(std::move(packets_stats)),
@@ -54,7 +49,7 @@ EblaCapability::EblaCapability(
   peers_state_ = std::make_shared<PeersState>(host, kConf);
   packets_handlers_ = init_packets_handlers(logs_prefix, conf, genesis_hash, peers_state_, pbft_syncing_state_,
                                             all_packets_stats_, db, pbft_mgr, pbft_chain, vote_mgr, dag_mgr, trx_mgr,
-                                            slashing_manager, pillar_chain_mgr, final_chain, version, node_addr);
+                                            slashing_manager, final_chain, version, node_addr);
 
   // Must be called after init_packets_handlers
   thread_pool_->setPacketsHandlers(version, packets_handlers_);
@@ -248,7 +243,6 @@ const EblaCapability::InitPacketsHandlers EblaCapability::kInitLatestVersionHand
        const std::shared_ptr<PbftManager> &pbft_mgr, const std::shared_ptr<PbftChain> &pbft_chain,
        const std::shared_ptr<VoteManager> &vote_mgr, const std::shared_ptr<DagManager> &dag_mgr,
        const std::shared_ptr<TransactionManager> &trx_mgr, const std::shared_ptr<SlashingManager> &slashing_manager,
-       const std::shared_ptr<pillar_chain::PillarChainManager> &pillar_chain_mgr,
        const std::shared_ptr<final_chain::FinalChain> &final_chain, TarcapVersion, const addr_t &node_addr) {
       auto packets_handlers = std::make_shared<PacketsHandler>();
       // Consensus packets with high processing priority
@@ -285,12 +279,6 @@ const EblaCapability::InitPacketsHandlers EblaCapability::kInitLatestVersionHand
       packets_handlers->registerHandler<PbftSyncPacketHandler>(config, peers_state, packets_stats, pbft_syncing_state,
                                                                pbft_chain, pbft_mgr, dag_mgr, vote_mgr, db, node_addr,
                                                                logs_prefix);
-      packets_handlers->registerHandler<PillarVotePacketHandler>(config, peers_state, packets_stats, pillar_chain_mgr,
-                                                                 node_addr, logs_prefix);
-      packets_handlers->registerHandler<GetPillarVotesBundlePacketHandler>(config, peers_state, packets_stats,
-                                                                           pillar_chain_mgr, node_addr, logs_prefix);
-      packets_handlers->registerHandler<PillarVotesBundlePacketHandler>(config, peers_state, packets_stats,
-                                                                        pillar_chain_mgr, node_addr, logs_prefix);
       packets_handlers->registerHandler<PbftBlocksBundlePacketHandler>(
           config, peers_state, packets_stats, pbft_mgr, final_chain, pbft_syncing_state, node_addr, logs_prefix);
       return packets_handlers;
@@ -303,7 +291,6 @@ const EblaCapability::InitPacketsHandlers EblaCapability::kInitV5VersionHandlers
        const std::shared_ptr<PbftManager> &pbft_mgr, const std::shared_ptr<PbftChain> &pbft_chain,
        const std::shared_ptr<VoteManager> &vote_mgr, const std::shared_ptr<DagManager> &dag_mgr,
        const std::shared_ptr<TransactionManager> &trx_mgr, const std::shared_ptr<SlashingManager> &slashing_manager,
-       const std::shared_ptr<pillar_chain::PillarChainManager> &pillar_chain_mgr,
        const std::shared_ptr<final_chain::FinalChain> & /*final_chain*/, TarcapVersion, const addr_t &node_addr) {
       auto packets_handlers = std::make_shared<PacketsHandler>();
       // Consensus packets with high processing priority
@@ -340,12 +327,6 @@ const EblaCapability::InitPacketsHandlers EblaCapability::kInitV5VersionHandlers
       packets_handlers->registerHandler<PbftSyncPacketHandler>(config, peers_state, packets_stats, pbft_syncing_state,
                                                                pbft_chain, pbft_mgr, dag_mgr, vote_mgr, db, node_addr,
                                                                logs_prefix);
-      packets_handlers->registerHandler<PillarVotePacketHandler>(config, peers_state, packets_stats, pillar_chain_mgr,
-                                                                 node_addr, logs_prefix);
-      packets_handlers->registerHandler<GetPillarVotesBundlePacketHandler>(config, peers_state, packets_stats,
-                                                                           pillar_chain_mgr, node_addr, logs_prefix);
-      packets_handlers->registerHandler<PillarVotesBundlePacketHandler>(config, peers_state, packets_stats,
-                                                                        pillar_chain_mgr, node_addr, logs_prefix);
       return packets_handlers;
     };
 

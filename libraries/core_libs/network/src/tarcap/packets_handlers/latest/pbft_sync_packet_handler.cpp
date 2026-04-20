@@ -107,11 +107,6 @@ void PbftSyncPacketHandler::process(const threadpool::PacketData &packet_data,
       }
     }
 
-    if (!pbft_mgr_->validatePillarDataInPeriodData(packet.period_data)) {
-      peers_state_->handleMaliciousSyncPeer(peer->getId());
-      return;
-    }
-
     auto order_hash = PbftManager::calculateOrderHash(packet.period_data.dag_blocks);
     if (order_hash != packet.period_data.pbft_blk->getOrderHash()) {
       {  // This is just log related stuff

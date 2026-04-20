@@ -14,21 +14,14 @@
 #include "logger/logger.hpp"
 #include "pbft/pbft_block.hpp"
 #include "pbft/period_data.hpp"
-#include "pillar_chain/pillar_block.hpp"
 #include "storage/uint_comparator.hpp"
 #include "transaction/receipt.hpp"
 #include "transaction/transaction.hpp"
-#include "vote/pillar_vote.hpp"
 #include "vote_manager/verified_votes.hpp"
 
 namespace ebla {
 namespace fs = std::filesystem;
 struct SortitionParamsChange;
-
-namespace pillar_chain {
-struct PillarBlockData;
-class PillarBlock;
-}  // namespace pillar_chain
 
 enum StatusDbField : uint8_t {
   ExecutedBlkCount = 0,
@@ -132,12 +125,6 @@ class DbStorage : public std::enable_shared_from_this<DbStorage> {
 
     COLUMN_W_COMP(block_rewards_stats, getIntComparator<uint64_t>());
 
-    // Finalized pillar blocks
-    COLUMN_W_COMP(pillar_block, getIntComparator<PbftPeriod>());
-    // Current pillar block data - current pillar block + current vote counts
-    COLUMN(current_pillar_block_data);
-    // Current pillar block own pillar vote
-    COLUMN(current_pillar_block_own_vote);
     // system transactions that is not a part of the block
     COLUMN(system_transaction);
     // system transactions hashes by period
@@ -236,17 +223,7 @@ class DbStorage : public std::enable_shared_from_this<DbStorage> {
   blk_hash_t getPeriodBlockHash(PbftPeriod period) const;
   SharedTransactions transactionsFromPeriodDataRlp(PbftPeriod period, const dev::RLP& period_data_rlp) const;
   std::optional<SharedTransactions> getPeriodTransactions(PbftPeriod period) const;
-  std::vector<std::shared_ptr<PillarVote>> getPeriodPillarVotes(PbftPeriod period) const;
   uint64_t getEarliestBlockNumber() const;
-
-  // Pillar chain
-  void savePillarBlock(const std::shared_ptr<pillar_chain::PillarBlock>& pillar_block);
-  std::shared_ptr<pillar_chain::PillarBlock> getPillarBlock(PbftPeriod period) const;
-  std::shared_ptr<pillar_chain::PillarBlock> getLatestPillarBlock() const;
-  void saveOwnPillarBlockVote(const std::shared_ptr<PillarVote>& vote);
-  std::shared_ptr<PillarVote> getOwnPillarBlockVote() const;
-  void saveCurrentPillarBlockData(const pillar_chain::CurrentPillarBlockDataDb& current_pillar_block_data);
-  std::optional<pillar_chain::CurrentPillarBlockDataDb> getCurrentPillarBlockData() const;
 
   // DAG
   void saveDagBlock(const std::shared_ptr<DagBlock>& blk, Batch* write_batch_p = nullptr);

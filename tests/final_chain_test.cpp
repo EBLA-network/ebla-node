@@ -75,7 +75,7 @@ struct FinalChainTest : WithDataDir {
     std::vector<vote_hash_t> reward_votes_hashes;
     auto pbft_block = std::make_shared<PbftBlock>(
         kNullBlockHash, kNullBlockHash, kNullBlockHash, kNullBlockHash, expected_blk_num, addr_t::random(),
-        pbft_proposer_keys.secret(), reward_votes_hashes, PbftBlockExtraData(1, 0, 0, 1, "", blk_hash_t(123)));
+        pbft_proposer_keys.secret(), reward_votes_hashes, PbftBlockExtraData(1, 0, 0, 1, ""));
 
     std::vector<std::shared_ptr<PbftVote>> votes;
     PeriodData period_data(pbft_block, votes);

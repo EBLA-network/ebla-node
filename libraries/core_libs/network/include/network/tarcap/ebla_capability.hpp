@@ -26,10 +26,6 @@ class TransactionManager;
 class SlashingManager;
 enum class TransactionStatus;
 
-namespace pillar_chain {
-class PillarChainManager;
-}
-
 namespace final_chain {
 class FinalChain;
 }
@@ -40,8 +36,6 @@ namespace ebla::network::tarcap {
 
 class ISyncPacketHandler;
 class IVotePacketHandler;
-class IPillarVotePacketHandler;
-class IGetPillarVotesBundlePacketHandler;
 class ITransactionPacketHandler;
 class IDagBlockPacketHandler;
 
@@ -61,7 +55,6 @@ class EblaCapability final : public dev::p2p::CapabilityFace {
       const std::shared_ptr<PbftManager> &pbft_mgr, const std::shared_ptr<PbftChain> &pbft_chain,
       const std::shared_ptr<VoteManager> &vote_mgr, const std::shared_ptr<DagManager> &dag_mgr,
       const std::shared_ptr<TransactionManager> &trx_mgr, const std::shared_ptr<SlashingManager> &slashing_manager,
-      const std::shared_ptr<pillar_chain::PillarChainManager> &pillar_chain_mgr,
       const std::shared_ptr<final_chain::FinalChain> &final_chain, TarcapVersion version, const addr_t &node_addr)>;
 
   /**
@@ -79,7 +72,6 @@ class EblaCapability final : public dev::p2p::CapabilityFace {
                    std::shared_ptr<PbftManager> pbft_mgr, std::shared_ptr<PbftChain> pbft_chain,
                    std::shared_ptr<VoteManager> vote_mgr, std::shared_ptr<DagManager> dag_mgr,
                    std::shared_ptr<TransactionManager> trx_mgr, std::shared_ptr<SlashingManager> slashing_manager,
-                   std::shared_ptr<pillar_chain::PillarChainManager> pillar_chain_mgr,
                    std::shared_ptr<final_chain::FinalChain> final_chain,
                    InitPacketsHandlers init_packets_handlers = kInitLatestVersionHandlers);
 
@@ -167,18 +159,6 @@ std::shared_ptr<PacketHandlerType> EblaCapability::getSpecificHandler(Subprotoco
     case SubprotocolPacketType::kVotePacket:
     case SubprotocolPacketType::kVotesBundlePacket:
       if (!std::is_same<IVotePacketHandler, PacketHandlerType>::value) {
-        assert(false);
-      }
-      break;
-
-    case SubprotocolPacketType::kPillarVotePacket:
-      if (!std::is_same<IPillarVotePacketHandler, PacketHandlerType>::value) {
-        assert(false);
-      }
-      break;
-
-    case SubprotocolPacketType::kGetPillarVotesBundlePacket:
-      if (!std::is_same<IGetPillarVotesBundlePacketHandler, PacketHandlerType>::value) {
         assert(false);
       }
       break;

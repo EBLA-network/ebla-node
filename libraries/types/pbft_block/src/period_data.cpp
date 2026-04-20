@@ -9,11 +9,9 @@ namespace ebla {
 using namespace std;
 
 PeriodData::PeriodData(std::shared_ptr<PbftBlock> pbft_blk,
-                       const std::vector<std::shared_ptr<PbftVote>>& previous_block_cert_votes,
-                       std::optional<std::vector<std::shared_ptr<PillarVote>>>&& pillar_votes)
+                       const std::vector<std::shared_ptr<PbftVote>>& previous_block_cert_votes)
     : pbft_blk(std::move(pbft_blk)),
-      previous_block_cert_votes(previous_block_cert_votes),
-      pillar_votes_(std::move(pillar_votes)) {}
+      previous_block_cert_votes(previous_block_cert_votes) {}
 
 PeriodData::PeriodData(const dev::RLP& rlp) {
   auto it = rlp.begin();
@@ -30,17 +28,12 @@ PeriodData::PeriodData(const dev::RLP& rlp) {
   for (auto&& trx_rlp : *it++) {
     transactions.emplace_back(std::make_shared<Transaction>(std::move(trx_rlp)));
   }
-
-  // Pillar votes are optional data of period data since ficus hardfork
-  if (rlp.itemCount() == 5) {
-    pillar_votes_ = decodePillarVotesBundleRlp(*it);
-  }
 }
 
 PeriodData::PeriodData(bytes const& all_rlp) : PeriodData(dev::RLP(all_rlp)) {}
 
 bytes PeriodData::rlp() const {
-  const auto kRlpSize = pillar_votes_.has_value() ? kBaseRlpItemCount + 1 : kBaseRlpItemCount;
+  const auto kRlpSize = kBaseRlpItemCount;
   dev::RLPStream s(kRlpSize);
   s.appendRaw(pbft_blk->rlp(true));
 
@@ -61,11 +54,6 @@ bytes PeriodData::rlp() const {
     s.appendRaw(t->rlp());
   }
 
-  // Pillar votes are optional data of period data since ficus hardfork
-  if (pillar_votes_.has_value()) {
-    s.appendRaw(encodePillarVotesBundleRlp(*pillar_votes_));
-  }
-
   return s.invalidate();
 }
 
@@ -74,7 +62,6 @@ void PeriodData::clear() {
   dag_blocks.clear();
   transactions.clear();
   previous_block_cert_votes.clear();
-  pillar_votes_.reset();
 }
 
 void PeriodData::rlp(::ebla::util::RLPDecoderRef encoding) { *this = PeriodData(encoding.value); }

@@ -8,8 +8,6 @@
 
 #include "config/version.hpp"
 #include "network/tarcap/packets_handlers/interface/dag_block_packet_handler.hpp"
-#include "network/tarcap/packets_handlers/interface/get_pillar_votes_bundle_packet_handler.hpp"
-#include "network/tarcap/packets_handlers/interface/pillar_vote_packet_handler.hpp"
 #include "network/tarcap/packets_handlers/interface/sync_packet_handler.hpp"
 #include "network/tarcap/packets_handlers/interface/transaction_packet_handler.hpp"
 #include "network/tarcap/packets_handlers/interface/vote_packet_handler.hpp"
@@ -26,7 +24,6 @@ Network::Network(const FullNodeConfig &config, const h256 &genesis_hash, const s
                  std::shared_ptr<PbftChain> pbft_chain, std::shared_ptr<VoteManager> vote_mgr,
                  std::shared_ptr<DagManager> dag_mgr, std::shared_ptr<TransactionManager> trx_mgr,
                  std::shared_ptr<SlashingManager> slashing_manager,
-                 std::shared_ptr<pillar_chain::PillarChainManager> pillar_chain_mgr,
                  std::shared_ptr<final_chain::FinalChain> final_chain)
     : kConf(config),
       all_packets_stats_(nullptr),
@@ -77,14 +74,14 @@ Network::Network(const FullNodeConfig &config, const h256 &genesis_hash, const s
     // Register latest version of ebla capability
     auto latest_tarcap = std::make_shared<network::tarcap::EblaCapability>(
         EBLA_NET_VERSION, config, genesis_hash, host, packets_tp_, all_packets_stats_, pbft_syncing_state_, db,
-        pbft_mgr, pbft_chain, vote_mgr, dag_mgr, trx_mgr, slashing_manager, pillar_chain_mgr, final_chain);
+        pbft_mgr, pbft_chain, vote_mgr, dag_mgr, trx_mgr, slashing_manager, final_chain);
     capabilities.emplace_back(latest_tarcap);
 
     // Register previous (v5) version of ebla capability
     assert(EBLA_NET_VERSION - 1 == 5);
     auto v5_tarcap = std::make_shared<network::tarcap::EblaCapability>(
         EBLA_NET_VERSION - 1, config, genesis_hash, host, packets_tp_, all_packets_stats_, pbft_syncing_state_, db,
-        pbft_mgr, pbft_chain, vote_mgr, dag_mgr, trx_mgr, slashing_manager, pillar_chain_mgr, final_chain,
+        pbft_mgr, pbft_chain, vote_mgr, dag_mgr, trx_mgr, slashing_manager, final_chain,
         network::tarcap::EblaCapability::kInitV5VersionHandlers);
     capabilities.emplace_back(v5_tarcap);
 
@@ -315,14 +312,6 @@ void Network::gossipVotesBundle(const std::vector<std::shared_ptr<PbftVote>> &vo
   }
 }
 
-void Network::gossipPillarBlockVote(const std::shared_ptr<PillarVote> &vote, bool rebroadcast) {
-  for (const auto &tarcap : tarcaps_) {
-    auto pillar_vote_packet_handler = tarcap.second->getSpecificHandler<network::tarcap::IPillarVotePacketHandler>(
-        network::SubprotocolPacketType::kPillarVotePacket);
-    pillar_vote_packet_handler->onNewPillarVote(vote, rebroadcast);
-  }
-}
-
 void Network::handleMaliciousSyncPeer(const dev::p2p::NodeID &node_id) {
   for (const auto &tarcap : tarcaps_) {
     auto peers_state = tarcap.second->getPeersState();
@@ -352,28 +341,6 @@ std::shared_ptr<network::tarcap::EblaPeer> Network::getMaxChainPeer() const {
   }
 
   return max_chain_peer;
-}
-
-void Network::requestPillarBlockVotesBundle(ebla::PbftPeriod period, const ebla::blk_hash_t &pillar_block_hash) {
-  // Max peer among all tarcaps
-  const auto max_peer = getMaxChainPeer();
-
-  for (const auto &tarcap : tarcaps_) {
-    // Try to get most up-to-date peer
-    const auto peer = tarcap.second->getPeersState()->getMaxChainPeer(pbft_mgr_);
-    if (!peer) {
-      continue;
-    }
-
-    if (peer->getId() != max_peer->getId()) {
-      continue;
-    }
-
-    auto get_pillar_votes_bundle_packet_handler =
-        tarcap.second->getSpecificHandler<network::tarcap::IGetPillarVotesBundlePacketHandler>(
-            network::SubprotocolPacketType::kGetPillarVotesBundlePacket);
-    get_pillar_votes_bundle_packet_handler->requestPillarVotesBundle(period, pillar_block_hash, peer);
-  }
 }
 
 // METHODS USED IN TESTS ONLY

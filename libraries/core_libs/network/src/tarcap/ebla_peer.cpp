@@ -38,10 +38,6 @@ bool EblaPeer::markPbftBlockAsKnown(const blk_hash_t& hash) {
 
 bool EblaPeer::isPbftBlockKnown(const blk_hash_t& hash) const { return known_pbft_blocks_.contains(hash); }
 
-bool EblaPeer::markPillarVoteAsKnown(const vote_hash_t& hash) { return known_votes_.insert(hash, pbft_chain_size_); }
-
-bool EblaPeer::isPillarVoteKnown(const vote_hash_t& hash) const { return known_votes_.contains(hash); }
-
 const dev::p2p::NodeID& EblaPeer::getId() const { return id_; }
 
 bool EblaPeer::reportSuspiciousPacket() {

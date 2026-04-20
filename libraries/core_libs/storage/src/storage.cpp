@@ -14,7 +14,6 @@
 #include "dag/dag_block_bundle_rlp.hpp"
 #include "dag/sortition_params_manager.hpp"
 #include "final_chain/data.hpp"
-#include "pillar_chain/pillar_block.hpp"
 #include "rocksdb/utilities/checkpoint.h"
 #include "transaction/system_transaction.hpp"
 #include "vote/pbft_vote.hpp"
@@ -27,7 +26,6 @@ static constexpr uint16_t PBFT_BLOCK_POS_IN_PERIOD_DATA = 0;
 static constexpr uint16_t CERT_VOTES_POS_IN_PERIOD_DATA = 1;
 static constexpr uint16_t DAG_BLOCKS_POS_IN_PERIOD_DATA = 2;
 static constexpr uint16_t TRANSACTIONS_POS_IN_PERIOD_DATA = 3;
-static constexpr uint16_t PILLAR_VOTES_POS_IN_PERIOD_DATA = 4;
 static constexpr uint16_t PREV_BLOCK_HASH_POS_IN_PBFT_BLOCK = 0;
 
 DbStorage::DbStorage(const fs::path& path, uint32_t db_snapshot_each_n_pbft_block, uint32_t max_open_files,
@@ -669,55 +667,6 @@ std::optional<PeriodData> DbStorage::getPeriodData(PbftPeriod period) const {
   return PeriodData{std::move(period_data_bytes)};
 }
 
-void DbStorage::savePillarBlock(const std::shared_ptr<pillar_chain::PillarBlock>& pillar_block) {
-  insert(Columns::pillar_block, pillar_block->getPeriod(), pillar_block->getRlp());
-}
-
-std::shared_ptr<pillar_chain::PillarBlock> DbStorage::getPillarBlock(PbftPeriod period) const {
-  const auto bytes = asBytes(lookup(period, Columns::pillar_block));
-  if (bytes.empty()) {
-    return {};
-  }
-
-  return std::make_shared<pillar_chain::PillarBlock>(dev::RLP(bytes));
-}
-
-std::shared_ptr<pillar_chain::PillarBlock> DbStorage::getLatestPillarBlock() const {
-  auto it = std::unique_ptr<rocksdb::Iterator>(db_->NewIterator(read_options_, handle(Columns::pillar_block)));
-  it->SeekToLast();
-  if (!it->Valid()) {
-    return {};
-  }
-
-  return std::make_shared<pillar_chain::PillarBlock>(dev::RLP(it->value().ToString()));
-}
-
-void DbStorage::saveOwnPillarBlockVote(const std::shared_ptr<PillarVote>& vote) {
-  insert(Columns::current_pillar_block_own_vote, 0, util::rlp_enc(vote));
-}
-
-std::shared_ptr<PillarVote> DbStorage::getOwnPillarBlockVote() const {
-  const auto bytes = asBytes(lookup(0, Columns::current_pillar_block_own_vote));
-  if (bytes.empty()) {
-    return nullptr;
-  }
-
-  return std::make_shared<PillarVote>(dev::RLP(bytes));
-}
-
-void DbStorage::saveCurrentPillarBlockData(const pillar_chain::CurrentPillarBlockDataDb& current_pillar_block_data) {
-  insert(Columns::current_pillar_block_data, 0, util::rlp_enc(current_pillar_block_data));
-}
-
-std::optional<pillar_chain::CurrentPillarBlockDataDb> DbStorage::getCurrentPillarBlockData() const {
-  const auto bytes = asBytes(lookup(0, Columns::current_pillar_block_data));
-  if (bytes.empty()) {
-    return {};
-  }
-
-  return util::rlp_dec<pillar_chain::CurrentPillarBlockDataDb>(dev::RLP(bytes));
-}
-
 void DbStorage::addTransactionLocationToBatch(Batch& write_batch, trx_hash_t const& trx_hash, PbftPeriod period,
                                               uint32_t position, bool is_system) {
   dev::RLPStream s;
@@ -951,21 +900,6 @@ SharedTransactionReceipts DbStorage::getBlockReceipts(PbftPeriod period) const {
   }
   return std::make_shared<std::vector<TransactionReceipt>>(
       util::rlp_dec<std::vector<TransactionReceipt>>(dev::RLP(raw)));
-}
-
-std::vector<std::shared_ptr<PillarVote>> DbStorage::getPeriodPillarVotes(PbftPeriod period) const {
-  const auto period_data = getPeriodDataRaw(period);
-  if (!period_data.size()) {
-    return {};
-  }
-
-  auto period_data_rlp = dev::RLP(period_data);
-  // This could potentially happen if getPeriodPillarVotes is called for period that does not contain pillar votes
-  if (period_data_rlp.itemCount() < PILLAR_VOTES_POS_IN_PERIOD_DATA) {
-    return {};
-  }
-
-  return decodePillarVotesBundleRlp(period_data_rlp[PILLAR_VOTES_POS_IN_PERIOD_DATA]);
 }
 
 void DbStorage::addTransactionToBatch(Transaction const& trx, Batch& write_batch) {

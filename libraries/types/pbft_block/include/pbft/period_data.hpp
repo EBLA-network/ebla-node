@@ -18,7 +18,6 @@ namespace ebla {
 
 class PbftVote;
 class PbftBlock;
-class PillarVote;
 
 /**
  * @brief PeriodData class is for block execution, that includes PBFT block, certify votes, DAG blocks, and transactions
@@ -27,8 +26,7 @@ class PeriodData {
  public:
   PeriodData() = default;
   PeriodData(std::shared_ptr<PbftBlock> pbft_blk,
-             const std::vector<std::shared_ptr<PbftVote>>& previous_block_cert_votes,
-             std::optional<std::vector<std::shared_ptr<PillarVote>>>&& pillar_votes = {});
+             const std::vector<std::shared_ptr<PbftVote>>& previous_block_cert_votes);
   explicit PeriodData(const dev::RLP& all_rlp);
   explicit PeriodData(const bytes& all_rlp);
 
@@ -38,14 +36,7 @@ class PeriodData {
   std::vector<std::shared_ptr<DagBlock>> dag_blocks;
   SharedTransactions transactions;
 
-  // Pillar votes should be present only if pbft block contains also pillar block hash
-  std::optional<std::vector<std::shared_ptr<PillarVote>>> pillar_votes_;
-
-  // Period data rlp without pillar votes
   constexpr static size_t kBaseRlpItemCount = 4;
-
-  // Period data rlp with pillar votes (optional since ficus hardfork)
-  constexpr static size_t kExtendedRlpItemCount = 5;
 
   /**
    * @brief Recursive Length Prefix

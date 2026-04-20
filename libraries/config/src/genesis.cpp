@@ -110,7 +110,6 @@ void GenesisConfig::updateBlocksPerYear() {
 
 void GenesisConfig::validate() const {
   gas_price.validate();
-  state.hardforks.ficus_hf.validate(state.dpos.delegation_delay);
 }
 
 bytes GenesisConfig::rlp() const {

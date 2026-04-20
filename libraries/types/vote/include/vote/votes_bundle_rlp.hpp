@@ -10,7 +10,6 @@
 namespace ebla {
 
 class PbftVote;
-class PillarVote;
 
 /** @addtogroup Vote
  * @{
@@ -37,30 +36,6 @@ std::vector<std::shared_ptr<PbftVote>> decodePbftVotesBundleRlp(const dev::RLP& 
 
 struct OptimizedPbftVotesBundle {
   std::vector<std::shared_ptr<PbftVote>> votes;
-
-  HAS_RLP_FIELDS
-};
-
-constexpr static size_t kPillarVotesBundleRlpSize{3};
-
-/**
- * @brief Encodes pillar votes into optimized votes bundle rlp
- *
- * @param votes
- * @return votes bundle rlp bytes
- */
-dev::bytes encodePillarVotesBundleRlp(const std::vector<std::shared_ptr<PillarVote>>& votes);
-
-/**
- * @brief Decodes pillar votes from optimized votes bundle rlp
- *
- * @param votes_bundle_rlp
- * @return votes
- */
-std::vector<std::shared_ptr<PillarVote>> decodePillarVotesBundleRlp(const dev::RLP& votes_bundle_rlp);
-
-struct OptimizedPillarVotesBundle {
-  std::vector<std::shared_ptr<PillarVote>> pillar_votes;
 
   HAS_RLP_FIELDS
 };

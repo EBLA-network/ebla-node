@@ -1,7 +1,6 @@
 #include "vote/votes_bundle_rlp.hpp"
 
 #include "vote/pbft_vote.hpp"
-#include "vote/pillar_vote.hpp"
 
 namespace ebla {
 
@@ -55,52 +54,6 @@ void OptimizedPbftVotesBundle::rlp(::ebla::util::RLPDecoderRef encoding) {
 }
 void OptimizedPbftVotesBundle::rlp(::ebla::util::RLPEncoderRef encoding) const {
   encoding.appendRaw(encodePbftVotesBundleRlp(votes));
-}
-
-dev::bytes encodePillarVotesBundleRlp(const std::vector<std::shared_ptr<PillarVote>>& votes) {
-  if (votes.empty()) {
-    assert(false);
-    return {};
-  }
-
-  const auto& reference_block_hash = votes.back()->getBlockHash();
-  const auto reference_period = votes.back()->getPeriod();
-
-  dev::RLPStream votes_bundle_rlp(kPillarVotesBundleRlpSize);
-  votes_bundle_rlp.append(reference_block_hash);
-  votes_bundle_rlp.append(reference_period);
-  votes_bundle_rlp.appendList(votes.size());
-
-  for (const auto& vote : votes) {
-    votes_bundle_rlp.appendRaw(util::rlp_enc(vote->getVoteSignature()));
-  }
-
-  return votes_bundle_rlp.invalidate();
-}
-
-std::vector<std::shared_ptr<PillarVote>> decodePillarVotesBundleRlp(const dev::RLP& votes_bundle_rlp) {
-  assert(votes_bundle_rlp.itemCount() == kPillarVotesBundleRlpSize);
-
-  const blk_hash_t votes_bundle_block_hash = votes_bundle_rlp[0].toHash<blk_hash_t>();
-  const PbftPeriod votes_bundle_pbft_period = votes_bundle_rlp[1].toInt<PbftPeriod>();
-
-  std::vector<std::shared_ptr<PillarVote>> votes;
-  votes.reserve(votes_bundle_rlp[2].itemCount());
-
-  for (const auto sig_rlp : votes_bundle_rlp[2]) {
-    auto vote_sig = util::rlp_dec<sig_t>(sig_rlp);
-    auto vote = std::make_shared<PillarVote>(votes_bundle_pbft_period, votes_bundle_block_hash, std::move(vote_sig));
-    votes.push_back(std::move(vote));
-  }
-
-  return votes;
-}
-
-void OptimizedPillarVotesBundle::rlp(::ebla::util::RLPDecoderRef encoding) {
-  pillar_votes = decodePillarVotesBundleRlp(encoding.value);
-}
-void OptimizedPillarVotesBundle::rlp(::ebla::util::RLPEncoderRef encoding) const {
-  encoding.appendRaw(encodePillarVotesBundleRlp(pillar_votes));
 }
 
 }  // namespace ebla
