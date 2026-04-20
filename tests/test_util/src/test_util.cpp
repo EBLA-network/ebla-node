@@ -250,8 +250,8 @@ NodesTest::NodesTest() {
     cfg.network.boot_nodes.clear();
     cfg.network.boot_nodes.emplace_back(
         ebla::NodeConfig{"7b1fcf0ec1078320117b96e9e9ad9032c06d030cf4024a598347a4623a14a421d4f030cf25ef368ab394a45e9"
-                           "20e14b57a259a09c41767dd50d1da27b627412a",
-                           "127.0.0.1", 10003});
+                         "20e14b57a259a09c41767dd50d1da27b627412a",
+                         "127.0.0.1", 10003});
     cfg.validate();
 
     node_cfgs.emplace_back(cfg);
@@ -288,8 +288,8 @@ void NodesTest::CleanupDirs() {
 }
 
 std::vector<ebla::FullNodeConfig> NodesTest::make_node_cfgs(size_t total_count, size_t validators_count,
-                                                              uint tests_speed, bool enable_rpc_http,
-                                                              bool enable_rpc_ws) {
+                                                            uint tests_speed, bool enable_rpc_http,
+                                                            bool enable_rpc_ws) {
   std::vector<ebla::FullNodeConfig> ret_configs = node_cfgs;
   assert(total_count <= ret_configs.size());
   assert(validators_count <= total_count);

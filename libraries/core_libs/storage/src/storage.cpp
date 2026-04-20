@@ -1036,8 +1036,7 @@ void DbStorage::savePbftHead(blk_hash_t const& hash, std::string const& pbft_cha
   insert(Columns::pbft_head, toSlice(hash.asBytes()), pbft_chain_head_str);
 }
 
-void DbStorage::addPbftHeadToBatch(ebla::blk_hash_t const& head_hash, std::string const& head_str,
-                                   Batch& write_batch) {
+void DbStorage::addPbftHeadToBatch(ebla::blk_hash_t const& head_hash, std::string const& head_str, Batch& write_batch) {
   insert(write_batch, Columns::pbft_head, toSlice(head_hash.asBytes()), head_str);
 }
 

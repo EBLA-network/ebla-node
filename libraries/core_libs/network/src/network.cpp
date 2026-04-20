@@ -7,6 +7,7 @@
 #include <boost/tokenizer.hpp>
 
 #include "config/version.hpp"
+#include "network/tarcap/ebla_capability.hpp"
 #include "network/tarcap/packets_handlers/interface/dag_block_packet_handler.hpp"
 #include "network/tarcap/packets_handlers/interface/sync_packet_handler.hpp"
 #include "network/tarcap/packets_handlers/interface/transaction_packet_handler.hpp"
@@ -14,7 +15,6 @@
 #include "network/tarcap/shared_states/pbft_syncing_state.hpp"
 #include "network/tarcap/stats/node_stats.hpp"
 #include "network/tarcap/stats/time_period_packets_stats.hpp"
-#include "network/tarcap/ebla_capability.hpp"
 #include "pbft/pbft_manager.hpp"
 
 namespace ebla {

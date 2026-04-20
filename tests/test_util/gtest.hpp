@@ -14,9 +14,9 @@ using ::ebla::util::lazy::Lazy;
 inline auto const DIR = fs::path(__FILE__).parent_path();
 inline auto const DIR_CONF = DIR / "conf";
 
-#define EBLA_TEST_MAIN(_extension)                          \
+#define EBLA_TEST_MAIN(_extension)                            \
   int main(int argc, char **argv) {                           \
-    ebla::static_init();                                    \
+    ebla::static_init();                                      \
     std::function<void(int, char **)> extension = _extension; \
     if (extension) {                                          \
       extension(argc, argv);                                  \

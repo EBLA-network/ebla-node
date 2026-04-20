@@ -14,9 +14,9 @@ class Query {
  public:
   explicit Query(std::shared_ptr<::ebla::final_chain::FinalChain> final_chain,
                  std::shared_ptr<::ebla::DagManager> dag_manager, std::shared_ptr<::ebla::PbftManager> pbft_manager,
-                 std::shared_ptr<::ebla::TransactionManager> transaction_manager,
-                 std::shared_ptr<::ebla::DbStorage> db, std::shared_ptr<::ebla::GasPricer> gas_pricer,
-                 std::weak_ptr<::ebla::Network> network, uint64_t chain_id) noexcept;
+                 std::shared_ptr<::ebla::TransactionManager> transaction_manager, std::shared_ptr<::ebla::DbStorage> db,
+                 std::shared_ptr<::ebla::GasPricer> gas_pricer, std::weak_ptr<::ebla::Network> network,
+                 uint64_t chain_id) noexcept;
 
   std::shared_ptr<object::Block> getBlock(std::optional<response::Value>&& numberArg,
                                           std::optional<response::Value>&& hashArg) const;

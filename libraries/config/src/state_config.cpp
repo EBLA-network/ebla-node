@@ -110,10 +110,10 @@ void dec_json(const Json::Value& json, DPOSConfig& obj) {
   obj.dag_proposers_reward = static_cast<uint16_t>(dev::getUInt(json["dag_proposers_reward"].asString()));
   obj.yield_percentage = static_cast<uint16_t>(dev::getUInt(json["yield_percentage"]));
   obj.blocks_per_year = dev::getUInt(json["blocks_per_year"]);
-  obj.trx_min_gas_price = json["trx_min_gas_price"].isUInt64()
-      ? dev::getUInt(json["trx_min_gas_price"]) : uint64_t(1000000000);
-  obj.trx_max_gas_limit = json["trx_max_gas_limit"].isUInt64()
-      ? dev::getUInt(json["trx_max_gas_limit"]) : uint64_t(31500000);
+  obj.trx_min_gas_price =
+      json["trx_min_gas_price"].isUInt64() ? dev::getUInt(json["trx_min_gas_price"]) : uint64_t(1000000000);
+  obj.trx_max_gas_limit =
+      json["trx_max_gas_limit"].isUInt64() ? dev::getUInt(json["trx_max_gas_limit"]) : uint64_t(31500000);
 
   const auto& initial_validators_json = json["initial_validators"];
   obj.initial_validators = std::vector<ValidatorInfo>(initial_validators_json.size());

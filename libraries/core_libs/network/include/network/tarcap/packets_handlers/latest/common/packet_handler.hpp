@@ -7,12 +7,12 @@
 
 #include "exceptions.hpp"
 #include "logger/logger.hpp"
+#include "network/tarcap/ebla_peer.hpp"
 #include "network/tarcap/packet_types.hpp"
 #include "network/tarcap/packets_handlers/latest/common/base_packet_handler.hpp"
 #include "network/tarcap/packets_handlers/latest/common/exceptions.hpp"
 #include "network/tarcap/shared_states/peers_state.hpp"
 #include "network/tarcap/stats/time_period_packets_stats.hpp"
-#include "network/tarcap/ebla_peer.hpp"
 #include "network/threadpool/packet_data.hpp"
 
 namespace ebla::network::tarcap {

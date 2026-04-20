@@ -71,10 +71,10 @@ Host::Host(std::string _clientVersion, KeyPair const& kp, NetworkConfig _n, Ebla
       m_peers[peer->id] = peer;
     }
   }
-  m_nodeTable = make_unique<NodeTable>(
-      ioc_, m_alias, NodeIPEndpoint(bi::make_address(listenAddress()), listenPort(), listenPort()),
-      updateENR(enr, m_tcpPublic, listenPort()), m_netConfig.discovery, m_netConfig.allowLocalDiscovery,
-      ebla_conf_.is_boot_node, ebla_conf_.chain_id);
+  m_nodeTable = make_unique<NodeTable>(ioc_, m_alias,
+                                       NodeIPEndpoint(bi::make_address(listenAddress()), listenPort(), listenPort()),
+                                       updateENR(enr, m_tcpPublic, listenPort()), m_netConfig.discovery,
+                                       m_netConfig.allowLocalDiscovery, ebla_conf_.is_boot_node, ebla_conf_.chain_id);
   m_nodeTable->setEventHandler(new NodeTableEventHandler([this](auto const&... args) { onNodeTableEvent(args...); }));
   if (restored_state) {
     for (auto const& node : restored_state->known_nodes) {
@@ -97,10 +97,8 @@ Host::Host(std::string _clientVersion, KeyPair const& kp, NetworkConfig _n, Ebla
 }
 
 std::shared_ptr<Host> Host::make(std::string _clientVersion, CapabilitiesFactory const& cap_factory, KeyPair const& kp,
-                                 NetworkConfig _n, EblaNetworkConfig ebla_conf,
-                                 std::filesystem::path state_file_path) {
-  shared_ptr<Host> self(
-      new Host(std::move(_clientVersion), kp, std::move(_n), ebla_conf, std::move(state_file_path)));
+                                 NetworkConfig _n, EblaNetworkConfig ebla_conf, std::filesystem::path state_file_path) {
+  shared_ptr<Host> self(new Host(std::move(_clientVersion), kp, std::move(_n), ebla_conf, std::move(state_file_path)));
   for (const auto& cap : cap_factory(self)) {
     CapabilityNameAndVersion cap_id{cap->name(), cap->version()};
     self->m_capabilities.emplace(cap_id, Capability(cap, cap->messageCount()));

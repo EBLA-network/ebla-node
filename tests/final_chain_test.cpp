@@ -73,9 +73,9 @@ struct FinalChainTest : WithDataDir {
                                               dag_proposer_keys.secret());
     db->saveDagBlock(dag_blk);
     std::vector<vote_hash_t> reward_votes_hashes;
-    auto pbft_block = std::make_shared<PbftBlock>(
-        kNullBlockHash, kNullBlockHash, kNullBlockHash, kNullBlockHash, expected_blk_num, addr_t::random(),
-        pbft_proposer_keys.secret(), reward_votes_hashes, PbftBlockExtraData(1, 0, 0, 1, ""));
+    auto pbft_block = std::make_shared<PbftBlock>(kNullBlockHash, kNullBlockHash, kNullBlockHash, kNullBlockHash,
+                                                  expected_blk_num, addr_t::random(), pbft_proposer_keys.secret(),
+                                                  reward_votes_hashes, PbftBlockExtraData(1, 0, 0, 1, ""));
 
     std::vector<std::shared_ptr<PbftVote>> votes;
     PeriodData period_data(pbft_block, votes);
@@ -191,10 +191,9 @@ struct FinalChainTest : WithDataDir {
 
 TEST_F(FinalChainTest, initial_balances) {
   cfg.genesis.state.initial_balances = {};
-  cfg.genesis.state.initial_balances[addr_t::random()] = ebla::uint256_t("0x16345785D8A0000");    // 1
-  cfg.genesis.state.initial_balances[addr_t::random()] = ebla::uint256_t("0x56BC75E2D63100000");  // 1k
-  cfg.genesis.state.initial_balances[addr_t::random()] =
-      ebla::uint256_t("0x204FCE5E3E25026110000000");  //  10 Billion
+  cfg.genesis.state.initial_balances[addr_t::random()] = ebla::uint256_t("0x16345785D8A0000");           // 1
+  cfg.genesis.state.initial_balances[addr_t::random()] = ebla::uint256_t("0x56BC75E2D63100000");         // 1k
+  cfg.genesis.state.initial_balances[addr_t::random()] = ebla::uint256_t("0x204FCE5E3E25026110000000");  //  10 Billion
   init();
 }
 

@@ -205,14 +205,14 @@ dev::bytes rlp_enc(T const& obj) {
 
 }  // namespace ebla::util
 
-#define HAS_RLP_FIELDS                              \
+#define HAS_RLP_FIELDS                            \
   void rlp(::ebla::util::RLPDecoderRef encoding); \
   void rlp(::ebla::util::RLPEncoderRef encoding) const;
 
-#define RLP_FIELDS_DEFINE(_class_, ...)                                                                           \
+#define RLP_FIELDS_DEFINE(_class_, ...)                                                                       \
   void _class_::rlp(::ebla::util::RLPDecoderRef encoding) { ::ebla::util::rlp_tuple(encoding, __VA_ARGS__); } \
   void _class_::rlp(::ebla::util::RLPEncoderRef encoding) const { ::ebla::util::rlp_tuple(encoding, __VA_ARGS__); }
 
-#define RLP_FIELDS_DEFINE_INPLACE(...)                                                                   \
+#define RLP_FIELDS_DEFINE_INPLACE(...)                                                               \
   void rlp(::ebla::util::RLPDecoderRef encoding) { ::ebla::util::rlp_tuple(encoding, __VA_ARGS__); } \
   void rlp(::ebla::util::RLPEncoderRef encoding) const { ::ebla::util::rlp_tuple(encoding, __VA_ARGS__); }

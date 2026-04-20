@@ -131,8 +131,7 @@ std::shared_ptr<object::DagBlock> Query::getDagBlock(std::optional<response::Val
   std::shared_ptr<::ebla::DagBlock> ebla_dag_block = nullptr;
 
   if (hashArg) {
-    if (const auto hash = ::ebla::blk_hash_t(hashArg->get<response::StringType>());
-        hash != ::ebla::kNullBlockHash) {
+    if (const auto hash = ::ebla::blk_hash_t(hashArg->get<response::StringType>()); hash != ::ebla::kNullBlockHash) {
       ebla_dag_block = dag_manager_->getDagBlock(hash);
     }
   } else {
@@ -183,8 +182,8 @@ std::vector<std::shared_ptr<object::DagBlock>> Query::getDagBlocks(std::optional
   }
 
   auto addDagBlocks = [final_chain = final_chain_, pbft_manager = pbft_manager_,
-                       transaction_manager = transaction_manager_, get_block_by_num = get_block_by_num_](
-                          auto ebla_dag_blocks, auto& result_dag_blocks) -> size_t {
+                       transaction_manager = transaction_manager_,
+                       get_block_by_num = get_block_by_num_](auto ebla_dag_blocks, auto& result_dag_blocks) -> size_t {
     for (auto& dag_block : ebla_dag_blocks) {
       result_dag_blocks.emplace_back(std::make_shared<object::DagBlock>(std::make_shared<DagBlock>(
           std::move(dag_block), final_chain, pbft_manager, transaction_manager, get_block_by_num)));

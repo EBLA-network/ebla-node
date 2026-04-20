@@ -22,8 +22,7 @@ PbftSyncPacketHandler::PbftSyncPacketHandler(const FullNodeConfig &conf, std::sh
       vote_mgr_(std::move(vote_mgr)),
       periodic_events_tp_(1, true) {}
 
-void PbftSyncPacketHandler::process(const threadpool::PacketData &packet_data,
-                                    const std::shared_ptr<EblaPeer> &peer) {
+void PbftSyncPacketHandler::process(const threadpool::PacketData &packet_data, const std::shared_ptr<EblaPeer> &peer) {
   // Decode packet rlp into packet object
   auto packet = decodePacketRlp<PbftSyncPacket>(packet_data.rlp_);
 

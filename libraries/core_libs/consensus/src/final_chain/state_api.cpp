@@ -75,7 +75,7 @@ class ErrorHandler {
   }
 };
 
-template <typename Result,                            //
+template <typename Result,                          //
           void (*decode)(ebla_evm_Bytes, Result&),  //
           void (*fn)(ebla_evm_state_API_ptr, ebla_evm_Bytes, ebla_evm_BytesCallback,
                      ebla_evm_BytesCallback),  //
@@ -87,7 +87,7 @@ void c_method_args_rlp(ebla_evm_state_API_ptr this_c, dev::RLPStream& encoding, 
   err_h.check();
 }
 
-template <typename Result,                            //
+template <typename Result,                          //
           void (*decode)(ebla_evm_Bytes, Result&),  //
           void (*fn)(ebla_evm_state_API_ptr, ebla_evm_Bytes, ebla_evm_BytesCallback,
                      ebla_evm_BytesCallback),  //
@@ -161,20 +161,20 @@ bytes StateAPI::get_code_by_address(EthBlockNumber blk_num, const addr_t& addr) 
 ExecutionResult StateAPI::dry_run_transaction(EthBlockNumber blk_num, const EVMBlock& blk,
                                               const EVMTransaction& trx) const {
   return c_method_args_rlp<ExecutionResult, from_rlp, ebla_evm_state_api_dry_run_transaction>(this_c_, blk_num, blk,
-                                                                                                trx);
+                                                                                              trx);
 }
 
 bytes StateAPI::trace(EthBlockNumber blk_num, const EVMBlock& blk, const std::vector<EVMTransaction>& state_trxs,
                       const std::vector<EVMTransaction>& trxs, std::optional<Tracing> params) const {
   return c_method_args_rlp<bytes, from_rlp, ebla_evm_state_api_trace_transactions>(this_c_, blk_num, blk, state_trxs,
-                                                                                     trxs, params);
+                                                                                   trxs, params);
 }
 
 StateDescriptor StateAPI::get_last_committed_state_descriptor() const {
   StateDescriptor ret;
   ErrorHandler err_h;
   ebla_evm_state_api_get_last_committed_state_descriptor(this_c_, decoder_cb_c<StateDescriptor, from_rlp>(ret),
-                                                           err_h.cgo_part_);
+                                                         err_h.cgo_part_);
   err_h.check();
   return ret;
 }
@@ -256,7 +256,7 @@ std::vector<ValidatorStake> StateAPI::dpos_validators_total_stakes(EthBlockNumbe
   ErrorHandler err_h;
   std::vector<ValidatorStake> ret;
   ebla_evm_state_api_validators_stakes(this_c_, blk_num, decoder_cb_c<std::vector<ValidatorStake>, from_rlp>(ret),
-                                         err_h.cgo_part_);
+                                       err_h.cgo_part_);
   err_h.check();
   return ret;
 }

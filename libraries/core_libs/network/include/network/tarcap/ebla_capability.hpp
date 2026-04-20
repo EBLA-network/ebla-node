@@ -65,15 +65,14 @@ class EblaCapability final : public dev::p2p::CapabilityFace {
 
  public:
   EblaCapability(TarcapVersion version, const FullNodeConfig &conf, const h256 &genesis_hash,
-                   std::weak_ptr<dev::p2p::Host> host,
-                   std::shared_ptr<network::threadpool::PacketsThreadPool> threadpool,
-                   std::shared_ptr<TimePeriodPacketsStats> packets_stats,
-                   std::shared_ptr<PbftSyncingState> syncing_state, std::shared_ptr<DbStorage> db,
-                   std::shared_ptr<PbftManager> pbft_mgr, std::shared_ptr<PbftChain> pbft_chain,
-                   std::shared_ptr<VoteManager> vote_mgr, std::shared_ptr<DagManager> dag_mgr,
-                   std::shared_ptr<TransactionManager> trx_mgr, std::shared_ptr<SlashingManager> slashing_manager,
-                   std::shared_ptr<final_chain::FinalChain> final_chain,
-                   InitPacketsHandlers init_packets_handlers = kInitLatestVersionHandlers);
+                 std::weak_ptr<dev::p2p::Host> host, std::shared_ptr<network::threadpool::PacketsThreadPool> threadpool,
+                 std::shared_ptr<TimePeriodPacketsStats> packets_stats, std::shared_ptr<PbftSyncingState> syncing_state,
+                 std::shared_ptr<DbStorage> db, std::shared_ptr<PbftManager> pbft_mgr,
+                 std::shared_ptr<PbftChain> pbft_chain, std::shared_ptr<VoteManager> vote_mgr,
+                 std::shared_ptr<DagManager> dag_mgr, std::shared_ptr<TransactionManager> trx_mgr,
+                 std::shared_ptr<SlashingManager> slashing_manager,
+                 std::shared_ptr<final_chain::FinalChain> final_chain,
+                 InitPacketsHandlers init_packets_handlers = kInitLatestVersionHandlers);
 
   virtual ~EblaCapability() = default;
   EblaCapability(const EblaCapability &ro) = delete;

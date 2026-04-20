@@ -16,9 +16,7 @@ EblaPeer::EblaPeer(const dev::p2p::NodeID& id, size_t transaction_pool_size, std
       known_pbft_blocks_(10000, 1000, 10),
       known_votes_(10000, 1000, 10) {}
 
-bool EblaPeer::markDagBlockAsKnown(const blk_hash_t& hash) {
-  return known_dag_blocks_.insert(hash, pbft_chain_size_);
-}
+bool EblaPeer::markDagBlockAsKnown(const blk_hash_t& hash) { return known_dag_blocks_.insert(hash, pbft_chain_size_); }
 
 bool EblaPeer::isDagBlockKnown(const blk_hash_t& hash) const { return known_dag_blocks_.contains(hash); }
 

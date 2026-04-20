@@ -234,8 +234,8 @@ struct NodesTest : virtual WithDataDir {
   std::shared_ptr<AppBase> create_node(const FullNodeConfig& cfg, bool start);
 
   std::vector<ebla::FullNodeConfig> make_node_cfgs(size_t total_count, size_t validators_count = 1,
-                                                     uint tests_speed = 1, bool enable_rpc_http = false,
-                                                     bool enable_rpc_ws = false);
+                                                   uint tests_speed = 1, bool enable_rpc_http = false,
+                                                   bool enable_rpc_ws = false);
   std::vector<TestConfig> make_test_cfgs(const std::vector<FullNodeConfig>& cfgs);
 
   bool wait_connect(const std::vector<std::shared_ptr<ebla::AppBase>>& nodes);

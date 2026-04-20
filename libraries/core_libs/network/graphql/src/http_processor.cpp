@@ -18,8 +18,8 @@ GraphQlHttpProcessor::GraphQlHttpProcessor(std::shared_ptr<::ebla::final_chain::
                                            std::weak_ptr<::ebla::Network> network, uint64_t chain_id)
     : HttpProcessor(),
       query_(std::make_shared<graphql::ebla::Query>(std::move(final_chain), std::move(dag_manager),
-                                                      std::move(pbft_manager), transaction_manager, std::move(db),
-                                                      std::move(gas_pricer), std::move(network), chain_id)),
+                                                    std::move(pbft_manager), transaction_manager, std::move(db),
+                                                    std::move(gas_pricer), std::move(network), chain_id)),
       mutation_(std::make_shared<graphql::ebla::Mutation>(transaction_manager)),
       subscription_(std::make_shared<graphql::ebla::Subscription>()),
       operations_(query_, mutation_, subscription_) {}

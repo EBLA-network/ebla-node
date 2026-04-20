@@ -19,8 +19,7 @@ DagBlockPacketHandler::DagBlockPacketHandler(const FullNodeConfig &conf, std::sh
                              logs_prefix + "DAG_BLOCK_PH"),
       trx_mgr_(std::move(trx_mgr)) {}
 
-void DagBlockPacketHandler::process(const threadpool::PacketData &packet_data,
-                                    const std::shared_ptr<EblaPeer> &peer) {
+void DagBlockPacketHandler::process(const threadpool::PacketData &packet_data, const std::shared_ptr<EblaPeer> &peer) {
   // Decode packet rlp into packet object
   auto packet = decodePacketRlp<DagBlockPacket>(packet_data.rlp_);
 

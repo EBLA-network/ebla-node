@@ -97,7 +97,7 @@ void PeersState::erasePeer(dev::p2p::NodeID const& node_id) {
 }
 
 std::shared_ptr<EblaPeer> PeersState::setPeerAsReadyToSendMessages(dev::p2p::NodeID const& node_id,
-                                                                     std::shared_ptr<EblaPeer> peer) {
+                                                                   std::shared_ptr<EblaPeer> peer) {
   std::unique_lock lock(peers_mutex_);
   pending_peers_.erase(node_id);
   auto ret = peers_.emplace(node_id, std::move(peer));

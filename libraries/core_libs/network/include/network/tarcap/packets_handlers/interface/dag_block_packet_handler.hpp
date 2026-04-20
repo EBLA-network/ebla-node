@@ -13,8 +13,8 @@ class IDagBlockPacketHandler : public ExtSyncingPacketHandler {
                          std::shared_ptr<DbStorage> db, const addr_t &node_addr, const std::string &logs_prefix);
 
   void onNewBlockVerified(const std::shared_ptr<DagBlock> &block, bool proposed, const SharedTransactions &trxs);
-  virtual void sendBlockWithTransactions(const std::shared_ptr<EblaPeer> &peer,
-                                         const std::shared_ptr<DagBlock> &block, SharedTransactions &&trxs) = 0;
+  virtual void sendBlockWithTransactions(const std::shared_ptr<EblaPeer> &peer, const std::shared_ptr<DagBlock> &block,
+                                         SharedTransactions &&trxs) = 0;
 
   // Note: Used only in tests
   void requestDagBlocks(std::shared_ptr<EblaPeer> peer);

@@ -18,9 +18,9 @@ response::Value Mutation::applySendRawTransaction(response::Value&& dataArg) con
   if (auto [ok, err_msg] = trx_manager_->insertTransaction(trx); !ok) {
     throw(
         std::runtime_error(::ebla::fmt("Transaction is rejected.\n"
-                                         "RLP: %s\n"
-                                         "Reason: %s",
-                                         dev::toJS(trx->rlp()), err_msg)));
+                                       "RLP: %s\n"
+                                       "Reason: %s",
+                                       dev::toJS(trx->rlp()), err_msg)));
   }
   return response::Value(dev::toJS(trx->getHash()));
 }

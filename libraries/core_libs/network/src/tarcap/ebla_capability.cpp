@@ -111,7 +111,7 @@ std::string EblaCapability::packetTypeToString(unsigned _packetType) const {
 }
 
 void EblaCapability::interpretCapabilityPacket(std::weak_ptr<dev::p2p::Session> session, unsigned _id,
-                                                 dev::RLP const &_r) {
+                                               dev::RLP const &_r) {
   const auto session_p = session.lock();
   if (!session_p) {
     LOG(log_er_) << "Unable to obtain session ptr !";
@@ -185,7 +185,7 @@ void EblaCapability::interpretCapabilityPacket(std::weak_ptr<dev::p2p::Session> 
 }
 
 void EblaCapability::handlePacketQueueOverLimit(std::shared_ptr<dev::p2p::Host> host, dev::p2p::NodeID node_id,
-                                                  size_t tp_queue_size) {
+                                                size_t tp_queue_size) {
   if (!queue_over_limit_) {
     queue_over_limit_start_time_ = std::chrono::system_clock::now();
     queue_over_limit_ = true;

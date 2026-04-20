@@ -13,8 +13,8 @@ namespace graphql::ebla {
 class Log {
  public:
   explicit Log(std::shared_ptr<::ebla::final_chain::FinalChain> final_chain,
-               std::shared_ptr<::ebla::TransactionManager> trx_manager,
-               std::shared_ptr<const Transaction> transaction, ::ebla::LogEntry log, int index) noexcept;
+               std::shared_ptr<::ebla::TransactionManager> trx_manager, std::shared_ptr<const Transaction> transaction,
+               ::ebla::LogEntry log, int index) noexcept;
 
   int getIndex() const noexcept;
   std::shared_ptr<object::Account> getAccount(std::optional<response::Value>&& blockArg) const noexcept;

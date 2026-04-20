@@ -53,7 +53,6 @@ class AppBase {
   const Secret &getSecretKey() const { return conf_.getFirstWallet().node_secret; }
   vrf_wrapper::vrf_sk_t getVrfSecretKey() const { return conf_.getFirstWallet().vrf_secret; }
 
-
   virtual std::shared_ptr<Plugin> getPlugin(const std::string &name) const = 0;
 
   bool isStarted() const { return started_; }

@@ -4,9 +4,9 @@
 #include "config/config.hpp"
 #include "libp2p/Common.h"
 #include "libp2p/Host.h"
+#include "network/tarcap/ebla_peer.hpp"
 #include "network/tarcap/packet_types.hpp"
 #include "network/tarcap/stats/time_period_packets_stats.hpp"
-#include "network/tarcap/ebla_peer.hpp"
 
 namespace ebla {
 class PbftManager;
@@ -35,7 +35,7 @@ class PeersState {
    * @return <std::shared_ptr<EblaPeer>, ""> if packet sender is known peer, otherwise <nullptr, "err message">
    */
   std::pair<std::shared_ptr<EblaPeer>, std::string> getPacketSenderPeer(const dev::p2p::NodeID& node_id,
-                                                                          SubprotocolPacketType packet_type) const;
+                                                                        SubprotocolPacketType packet_type) const;
 
   PeersMap getAllPeers() const;
   std::vector<dev::p2p::NodeID> getAllPendingPeersIDs() const;
@@ -43,7 +43,7 @@ class PeersState {
   std::shared_ptr<EblaPeer> addPendingPeer(const dev::p2p::NodeID& node_id, const std::string& address);
   void erasePeer(const dev::p2p::NodeID& node_id);
   std::shared_ptr<EblaPeer> setPeerAsReadyToSendMessages(dev::p2p::NodeID const& node_id,
-                                                           std::shared_ptr<EblaPeer> peer);
+                                                         std::shared_ptr<EblaPeer> peer);
 
   /**
    * @brief Marks peer as malicious

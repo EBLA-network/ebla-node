@@ -6,8 +6,8 @@
 #include "graphql/ws_server.hpp"
 #include "metrics/metrics_service.hpp"
 #include "network/rpc/Debug.h"
-#include "network/rpc/Net.h"
 #include "network/rpc/Ebla.h"
+#include "network/rpc/Net.h"
 #include "network/rpc/Test.h"
 #include "network/rpc/eth/Eth.h"
 #include "network/rpc/jsonrpc_http_processor.hpp"
@@ -96,9 +96,9 @@ void Rpc::start() {
 
     jsonrpc_api_ = std::make_unique<JsonRpcServer>(
         std::make_shared<net::Ebla>(app()),  // TODO Because this object refers to App, the
-                                               // lifecycle/dependency management is more complicated
-        std::make_shared<net::Net>(app()),     // TODO Because this object refers to App, the
-                                               // lifecycle/dependency management is more complicated
+                                             // lifecycle/dependency management is more complicated
+        std::make_shared<net::Net>(app()),   // TODO Because this object refers to App, the
+                                             // lifecycle/dependency management is more complicated
         eth_json_rpc, test_json_rpc, debug_json_rpc);
 
     if (conf.network.rpc->http_port) {

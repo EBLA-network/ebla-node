@@ -607,7 +607,6 @@ void PbftManager::broadcastVotes() {
       LOG(log_dg_) << "Broadcast own votes for period " << period << ", round " << round << ", rebroadcast "
                    << rebroadcast;
     }
-
   };
 
   // (Re)broadcast 2t+1 soft/reward/previous round next votes + all own votes

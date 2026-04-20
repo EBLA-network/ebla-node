@@ -6,8 +6,7 @@
 
 namespace ebla::state_api {
 
-EblaEVMError::EblaEVMError(std::string&& type, const std::string& msg)
-    : runtime_error(msg), type(std::move(type)) {}
+EblaEVMError::EblaEVMError(std::string&& type, const std::string& msg) : runtime_error(msg), type(std::move(type)) {}
 
 h256 const& Account::storage_root_eth() const { return storage_root_hash ? storage_root_hash : EmptyRLPListSHA3(); }
 

@@ -57,7 +57,7 @@ void InitLogging(Config& logging_config, const addr_t& node_id);
 
 #define LOG BOOST_LOG
 
-#define LOG_OBJECTS_DEFINE                \
+#define LOG_OBJECTS_DEFINE              \
   mutable ebla::logger::Logger log_si_; \
   mutable ebla::logger::Logger log_er_; \
   mutable ebla::logger::Logger log_wr_; \
@@ -65,7 +65,7 @@ void InitLogging(Config& logging_config, const addr_t& node_id);
   mutable ebla::logger::Logger log_dg_; \
   mutable ebla::logger::Logger log_tr_;
 
-#define LOG_OBJECTS_CREATE(channel)                                                               \
+#define LOG_OBJECTS_CREATE(channel)                                                           \
   log_si_ = ebla::logger::createLogger(ebla::logger::Verbosity::Silent, channel, node_addr);  \
   log_er_ = ebla::logger::createLogger(ebla::logger::Verbosity::Error, channel, node_addr);   \
   log_wr_ = ebla::logger::createLogger(ebla::logger::Verbosity::Warning, channel, node_addr); \

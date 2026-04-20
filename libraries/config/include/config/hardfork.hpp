@@ -43,7 +43,6 @@ struct AspenHardfork {
 Json::Value enc_json(const AspenHardfork& obj);
 void dec_json(const Json::Value& json, AspenHardfork& obj);
 
-
 // Keeping it for next HF
 // struct BambooRedelegation {
 //   ebla::addr_t validator;
@@ -94,7 +93,6 @@ struct HardforksConfig {
   AspenHardfork aspen_hf;
 
   bool isAspenHardforkPartOne(uint64_t block_number) const { return block_number >= aspen_hf.block_num_part_one; }
-
 
   HAS_RLP_FIELDS
 };
