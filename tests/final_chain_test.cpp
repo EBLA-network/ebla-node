@@ -766,7 +766,6 @@ TEST_F(FinalChainTest, fee_rewards_distribution) {
   const auto& sk = sender_keys.secret();
   cfg.genesis.state.initial_balances = {};
   cfg.genesis.state.initial_balances[addr] = ebla::uint256_t("0x204FCE5E3E25026110000000");  //  10 Billion
-  cfg.genesis.state.hardforks.magnolia_hf.block_num = 2;
   create_validators();
   init();
   const auto gas_price = 1000000000;
@@ -836,8 +835,7 @@ TEST_F(FinalChainTest, remove_jailed_validator_votes_from_total) {
   const std::vector<dev::KeyPair> validator_keys = {dev::KeyPair::create(), dev::KeyPair::create(),
                                                     dev::KeyPair::create()};
   fillConfigForGenesisTests(key.address());
-  cfg.genesis.state.hardforks.magnolia_hf.block_num = 1;
-  cfg.genesis.state.hardforks.magnolia_hf.jail_time = 50;
+  cfg.genesis.state.hardforks.slashing.jail_time = 50;
 
   for (const auto& vk : validator_keys) {
     const auto vrf_pub_key = ebla::vrf_wrapper::getVrfKeyPair().first;

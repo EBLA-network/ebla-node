@@ -1639,8 +1639,7 @@
     "rewards_distribution_frequency": {
       "5730000": 100
     },
-    "magnolia_hf": {
-      "block_num": 5730000,
+    "slashing": {
       "jail_time": 163459
     },
     "phalaenopsis_hf_block_num": 6943000,

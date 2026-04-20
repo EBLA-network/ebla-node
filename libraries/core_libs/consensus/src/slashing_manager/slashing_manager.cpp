@@ -24,10 +24,6 @@ bool SlashingManager::submitDoubleVotingProof(const std::shared_ptr<PbftVote> &v
     return false;
   }
 
-  if (vote_a->getPeriod() < kConfig.genesis.state.hardforks.magnolia_hf.block_num) {
-    return false;
-  }
-
   if (vote_a->getPeriod() != vote_b->getPeriod() || vote_a->getRound() != vote_b->getRound() ||
       vote_a->getStep() != vote_b->getStep()) {
     return false;

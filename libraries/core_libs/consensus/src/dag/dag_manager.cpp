@@ -484,11 +484,7 @@ void DagManager::recoverDag() {
         try {
           uint64_t max_vote_count = 0;
           const auto vote_count = final_chain_->dposEligibleVoteCount(*propose_period, blk->getSender());
-          if (*propose_period < kGenesis.state.hardforks.magnolia_hf.block_num) {
-            max_vote_count = final_chain_->dposEligibleTotalVoteCount(*propose_period);
-          } else {
-            max_vote_count = kValidatorMaxVote;
-          }
+          max_vote_count = kValidatorMaxVote;
           blk->verifyVdf(sortition_params_manager_.getSortitionParams(*propose_period),
                          db_->getPeriodBlockHash(*propose_period), *pk, vote_count, max_vote_count);
         } catch (vdf_sortition::VdfSortition::InvalidVdfSortition const &e) {
@@ -646,11 +642,7 @@ std::pair<DagManager::VerifyBlockReturnType, SharedTransactions> DagManager::ver
     const auto proposal_period_hash = db_->getPeriodBlockHash(*propose_period);
     uint64_t max_vote_count = 0;
     const auto vote_count = final_chain_->dposEligibleVoteCount(*propose_period, blk->getSender());
-    if (*propose_period < kGenesis.state.hardforks.magnolia_hf.block_num) {
-      max_vote_count = final_chain_->dposEligibleTotalVoteCount(*propose_period);
-    } else {
-      max_vote_count = kValidatorMaxVote;
-    }
+    max_vote_count = kValidatorMaxVote;
     blk->verifyVdf(sortition_params_manager_.getSortitionParams(*propose_period), proposal_period_hash, *pk, vote_count,
                    max_vote_count);
   } catch (vdf_sortition::VdfSortition::InvalidVdfSortition const &e) {

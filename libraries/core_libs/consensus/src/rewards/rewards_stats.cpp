@@ -58,9 +58,6 @@ BlockStats Stats::getBlockStats(const PeriodData& blk, const std::vector<gas_t>&
   if (!blk.previous_block_cert_votes.empty()) [[likely]] {
     dpos_vote_count = dpos_eligible_total_vote_count_(blk.previous_block_cert_votes[0]->getPeriod() - 1);
   }
-  if (blk.pbft_blk->getPeriod() < kHardforksConfig.magnolia_hf.block_num) {
-    return BlockStats{blk, {}, dpos_vote_count, kCommitteeSize};
-  }
 
   const auto aspen_hf_part_one = kHardforksConfig.isAspenHardforkPartOne(blk.pbft_blk->getPeriod());
   return BlockStats{blk, trxs_fees, dpos_vote_count, kCommitteeSize, aspen_hf_part_one};

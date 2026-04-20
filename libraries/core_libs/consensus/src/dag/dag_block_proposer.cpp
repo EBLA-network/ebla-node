@@ -80,11 +80,7 @@ bool DagBlockProposer::proposeDagBlock(const std::shared_ptr<NodeDagProposerData
   uint64_t max_vote_count = 0;
   const auto vote_count =
       final_chain_->dposEligibleVoteCount(*proposal_period, node_dag_proposer_data->wallet.node_addr);
-  if (*proposal_period < kHardforks.magnolia_hf.block_num) {
-    max_vote_count = final_chain_->dposEligibleTotalVoteCount(*proposal_period);
-  } else {
-    max_vote_count = kValidatorMaxVote;
-  }
+  max_vote_count = kValidatorMaxVote;
 
   if (max_vote_count == 0) {
     LOG(log_er_) << node_dag_proposer_data->wallet.node_addr

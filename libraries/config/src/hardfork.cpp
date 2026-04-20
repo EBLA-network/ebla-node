@@ -19,18 +19,16 @@ void dec_json(const Json::Value& json, Redelegation& obj) {
 
 RLP_FIELDS_DEFINE(Redelegation, validator, delegator, amount)
 
-Json::Value enc_json(const MagnoliaHardfork& obj) {
+Json::Value enc_json(const SlashingConfig& obj) {
   Json::Value json(Json::objectValue);
-  json["block_num"] = dev::toJS(obj.block_num);
   json["jail_time"] = dev::toJS(obj.jail_time);
   return json;
 }
 
-void dec_json(const Json::Value& json, MagnoliaHardfork& obj) {
-  obj.block_num = json["block_num"].isUInt64() ? dev::getUInt(json["block_num"]) : uint64_t(-1);
+void dec_json(const Json::Value& json, SlashingConfig& obj) {
   obj.jail_time = dev::getUInt(json["jail_time"]);
 }
-RLP_FIELDS_DEFINE(MagnoliaHardfork, block_num, jail_time)
+RLP_FIELDS_DEFINE(SlashingConfig, jail_time)
 
 Json::Value enc_json(const AspenHardfork& obj) {
   Json::Value json(Json::objectValue);
@@ -105,7 +103,7 @@ Json::Value enc_json(const HardforksConfig& obj) {
     rewards[std::to_string(i->first)] = i->second;
   }
 
-  json["magnolia_hf"] = enc_json(obj.magnolia_hf);
+  json["slashing"] = enc_json(obj.slashing);
   json["aspen_hf"] = enc_json(obj.aspen_hf);
   // json["bamboo_hf"] = enc_json(obj.bamboo_hf);
 
@@ -134,13 +132,13 @@ void dec_json(const Json::Value& json, HardforksConfig& obj) {
     }
   }
 
-  dec_json(json["magnolia_hf"], obj.magnolia_hf);
+  dec_json(json["slashing"], obj.slashing);
   dec_json(json["aspen_hf"], obj.aspen_hf);
   // dec_json(json["bamboo_hf"], obj.bamboo_hf);
 
 
 }
 
-RLP_FIELDS_DEFINE(HardforksConfig, fix_redelegate_block_num, redelegations, rewards_distribution_frequency, magnolia_hf,
+RLP_FIELDS_DEFINE(HardforksConfig, fix_redelegate_block_num, redelegations, rewards_distribution_frequency,
                   phalaenopsis_hf_block_num, aspen_hf)              
 }  // namespace ebla
