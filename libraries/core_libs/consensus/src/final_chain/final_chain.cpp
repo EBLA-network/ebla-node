@@ -134,8 +134,6 @@ std::shared_ptr<const FinalizationResult> FinalChain::finalize_(PeriodData&& new
     }
   } */
 
-  auto system_transactions = makeSystemTransactions(new_blk.pbft_blk->getPeriod());
-
   auto all_transactions = new_blk.transactions;
   std::vector<state_api::EVMTransaction> evm_trxs;
   appendEvmTransactions(evm_trxs, all_transactions);

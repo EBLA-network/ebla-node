@@ -253,7 +253,7 @@ class PbftManager {
    * @param period period
    * @return true if total weight of gas estimation is less or equal to gas limit. Otherwise return false
    */
-  bool checkBlockWeight(const std::vector<std::shared_ptr<DagBlock>> &dag_blocks, PbftPeriod period) const;
+  bool checkBlockWeight(const std::vector<std::shared_ptr<DagBlock>> &dag_blocks) const;
 
   blk_hash_t getLastPbftBlockHash();
 

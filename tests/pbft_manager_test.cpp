@@ -683,7 +683,7 @@ TEST_F(PbftManagerWithDagCreation, produce_overweighted_block) {
   const auto period = node->getFinalChain()->lastBlockNumber();
   auto period_data = node->getDB()->getPeriodData(period);
   ASSERT_TRUE(period_data.has_value());
-  EXPECT_FALSE(node->getPbftManager()->checkBlockWeight(period_data->dag_blocks, period));
+  EXPECT_FALSE(node->getPbftManager()->checkBlockWeight(period_data->dag_blocks));
 }
 
 TEST_F(PbftManagerWithDagCreation, proposed_blocks) {
