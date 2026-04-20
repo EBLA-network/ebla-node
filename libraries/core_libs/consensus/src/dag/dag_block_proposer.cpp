@@ -26,9 +26,9 @@ DagBlockProposer::DagBlockProposer(const FullNodeConfig& config, std::shared_ptr
       db_(std::move(db)),
       nodes_dag_proposers_data_(),
       kDagProposeGasLimit(
-          std::min(config.propose_dag_gas_limit, config.genesis.getGasLimits(final_chain_->lastBlockNumber()).first)),
-      kPbftGasLimit(config.genesis.getGasLimits(final_chain_->lastBlockNumber()).second),
-      kDagGasLimit(config.genesis.getGasLimits(final_chain_->lastBlockNumber()).first),
+          std::min(config.propose_dag_gas_limit, config.genesis.getGasLimits().first)),
+      kPbftGasLimit(config.genesis.getGasLimits().second),
+      kDagGasLimit(config.genesis.getGasLimits().first),
       kHardforks(config.genesis.state.hardforks),
       kValidatorMaxVote(config.genesis.state.dpos.validator_maximum_stake /
                         config.genesis.state.dpos.vote_eligibility_balance_step) {

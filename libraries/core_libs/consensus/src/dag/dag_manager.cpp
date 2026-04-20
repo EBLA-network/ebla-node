@@ -667,7 +667,7 @@ std::pair<DagManager::VerifyBlockReturnType, SharedTransactions> DagManager::ver
     return {VerifyBlockReturnType::NotEligible, {}};
   }
   {
-    const auto [dag_gas_limit, pbft_gas_limit] = kGenesis.getGasLimits(*propose_period);
+    const auto [dag_gas_limit, pbft_gas_limit] = kGenesis.getGasLimits();
 
     auto block_gas_estimation = blk->getGasEstimation();
     if (block_gas_estimation > dag_gas_limit) {
