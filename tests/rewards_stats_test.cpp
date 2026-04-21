@@ -240,8 +240,8 @@ TEST_F(RewardsStatsTest, dagBlockRewards) {
   // Create two reward stats to test before and after aspen hardfork part 1
   rewards::Stats pre_aspen_reward_stats(100, HardforksConfig{0, {}, {}, SlashingConfig{0}, 0, AspenHardfork{6, 999}},
                                         db, [](auto) { return 100; });
-  rewards::Stats post_aspen_reward_stats(
-      100, HardforksConfig{0, {}, {}, SlashingConfig{0}, 0, AspenHardfork{4, 999}}, db, [](auto) { return 100; });
+  rewards::Stats post_aspen_reward_stats(100, HardforksConfig{0, {}, {}, SlashingConfig{0}, 0, AspenHardfork{4, 999}},
+                                         db, [](auto) { return 100; });
 
   // Create pbft block with 5 dag blocks
   auto dag_key1 = dev::KeyPair::create();
