@@ -55,6 +55,8 @@ class EblaPeer : public boost::noncopyable {
   bool markPbftBlockAsKnown(const blk_hash_t& hash);
   bool isPbftBlockKnown(const blk_hash_t& hash) const;
 
+  const dev::p2p::NodeID& getId() const;
+  
   /**
    * @brief Reports suspicious pacet
    *
