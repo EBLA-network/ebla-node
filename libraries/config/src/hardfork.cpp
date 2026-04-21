@@ -130,5 +130,5 @@ void dec_json(const Json::Value& json, HardforksConfig& obj) {
 }
 
 RLP_FIELDS_DEFINE(HardforksConfig, fix_redelegate_block_num, redelegations, rewards_distribution_frequency,
-                  phalaenopsis_hf_block_num, aspen_hf)
+                  slashing, phalaenopsis_hf_block_num, aspen_hf)
 }  // namespace ebla
