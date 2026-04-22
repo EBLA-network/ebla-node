@@ -19,7 +19,7 @@ struct RewardsStatsTest : NodesTest {};
 class TestableRewardsStats : public rewards::Stats {
  public:
   TestableRewardsStats(const HardforksConfig::RewardsDistributionMap& rdm, std::shared_ptr<DbStorage> db)
-      : rewards::Stats(100, HardforksConfig{0, {}, rdm, SlashingConfig{0}, 0, AspenHardfork{0, 0}}, db,
+      : rewards::Stats(100, HardforksConfig{0, {}, rdm, SlashingConfig{0}, AspenHardfork{0, 0}}, db,
                        [](auto) { return 100; }) {}
   auto getStats() { return blocks_stats_; }
 };
@@ -238,9 +238,9 @@ TEST_F(RewardsStatsTest, dagBlockRewards) {
   hfc.aspen_hf.block_num_part_two = 4;
 
   // Create two reward stats to test before and after aspen hardfork part 1
-  rewards::Stats pre_aspen_reward_stats(100, HardforksConfig{0, {}, {}, SlashingConfig{0}, 0, AspenHardfork{6, 999}},
+  rewards::Stats pre_aspen_reward_stats(100, HardforksConfig{0, {}, {}, SlashingConfig{0}, AspenHardfork{6, 999}},
                                         db, [](auto) { return 100; });
-  rewards::Stats post_aspen_reward_stats(100, HardforksConfig{0, {}, {}, SlashingConfig{0}, 0, AspenHardfork{4, 999}},
+  rewards::Stats post_aspen_reward_stats(100, HardforksConfig{0, {}, {}, SlashingConfig{0}, AspenHardfork{4, 999}},
                                          db, [](auto) { return 100; });
 
   // Create pbft block with 5 dag blocks
