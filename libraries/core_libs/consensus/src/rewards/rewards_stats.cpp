@@ -105,8 +105,8 @@ std::vector<BlockStats> Stats::processStats(const PeriodData& current_blk, const
                  std::inserter(ordered_blocks_stats, ordered_blocks_stats.end()),
                  [](auto&& t) { return std::move(t); });
 
-    res = transformStatsToVector(std::move(ordered_blocks_stats));
-  }
+  res = transformStatsToVector(std::move(ordered_blocks_stats));
+
   return res;
 }
 
