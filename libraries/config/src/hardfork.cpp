@@ -30,22 +30,16 @@ RLP_FIELDS_DEFINE(SlashingConfig, jail_time)
 
 Json::Value enc_json(const AspenHardfork& obj) {
   Json::Value json(Json::objectValue);
-  json["block_num_part_one"] = dev::toJS(obj.block_num_part_one);
-  json["block_num_part_two"] = dev::toJS(obj.block_num_part_two);
   json["max_supply"] = dev::toJS(obj.max_supply);
   json["generated_rewards"] = dev::toJS(obj.generated_rewards);
   return json;
 }
 
 void dec_json(const Json::Value& json, AspenHardfork& obj) {
-  obj.block_num_part_one =
-      json["block_num_part_one"].isUInt64() ? dev::getUInt(json["block_num_part_one"]) : uint64_t(-1);
-  obj.block_num_part_two =
-      json["block_num_part_two"].isUInt64() ? dev::getUInt(json["block_num_part_two"]) : uint64_t(-1);
   obj.max_supply = dev::jsToU256(json["max_supply"].asString());
   obj.generated_rewards = dev::jsToU256(json["generated_rewards"].asString());
 }
-RLP_FIELDS_DEFINE(AspenHardfork, block_num_part_one, block_num_part_two, max_supply, generated_rewards)
+RLP_FIELDS_DEFINE(AspenHardfork, max_supply, generated_rewards)
 
 // Json::Value enc_json(const BambooRedelegation& obj) {
 //   Json::Value json(Json::objectValue);

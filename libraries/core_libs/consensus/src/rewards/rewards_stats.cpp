@@ -59,8 +59,10 @@ BlockStats Stats::getBlockStats(const PeriodData& blk, const std::vector<gas_t>&
     dpos_vote_count = dpos_eligible_total_vote_count_(blk.previous_block_cert_votes[0]->getPeriod() - 1);
   }
 
-  const auto aspen_hf_part_one = kHardforksConfig.isAspenHardforkPartOne(blk.pbft_blk->getPeriod());
-  return BlockStats{blk, trxs_fees, dpos_vote_count, kCommitteeSize, aspen_hf_part_one};
+  // Aspen hardfork is permanent from block 0 in EBLA (Phase 14.3).
+  // Pass `true` unconditionally; the bool parameter remains for BlockStats API
+  // stability. Phase 14.9 will drop the parameter entirely.
+  return BlockStats{blk, trxs_fees, dpos_vote_count, kCommitteeSize, true};
 }
 
 std::vector<BlockStats> Stats::processStats(const PeriodData& current_blk, const std::vector<gas_t>& trxs_gas_used,
@@ -97,16 +99,11 @@ std::vector<BlockStats> Stats::processStats(const PeriodData& current_blk, const
   };
 
   std::vector<BlockStats> res;
-
-  // Blocks stats were not sorted by period before aspen hardfork part one
-  if (current_period < kHardforksConfig.aspen_hf.block_num_part_one) {
-    res = transformStatsToVector(std::move(blocks_stats_));
-  } else {
-    // Blocks stats are sorted by period after aspen hardfork part one
-    std::map<PbftPeriod, BlockStats> ordered_blocks_stats;
-    std::transform(std::make_move_iterator(blocks_stats_.begin()), std::make_move_iterator(blocks_stats_.end()),
-                   std::inserter(ordered_blocks_stats, ordered_blocks_stats.end()),
-                   [](auto&& t) { return std::move(t); });
+  // EBLA (Phase 14.3): Aspen is permanent from block 0 - always sort by period.
+  std::map<PbftPeriod, BlockStats> ordered_blocks_stats;
+  std::transform(std::make_move_iterator(blocks_stats_.begin()), std::make_move_iterator(blocks_stats_.end()),
+                 std::inserter(ordered_blocks_stats, ordered_blocks_stats.end()),
+                 [](auto&& t) { return std::move(t); });
 
     res = transformStatsToVector(std::move(ordered_blocks_stats));
   }

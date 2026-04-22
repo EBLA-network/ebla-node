@@ -27,15 +27,12 @@ struct SlashingConfig {
 Json::Value enc_json(const SlashingConfig& obj);
 void dec_json(const Json::Value& json, SlashingConfig& obj);
 
+// Permanent supply-cap / yield-curve parameters in EBLA.
+// The original Taraxa Aspen hardfork block-number gates were removed in
+// Phase 14.3 — both parts (minted-tokens DB and dynamic yield curve) are
+// unconditional from block 0. Only the supply invariants remain.
 struct AspenHardfork {
-  // Part 1 prepares db data that are required for part 2 to be functional
-  uint64_t block_num_part_one{0};
-  // Part 2 implements new yield curve
-  uint64_t block_num_part_two{0};
-
   ebla::uint256_t max_supply{"0x26C62AD77DC602DAE0000000"};  // 12 Billion
-  // total generated rewards from block 1 to block_num
-  // It is partially estimated for blocks between the aspen hf release block and actual aspen hf block_num
   ebla::uint256_t generated_rewards{0};
 
   HAS_RLP_FIELDS
@@ -88,8 +85,6 @@ struct HardforksConfig {
 
   // Aspen hardfork implements new yield curve
   AspenHardfork aspen_hf;
-
-  bool isAspenHardforkPartOne(uint64_t block_number) const { return block_number >= aspen_hf.block_num_part_one; }
 
   HAS_RLP_FIELDS
 };
