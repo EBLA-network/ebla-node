@@ -129,6 +129,6 @@ void dec_json(const Json::Value& json, HardforksConfig& obj) {
   // dec_json(json["bamboo_hf"], obj.bamboo_hf);
 }
 
-RLP_FIELDS_DEFINE(HardforksConfig, fix_redelegate_block_num, redelegations, rewards_distribution_frequency,
-                  slashing, phalaenopsis_hf_block_num, aspen_hf)
+RLP_FIELDS_DEFINE(HardforksConfig, fix_redelegate_block_num, redelegations, rewards_distribution_frequency, slashing,
+                  phalaenopsis_hf_block_num, aspen_hf)
 }  // namespace ebla
