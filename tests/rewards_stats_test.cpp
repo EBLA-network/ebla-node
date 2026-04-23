@@ -234,10 +234,10 @@ TEST_F(RewardsStatsTest, dagBlockRewards) {
   auto batch = db->createWriteBatch();
 
   std::vector<std::shared_ptr<PbftVote>> empty_votes;
-  HardforksConfig hfc;
-  hfc.aspen_hf.block_num_part_two = 4;
 
-  // Create two reward stats to test before and after aspen hardfork part 1
+  // Post-Phase 14.3: Aspen is permanent from block 0, so pre_aspen_reward_stats
+  // and post_aspen_reward_stats now behave identically. Both kept to exercise
+  // processStats() with populated HardforksConfig values.
   rewards::Stats pre_aspen_reward_stats(100, HardforksConfig{0, {}, {}, SlashingConfig{0}, AspenHardfork{6, 999}}, db,
                                         [](auto) { return 100; });
   rewards::Stats post_aspen_reward_stats(100, HardforksConfig{0, {}, {}, SlashingConfig{0}, AspenHardfork{4, 999}}, db,
