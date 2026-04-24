@@ -3,21 +3,6 @@
 #include "common/config_exception.hpp"
 
 namespace ebla {
-Json::Value enc_json(const Redelegation& obj) {
-  Json::Value json(Json::objectValue);
-  json["validator"] = dev::toJS(obj.validator);
-  json["delegator"] = dev::toJS(obj.delegator);
-  json["amount"] = dev::toJS(obj.amount);
-  return json;
-}
-
-void dec_json(const Json::Value& json, Redelegation& obj) {
-  obj.validator = ebla::addr_t(json["validator"].asString());
-  obj.delegator = ebla::addr_t(json["delegator"].asString());
-  obj.amount = dev::jsToU256(json["amount"].asString());
-}
-
-RLP_FIELDS_DEFINE(Redelegation, validator, delegator, amount)
 
 Json::Value enc_json(const SlashingConfig& obj) {
   Json::Value json(Json::objectValue);
@@ -41,47 +26,9 @@ void dec_json(const Json::Value& json, AspenHardfork& obj) {
 }
 RLP_FIELDS_DEFINE(AspenHardfork, max_supply, generated_rewards)
 
-// Json::Value enc_json(const BambooRedelegation& obj) {
-//   Json::Value json(Json::objectValue);
-//   json["validator"] = dev::toJS(obj.validator);
-//   json["amount"] = dev::toJS(obj.amount);
-//   return json;
-// }
-
-// void dec_json(const Json::Value& json, BambooRedelegation& obj) {
-//   obj.validator = ebla::addr_t(json["validator"].asString());
-//   obj.amount = dev::jsToU256(json["amount"].asString());
-// }
-
-// RLP_FIELDS_DEFINE(BambooRedelegation, validator, amount)
-
-// Json::Value enc_json(const BambooHardfork& obj) {
-//   Json::Value json(Json::objectValue);
-//   json["block_num"] = dev::toJS(obj.block_num);
-//   for (const auto& v : obj.redelegations) {
-//     json["redelegations"].append(enc_json(v));
-//   }
-//   return json;
-// }
-
-// void dec_json(const Json::Value& json, BambooHardfork& obj) {
-//   obj.block_num = json["block_num"].isUInt64() ? dev::getUInt(json["block_num"]) : uint64_t(-1);
-
-//   const auto& redelegations_json = json["redelegations"];
-//   obj.redelegations = std::vector<BambooRedelegation>(redelegations_json.size());
-//   for (uint32_t i = 0; i < redelegations_json.size(); ++i) {
-//     dec_json(redelegations_json[i], obj.redelegations[i]);
-//   }
-// }
-// RLP_FIELDS_DEFINE(BambooHardfork, block_num, redelegations)
-
 Json::Value enc_json(const HardforksConfig& obj) {
   Json::Value json(Json::objectValue);
-  json["fix_redelegate_block_num"] = dev::toJS(obj.fix_redelegate_block_num);
   json["initial_validators"] = Json::Value(Json::arrayValue);
-  for (const auto& v : obj.redelegations) {
-    json["redelegations"].append(enc_json(v));
-  }
 
   auto& rewards = json["rewards_distribution_frequency"];
   rewards = Json::objectValue;
@@ -97,16 +44,6 @@ Json::Value enc_json(const HardforksConfig& obj) {
 }
 
 void dec_json(const Json::Value& json, HardforksConfig& obj) {
-  obj.fix_redelegate_block_num =
-      json["fix_redelegate_block_num"].isUInt64() ? dev::getUInt(json["fix_redelegate_block_num"]) : uint64_t(-1);
-
-  const auto& redelegations_json = json["redelegations"];
-  obj.redelegations = std::vector<Redelegation>(redelegations_json.size());
-
-  for (uint32_t i = 0; i < redelegations_json.size(); ++i) {
-    dec_json(redelegations_json[i], obj.redelegations[i]);
-  }
-
   if (const auto& e = json["rewards_distribution_frequency"]) {
     assert(e.isObject());
 
@@ -120,6 +57,5 @@ void dec_json(const Json::Value& json, HardforksConfig& obj) {
   // dec_json(json["bamboo_hf"], obj.bamboo_hf);
 }
 
-RLP_FIELDS_DEFINE(HardforksConfig, fix_redelegate_block_num, redelegations, rewards_distribution_frequency, slashing,
-                  aspen_hf)
+RLP_FIELDS_DEFINE(HardforksConfig, rewards_distribution_frequency, slashing, aspen_hf)
 }  // namespace ebla

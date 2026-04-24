@@ -6,15 +6,6 @@
 #include "common/types.hpp"
 
 namespace ebla {
-struct Redelegation {
-  ebla::addr_t validator;
-  ebla::addr_t delegator;
-  ebla::uint256_t amount;
-  HAS_RLP_FIELDS
-};
-Json::Value enc_json(const Redelegation& obj);
-void dec_json(const Json::Value& json, Redelegation& obj);
-
 // EBLA slashing / jailing configuration.
 // Originally introduced by Taraxa's Magnolia hardfork; features are permanent in EBLA
 // from block 0, so the hardfork gate has been removed. Only the runtime jail_time
@@ -49,19 +40,10 @@ void dec_json(const Json::Value& json, AspenHardfork& obj);
 // Json::Value enc_json(const BambooRedelegation& obj);
 // void dec_json(const Json::Value& json, BambooRedelegation& obj);
 
-// struct BambooHardfork {
-//   uint64_t block_num{0};
-//   std::vector<BambooRedelegation> redelegations;
-
-//   HAS_RLP_FIELDS
-// };
 // Json::Value enc_json(const BambooHardfork& obj);
 // void dec_json(const Json::Value& json, BambooHardfork& obj);
 
 struct HardforksConfig {
-  // disable it by default (set to max uint64)
-  uint64_t fix_redelegate_block_num = -1;
-  std::vector<Redelegation> redelegations;
   /*
    * @brief key is block number at which change is applied and value is new distribution interval.
    * Default distribution frequency is every block

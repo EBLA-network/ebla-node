@@ -1628,14 +1628,6 @@
     }
   },
   "hardforks": {
-    "fix_redelegate_block_num": 3091000,
-    "redelegations": [
-      {
-        "validator": "0x6671df8b597c0A14a9361b4B98F97AF1360e4352",
-        "delegator": "0xaf5a5cd6da86838efac0ea91a712857d6aca53ac",
-        "amount": "0x3e8"
-      }
-    ],
     "rewards_distribution_frequency": {
       "5730000": 100
     },

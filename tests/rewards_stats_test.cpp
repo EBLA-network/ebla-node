@@ -19,7 +19,7 @@ struct RewardsStatsTest : NodesTest {};
 class TestableRewardsStats : public rewards::Stats {
  public:
   TestableRewardsStats(const HardforksConfig::RewardsDistributionMap& rdm, std::shared_ptr<DbStorage> db)
-      : rewards::Stats(100, HardforksConfig{0, {}, rdm, SlashingConfig{0}, AspenHardfork{0, 0}}, db,
+      : rewards::Stats(100, HardforksConfig{rdm, SlashingConfig{0}, AspenHardfork{0, 0}}, db,
                        [](auto) { return 100; }) {}
   auto getStats() { return blocks_stats_; }
 };
@@ -238,9 +238,9 @@ TEST_F(RewardsStatsTest, dagBlockRewards) {
   // Post-Phase 14.3: Aspen is permanent from block 0, so pre_aspen_reward_stats
   // and post_aspen_reward_stats now behave identically. Both kept to exercise
   // processStats() with populated HardforksConfig values.
-  rewards::Stats pre_aspen_reward_stats(100, HardforksConfig{0, {}, {}, SlashingConfig{0}, AspenHardfork{6, 999}}, db,
+  rewards::Stats pre_aspen_reward_stats(100, HardforksConfig{{}, SlashingConfig{0}, AspenHardfork{6, 999}}, db,
                                         [](auto) { return 100; });
-  rewards::Stats post_aspen_reward_stats(100, HardforksConfig{0, {}, {}, SlashingConfig{0}, AspenHardfork{4, 999}}, db,
+  rewards::Stats post_aspen_reward_stats(100, HardforksConfig{{}, SlashingConfig{0}, AspenHardfork{4, 999}}, db,
                                          [](auto) { return 100; });
 
   // Create pbft block with 5 dag blocks

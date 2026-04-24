@@ -101,7 +101,6 @@
     }
   },
   "hardforks": {
-    "fix_redelegate_block_num": 0,
     "rewards_distribution_frequency": {
       "0": 100
     },
