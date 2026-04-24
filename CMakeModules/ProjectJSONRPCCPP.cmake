@@ -5,6 +5,7 @@ set(include_path "${prefix}/include")
 ExternalProject_Add(jsonrpccpp
     PREFIX "${prefix}"
     GIT_REPOSITORY https://github.com/EBLA-network/libjson-rpc-cpp.git
+    GIT_TAG ef90ee54dbe65dbdb8d9d4a060653641c1e659d3
     GIT_SHALLOW true
     CMAKE_ARGS
         -DCMAKE_BUILD_TYPE=Release

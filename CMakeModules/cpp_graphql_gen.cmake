@@ -6,7 +6,7 @@ set(Boost_NO_WARN_NEW_VERSIONS 1)
 FetchContent_Declare(
   cppgraphqlgen
   GIT_REPOSITORY https://github.com/microsoft/cppgraphqlgen.git
-  GIT_TAG v4.5.8
+  GIT_TAG 681b0e1942521d4dd7806a4badfce9aa703f6dcf   # tag v4.5.8
   GIT_SHALLOW TRUE
 )
 set(GRAPHQL_BUILD_TESTS OFF)

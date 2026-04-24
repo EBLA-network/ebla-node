@@ -28,11 +28,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # install solc for py_test if arch is not arm64 because it is not available
 
-# Install solc 0.8.24 as we do not support 0.8.25 yet
+# Install solc 0.8.25 with SHA256 verification
 RUN \
 if [ `arch` != "aarch64" ]; \
 then  \
 curl -L -o solc-0.8.25 https://github.com/ethereum/solidity/releases/download/v0.8.25/solc-static-linux \
+    && echo "c42aada7a52057ddbed93ec011235e256c564c440b68dbaac5ae482babbb3d6d *solc-0.8.25" | sha256sum -c - \
     && chmod +x solc-0.8.25 \
     && mv solc-0.8.25 /usr/bin/solc; \
 fi

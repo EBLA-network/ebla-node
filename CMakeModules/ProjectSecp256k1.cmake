@@ -5,6 +5,7 @@ set(SECP256K1_INCLUDE_DIR "${prefix}/include")
 ExternalProject_Add(secp256k1
     PREFIX "${prefix}"
     GIT_REPOSITORY https://github.com/EBLA-network/secp256k1.git
+    GIT_TAG acb06cc0a6cee503a0778d578b2f0ceb3a030d94
     GIT_SHALLOW true
     CMAKE_ARGS
         -DCMAKE_BUILD_TYPE=Release
