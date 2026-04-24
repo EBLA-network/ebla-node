@@ -1,10 +1,11 @@
+#include "Ebla.h"
+
 #include <json/reader.h>
 #include <jsonrpccpp/common/exception.h>
 #include <libdevcore/CommonData.h>
 #include <libdevcore/CommonJS.h>
 #include <libp2p/Common.h>
 
-#include "Ebla.h"
 #include "config/version.hpp"
 #include "dag/dag_manager.hpp"
 #include "pbft/pbft_manager.hpp"
