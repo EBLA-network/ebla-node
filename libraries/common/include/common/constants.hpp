@@ -43,7 +43,7 @@ constexpr uint64_t kTxDataZeroGas = 4;
 constexpr uint64_t kTxDataNonZeroGas = 68;
 
 // The various denominations; here for ease of use where needed within code.
-static const u256 kOneTara = dev::exp10<18>();
+static const u256 kOneEbla = dev::exp10<18>();
 // static const u256 kFinney = exp10<15>();
 // static const u256 kSzabo = exp10<12>();
 // static const u256 kShannon = dev::exp10<9>();

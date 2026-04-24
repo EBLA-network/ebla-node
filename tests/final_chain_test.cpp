@@ -170,11 +170,11 @@ struct FinalChainTest : WithDataDir {
 
   void fillConfigForGenesisTests(const addr_t& init_address) {
     cfg.genesis.state.initial_balances = {};
-    cfg.genesis.state.initial_balances[init_address] = 1000000000 * kOneTara;
-    cfg.genesis.state.dpos.eligibility_balance_threshold = 5000 * kOneTara;
-    cfg.genesis.state.dpos.vote_eligibility_balance_step = 1000 * kOneTara;
-    cfg.genesis.state.dpos.validator_maximum_stake = 10000000 * kOneTara;
-    cfg.genesis.state.dpos.minimum_deposit = 100 * kOneTara;
+    cfg.genesis.state.initial_balances[init_address] = 1000000000 * kOneEbla;
+    cfg.genesis.state.dpos.eligibility_balance_threshold = 5000 * kOneEbla;
+    cfg.genesis.state.dpos.vote_eligibility_balance_step = 1000 * kOneEbla;
+    cfg.genesis.state.dpos.validator_maximum_stake = 10000000 * kOneEbla;
+    cfg.genesis.state.dpos.minimum_deposit = 100 * kOneEbla;
     cfg.genesis.state.dpos.yield_percentage = 7;
     cfg.genesis.state.dpos.blocks_per_year = 1000;
   }
