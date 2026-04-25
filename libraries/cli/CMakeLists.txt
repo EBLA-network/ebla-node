@@ -64,4 +64,4 @@ foreach(i RANGE ${configs_count})
 endforeach()
 
 # generate proper header file from json configuration files data read before
-configure_file(${JSONS_DIRECTIORY}/configs.hpp.in ${CMAKE_CURRENT_SOURCE_DIR}/include/cli/configs.hpp)
+configure_file(${JSONS_DIRECTIORY}/configs.hpp.in ${CMAKE_CURRENT_SOURCE_DIR}/include/cli/configs.hpp @ONLY)
