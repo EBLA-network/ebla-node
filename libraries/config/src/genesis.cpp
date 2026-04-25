@@ -82,7 +82,7 @@ GenesisConfig::GenesisConfig() {
   sortition.vdf.lambda_bound = 100;
 
   // PBFT config
-  pbft.lambda_ms = 2000;
+  pbft.lambda_ms = 1500;
   pbft.committee_size = 5;
   pbft.dag_blocks_size = 100;
   pbft.ghost_path_move_back = 1;
