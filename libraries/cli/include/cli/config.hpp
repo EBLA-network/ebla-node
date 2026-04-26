@@ -61,7 +61,7 @@ class Config {
 
   // Adding cli allowed options to the config
   void addCliOptions(const bpo::options_description& options);
-  enum class ChainIdType { Mainnet = 841, Testnet, Devnet, LastNetworkId };
+  enum class ChainIdType { Mainnet = 60186, Testnet, Devnet, LastNetworkId };
   static constexpr ChainIdType DEFAULT_CHAIN_ID = ChainIdType::Mainnet;
 
  protected:
