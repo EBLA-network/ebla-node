@@ -294,9 +294,10 @@ bpo::options_description Config::makeNodeOptions(const std::string& available_pl
                                      "Data directory for the databases, logs ... (default: \"~/.ebla/data\")");
   node_command_options.add_options()(LIGHT, bpo::bool_switch()->default_value(false),
                                      "Enable light node functionality");
-  node_command_options.add_options()(CHAIN_ID, bpo::value<int>(),
-                                     "Chain identifier (integer, 60186=Mainnet, 60187=Testnet, 60188=Devnet) (default: 60186) "
-                                     "Only used when creating new config file");
+  node_command_options.add_options()(
+      CHAIN_ID, bpo::value<int>(),
+      "Chain identifier (integer, 60186=Mainnet, 60187=Testnet, 60188=Devnet) (default: 60186) "
+      "Only used when creating new config file");
   node_command_options.add_options()(CHAIN, bpo::value<std::string>(),
                                      "Chain identifier (string, mainnet, testnet, devnet) (default: mainnet) "
                                      "Only used when creating new config file");
