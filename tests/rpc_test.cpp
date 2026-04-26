@@ -258,7 +258,7 @@ TEST_F(RPCTest, eip_1898) {
 TEST_F(RPCTest, transaction_json) {
   auto nonce = 0;
   auto trx = std::make_shared<Transaction>(nonce, 100, 1000000000, 100000, dev::bytes(),
-                                           dev::KeyPair::create().secret(), dev::KeyPair::create().address(), 841);
+                                           dev::KeyPair::create().secret(), dev::KeyPair::create().address(), 60186);
   const auto loc = net::rpc::eth::TransactionLocationWithBlockHash{TransactionLocation{1, 1}, h256(123)};
   const auto json = toJson(*trx, loc);
 
