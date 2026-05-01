@@ -134,7 +134,8 @@ struct PbftManagerTest : NodesTest {
       std::cout << "Node" << i << " committee " << committee << ", valid voting players " << valid_voting_players
                 << ", 5/8 " << five_of_eight << std::endl;
       EXPECT_EQ(valid_voting_players, nodes.size());
-      std::tie(expected_five_of_eight, expected_threshold) = calculateFiveOfEightThreshold(committee, valid_voting_players);
+      std::tie(expected_five_of_eight, expected_threshold) =
+          calculateFiveOfEightThreshold(committee, valid_voting_players);
       EXPECT_EQ(five_of_eight, expected_five_of_eight);
     }
 
@@ -189,7 +190,8 @@ struct PbftManagerTest : NodesTest {
       std::cout << "Node" << i << " committee " << committee << ", valid voting players " << valid_voting_players
                 << ", 5/8 " << five_of_eight << std::endl;
       EXPECT_EQ(valid_voting_players, nodes.size());
-      std::tie(expected_five_of_eight, expected_threshold) = calculateFiveOfEightThreshold(committee, valid_voting_players);
+      std::tie(expected_five_of_eight, expected_threshold) =
+          calculateFiveOfEightThreshold(committee, valid_voting_players);
       EXPECT_EQ(five_of_eight, expected_five_of_eight);
     }
   }
@@ -331,7 +333,8 @@ TEST_F(PbftManagerTest, check_get_eligible_vote_count) {
     std::cout << "Node" << i << " committee " << committee << ", eligible total vote count "
               << eligible_total_vote_count << ", 5/8 " << five_of_eight << std::endl;
     EXPECT_EQ(eligible_total_vote_count, expected_eligible_total_vote);
-    std::tie(expected_five_of_eight, expected_threshold) = calculateFiveOfEightThreshold(committee, eligible_total_vote_count);
+    std::tie(expected_five_of_eight, expected_threshold) =
+        calculateFiveOfEightThreshold(committee, eligible_total_vote_count);
     EXPECT_EQ(five_of_eight, expected_five_of_eight);
   }
 }
