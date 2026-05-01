@@ -214,7 +214,7 @@ TEST_F(FullNodeTest, db_test) {
   db.commitWriteBatch(batch);
   EXPECT_TRUE(db.getOwnVerifiedVotes().empty());
 
-  // 2t+1 votes bundles for the latest round
+  // 5/8 votes bundles for the latest round
   EXPECT_TRUE(db.getAllFiveOfEightVotes().empty());
   db.replaceFiveOfEightVotes(FiveOfEightVotedBlockType::SoftVotedBlock, verified_votes);
   const auto db_five_of_eight_votes = db.getAllFiveOfEightVotes();

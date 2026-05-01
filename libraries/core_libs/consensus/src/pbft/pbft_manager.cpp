@@ -523,8 +523,8 @@ void PbftManager::initialState() {
       current_pbft_period, current_pbft_round - 1, FiveOfEightVotedBlockType::NextVotedNullBlock);
 
   LOG(log_nf_) << "Node initialize at period " << current_pbft_period << ", round " << current_pbft_round << ", step "
-               << current_pbft_step << ". Previous round 2t+1 next voted null block: " << std::boolalpha
-               << previous_round_next_voted_null_block.has_value() << ", previous round 2t+1 next voted block "
+               << current_pbft_step << ". Previous round 5/8 next voted null block: " << std::boolalpha
+               << previous_round_next_voted_null_block.has_value() << ", previous round 5/8 next voted block "
                << (previous_round_next_voted_block.has_value() ? previous_round_next_voted_block->abridged()
                                                                : "no value");
 }
@@ -609,24 +609,24 @@ void PbftManager::broadcastVotes() {
     }
   };
 
-  // (Re)broadcast 2t+1 soft/reward/previous round next votes + all own votes
+  // (Re)broadcast 5/8 soft/reward/previous round next votes + all own votes
   auto stuckRoundBroadcastVotes = [this, &gossipVotes, &stuckPeriodBroadcastVotes](bool rebroadcast) {
     auto [round, period] = getPbftRoundAndPeriod();
 
     stuckPeriodBroadcastVotes(rebroadcast);
 
-    // Broadcast 2t+1 soft votes
+    // Broadcast 5/8 soft votes
     gossipVotes(vote_mgr_->getFiveOfEightVotedBlockVotes(period, round, FiveOfEightVotedBlockType::SoftVotedBlock),
-                "2t+1 soft votes", rebroadcast);
+                "5/8 soft votes", rebroadcast);
 
-    // Broadcast previous round 2t+1 next votes
+    // Broadcast previous round 5/8 next votes
     if (round > 1) {
       gossipVotes(
           vote_mgr_->getFiveOfEightVotedBlockVotes(period, round - 1, FiveOfEightVotedBlockType::NextVotedBlock),
-          "2t+1 next votes", rebroadcast);
+          "5/8 next votes", rebroadcast);
       gossipVotes(
           vote_mgr_->getFiveOfEightVotedBlockVotes(period, round - 1, FiveOfEightVotedBlockType::NextVotedNullBlock),
-          "2t+1 next null votes", rebroadcast);
+          "5/8 next null votes", rebroadcast);
     }
   };
 
@@ -698,13 +698,13 @@ bool PbftManager::stateOperations_() {
     // (Re)broadcast votes if needed
     broadcastVotes();
 
-    // Check if there is 2t+1 cert votes for some valid block, if so - push it into the chain
+    // Check if there is 5/8 cert votes for some valid block, if so - push it into the chain
     if (tryPushCertVotesBlock()) {
       return true;
     }
   }
 
-  // Check if there is 2t+1 next votes for some valid block, if so - advance round
+  // Check if there is 5/8 next votes for some valid block, if so - advance round
   if (advanceRound()) {
     return true;
   }
@@ -719,9 +719,9 @@ bool PbftManager::stateOperations_() {
 
   // If node is not eligible to vote and create block, always return true so pbft state machine never enters specific
   // consensus steps (propose, soft-vote, cert-vote, next-vote). Nodes that have no delegation should just
-  // observe 2t+1 cert votes to move to the next period or 2t+1 next votes to move to the next round
+  // observe 5/8 cert votes to move to the next period or 5/8 next votes to move to the next round
 
-  // Check 2t+1 cert/next votes every kPollingIntervalMs
+  // Check 5/8 cert/next votes every kPollingIntervalMs
   std::this_thread::sleep_for(std::chrono::milliseconds(kPollingIntervalMs));
   return true;
 }
@@ -828,7 +828,7 @@ bool PbftManager::genAndPlaceProposeVote(const std::shared_ptr<PbftBlock> &propo
     return false;
   }
 
-  // Broadcast reward votes - previous round 2t+1 cert votes
+  // Broadcast reward votes - previous round 5/8 cert votes
   if (auto net = network_.lock()) {
     LOG(log_dg_) << "Broadcast propose block reward votes for block " << proposed_block->getBlockHash()
                  << ", num of reward votes: " << reward_votes.size() << ", period " << current_pbft_period << ", round "
@@ -901,11 +901,11 @@ void PbftManager::proposeBlock_() {
   if (round == 1 ||
       vote_mgr_->getFiveOfEightVotedBlock(period, round - 1, FiveOfEightVotedBlockType::NextVotedNullBlock)
           .has_value()) {
-    LOG(log_nf_) << " 2t+1 next voted kNullBlockHash in previous round " << round - 1;
+    LOG(log_nf_) << " 5/8 next voted kNullBlockHash in previous round " << round - 1;
 
     // Propose new block
     if (auto proposed_block_data = proposePbftBlock(); proposed_block_data.has_value()) {
-      // Broadcast reward votes - previous round 2t+1 cert votes
+      // Broadcast reward votes - previous round 5/8 cert votes
       if (auto net = network_.lock()) {
         LOG(log_dg_) << "Broadcast propose block reward votes for block "
                      << proposed_block_data->pbft_block->getBlockHash()
@@ -1021,7 +1021,7 @@ void PbftManager::certifyBlock_() {
 
       debug_msg += "]\n";
     }
-    debug_msg += "all votes weight " + std::to_string(votes_weight) + ", 2t+1 threshold " +
+    debug_msg += "all votes weight " + std::to_string(votes_weight) + ", 5/8 threshold " +
                  std::to_string(vote_mgr_->getPbftFiveOfEight(period - 1, PbftVoteTypes::soft_vote).value());
     LOG(log_dg_) << debug_msg;
 
@@ -1041,7 +1041,7 @@ void PbftManager::certifyBlock_() {
     return;
   }
 
-  // Get 2t+1 soft voted bock hash
+  // Get 5/8 soft voted bock hash
   const auto soft_voted_block_hash =
       vote_mgr_->getFiveOfEightVotedBlock(period, round, FiveOfEightVotedBlockType::SoftVotedBlock);
   if (!soft_voted_block_hash.has_value()) {
@@ -1049,10 +1049,10 @@ void PbftManager::certifyBlock_() {
     return;
   }
 
-  // Get 2t+1 soft voted bock
+  // Get 5/8 soft voted bock
   const auto soft_voted_block = getValidPbftProposedBlock(period, *soft_voted_block_hash);
   if (soft_voted_block == nullptr) {
-    LOG(log_dg_) << "Certify: invalid 2t+1 soft voted block " << *soft_voted_block_hash << ". Period " << period
+    LOG(log_dg_) << "Certify: invalid 5/8 soft voted block " << *soft_voted_block_hash << ". Period " << period
                  << ",  round " << round;
     return;
   }
@@ -1088,8 +1088,8 @@ void PbftManager::firstFinish_() {
     // voting null block hash...
     genAndPlaceVote(PbftVoteTypes::next_vote, period, round, step_, kNullBlockHash);
   } else {
-    // TODO: We should vote for any value that we first saw 2t+1 next votes for in previous round -> in current design
-    // we dont know for which value we saw 2t+1 next votes as first so we prefer specific block if possible
+    // TODO: We should vote for any value that we first saw 5/8 next votes for in previous round -> in current design
+    // we dont know for which value we saw 5/8 next votes as first so we prefer specific block if possible
     std::pair<blk_hash_t, std::shared_ptr<PbftBlock>> starting_value;
 
     const auto previous_round_next_voted_value =
@@ -1126,13 +1126,13 @@ void PbftManager::secondFinish_() {
     printSecondFinishStepInfo_ = false;
   }
 
-  // Lambda function for next voting 2t+1 soft voted block from current round
+  // Lambda function for next voting 5/8 soft voted block from current round
   auto next_vote_soft_voted_block = [this, period = period, round = round]() {
     if (already_next_voted_value_) {
       return;
     }
 
-    // Get 2t+1 soft voted bock hash
+    // Get 5/8 soft voted bock hash
     const auto soft_voted_block_hash =
         vote_mgr_->getFiveOfEightVotedBlock(period, round, FiveOfEightVotedBlockType::SoftVotedBlock);
     if (!soft_voted_block_hash.has_value()) {
@@ -1141,10 +1141,10 @@ void PbftManager::secondFinish_() {
       return;
     }
 
-    // Get 2t+1 soft voted bock
+    // Get 5/8 soft voted bock
     const auto soft_voted_block = getValidPbftProposedBlock(period, *soft_voted_block_hash);
     if (soft_voted_block == nullptr) {
-      LOG(log_dg_) << "Second finish: invalid 2t+1 soft voted block " << *soft_voted_block_hash << ". Period " << period
+      LOG(log_dg_) << "Second finish: invalid 5/8 soft voted block " << *soft_voted_block_hash << ". Period " << period
                    << ",  round " << round;
       return;
     }
@@ -1155,16 +1155,16 @@ void PbftManager::secondFinish_() {
     }
   };
 
-  // Try to next vote 2t+1 soft voted block from current round
+  // Try to next vote 5/8 soft voted block from current round
   next_vote_soft_voted_block();
 
-  // Lambda function for next voting 2t+1 next voted null block from previous round
+  // Lambda function for next voting 5/8 next voted null block from previous round
   auto next_vote_null_block = [this, period = period, round = round]() {
     if (cert_voted_block_for_round_.has_value() || already_next_voted_null_block_hash_ || round < 2) {
       return;
     }
 
-    // Get 2t+1 next voted null bock from previous round
+    // Get 5/8 next voted null bock from previous round
     const auto next_voted_null_block_hash =
         vote_mgr_->getFiveOfEightVotedBlock(period, round - 1, FiveOfEightVotedBlockType::NextVotedNullBlock);
     if (!next_voted_null_block_hash.has_value()) {
@@ -1179,7 +1179,7 @@ void PbftManager::secondFinish_() {
     }
   };
 
-  // Try to next vote 2t+1 next voted null block from previous round
+  // Try to next vote 5/8 next voted null block from previous round
   next_vote_null_block();
 
   loop_back_finish_state_ = elapsedTimeInMs(second_finish_step_start_datetime_) > 2 * (lambda_ - kPollingIntervalMs);
@@ -2015,13 +2015,13 @@ bool PbftManager::validatePbftBlockCertVotes(const std::shared_ptr<PbftBlock> pb
     vote_mgr_->addVerifiedVote(v);
   }
 
-  const auto two_t_plus_one = vote_mgr_->getPbftFiveOfEight(first_vote_period - 1, PbftVoteTypes::cert_vote);
-  if (!two_t_plus_one.has_value()) {
+  const auto five_of_eight = vote_mgr_->getPbftFiveOfEight(first_vote_period - 1, PbftVoteTypes::cert_vote);
+  if (!five_of_eight.has_value()) {
+    LOG(log_wr_) << "Unable to get 5/8 threshold for vote period " << first_vote_period;
     return false;
   }
-
-  if (votes_weight < *two_t_plus_one) {
-    LOG(log_wr_) << "Invalid votes weight " << votes_weight << " < five_of_eight " << *two_t_plus_one << ", pbft block "
+  if (votes_weight < *five_of_eight) {
+    LOG(log_wr_) << "Invalid votes weight " << votes_weight << " < five_of_eight " << *five_of_eight << ", pbft block "
                  << pbft_block->getBlockHash();
     return false;
   }

@@ -89,7 +89,7 @@ void NodeStats::logNodeStats(const std::vector<std::shared_ptr<network::tarcap::
   if (const auto votes_count = pbft_mgr_->getCurrentNodeVotesCount()) {
     local_dpos_node_votes_count = *votes_count;
   }
-  const auto local_twotplusone = vote_mgr_->getPbftFiveOfEight(local_pbft_period - 1, PbftVoteTypes::cert_vote);
+  const auto local_five_of_eight = vote_mgr_->getPbftFiveOfEight(local_pbft_period - 1, PbftVoteTypes::cert_vote);
 
   // Syncing period...
   const auto local_pbft_sync_period = pbft_mgr_->pbftSyncingPeriod();
@@ -170,8 +170,8 @@ void NodeStats::logNodeStats(const std::vector<std::shared_ptr<network::tarcap::
   LOG(log_nf_) << "DPOS total votes count:          "
                << (local_dpos_total_votes_count.has_value() ? std::to_string(*local_dpos_total_votes_count)
                                                             : "Info not available");
-  LOG(log_nf_) << "PBFT consensus 2t+1 threshold:   "
-               << (local_twotplusone.has_value() ? std::to_string(*local_twotplusone) : "Info not available");
+  LOG(log_nf_) << "PBFT consensus 5/8 threshold:    "
+               << (local_five_of_eight.has_value() ? std::to_string(*local_five_of_eight) : "Info not available");
   LOG(log_nf_) << "Node eligible vote count:        " << std::to_string(local_dpos_node_votes_count);
 
   LOG(log_dg_) << "****** Memory structures sizes ******";

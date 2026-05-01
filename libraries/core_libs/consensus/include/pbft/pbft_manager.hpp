@@ -318,7 +318,7 @@ class PbftManager {
 
  private:
   /**
-   * @brief Broadcast or rebroadcast 2t+1 soft/reward/previous round next votes + all own votes if needed
+   * @brief Broadcast or rebroadcast 5/8 soft/reward/previous round next votes + all own votes if needed
    */
   void broadcastVotes();
 
@@ -328,19 +328,19 @@ class PbftManager {
   void resetStep();
 
   /**
-   * @brief If node receives 2t+1 next votes for some block(including kNullBlockHash), advance round to + 1.
+   * @brief If node receives 5/8 next votes for some block(including kNullBlockHash), advance round to + 1.
    * @return true if PBFT round advanced, otherwise false
    */
   bool advanceRound();
 
   /**
-   * @brief If node receives 2t+1 cert votes for some valid block and pushes it to the chain, advance period to + 1.
+   * @brief If node receives 5/8 cert votes for some valid block and pushes it to the chain, advance period to + 1.
    * @return true if PBFT period advanced, otherwise false
    */
   bool advancePeriod();
 
   /**
-   * @brief Check if there is 2t+1 cert votes for some valid block, if yes - push it into the chain
+   * @brief Check if there is 5/8 cert votes for some valid block, if yes - push it into the chain
    * @return true if new cert voted block was pushed into the chain, otherwise false
    */
   bool tryPushCertVotesBlock();
@@ -558,7 +558,7 @@ class PbftManager {
    * @param pbft_block
    * @param cert_votes
    *
-   * @return true if there is enough(2t+1) votes and all of them are valid, otherwise false
+   * @return true if there is enough(5/8) votes and all of them are valid, otherwise false
    */
   bool validatePbftBlockCertVotes(const std::shared_ptr<PbftBlock> pbft_block,
                                   const std::vector<std::shared_ptr<PbftVote>> &cert_votes) const;

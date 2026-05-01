@@ -52,7 +52,7 @@ VoteManager::VoteManager(const FullNodeConfig& config, std::shared_ptr<DbStorage
     }
   };
 
-  // Load 2t+1 vote blocks votes
+  // Load 5/8 vote blocks votes
   addVerifiedVotes(db_->getAllFiveOfEightVotes(), true);
 
   // Load own votes
@@ -125,27 +125,27 @@ void VoteManager::setCurrentPbftPeriodAndRound(PbftPeriod pbft_period, PbftRound
     return;
   }
 
-  // Check if we already have 2t+1 votes bundles for specified pbft period & round. If so, save those votes into db
-  // During normal node operation this should happen rarely - it can happen only if we receive 2t+1 future votes for
+  // Check if we already have 5/8 votes bundles for specified pbft period & round. If so, save those votes into db
+  // During normal node operation this should happen rarely - it can happen only if we receive 5/8 future votes for
   // a period or round that we are not yet in
   for (const auto& five_of_eight_voted_block : found_round_it->second.five_of_eight_voted_blocks_) {
     const FiveOfEightVotedBlockType five_of_eight_voted_block_type = five_of_eight_voted_block.first;
-    // 2t+1 cert voted blocks are only saved to the database in a db batch when block is pushed to the chain
+    // 5/8 cert voted blocks are only saved to the database in a db batch when block is pushed to the chain
     if (five_of_eight_voted_block_type != FiveOfEightVotedBlockType::CertVotedBlock) {
       const auto& [five_of_eight_voted_block_hash, five_of_eight_voted_block_step] = five_of_eight_voted_block.second;
 
       const auto found_step_votes_it = found_round_it->second.step_votes.find(five_of_eight_voted_block_step);
       if (found_step_votes_it == found_round_it->second.step_votes.end()) {
-        LOG(log_er_) << "Unable to find 2t+1 votes in verified_votes for period " << pbft_period << ", round "
+        LOG(log_er_) << "Unable to find 5/8 votes in verified_votes for period " << pbft_period << ", round "
                      << pbft_round << ", step " << five_of_eight_voted_block_step;
         assert(false);
         return;
       }
 
-      // Find verified votes for specified block_hash based on found 2t+1 voted block of type "type"
+      // Find verified votes for specified block_hash based on found 5/8 voted block of type "type"
       const auto found_verified_votes_it = found_step_votes_it->second.votes.find(five_of_eight_voted_block_hash);
       if (found_verified_votes_it == found_step_votes_it->second.votes.end()) {
-        LOG(log_er_) << "Unable to find 2t+1 votes in verified_votes for period " << pbft_period << ", round "
+        LOG(log_er_) << "Unable to find 5/8 votes in verified_votes for period " << pbft_period << ", round "
                      << pbft_round << ", step " << five_of_eight_voted_block_step << ", block hash "
                      << five_of_eight_voted_block_hash;
         assert(false);
@@ -257,7 +257,7 @@ bool VoteManager::addVerifiedVote(const std::shared_ptr<PbftVote>& vote) {
 
     const auto total_weight = (found_voted_value_it->second.first += weight);
 
-    // Unable to get 2t+1
+    // Unable to get 5/8
     const auto five_of_eight = getPbftFiveOfEight(vote->getPeriod() - 1, vote->getType());
     if (!five_of_eight.has_value()) [[unlikely]] {
       LOG(log_er_) << "Cannot set quorum voted block as 5/8 quorum threshold is unavailable, vote " << vote->getHash();
@@ -274,23 +274,23 @@ bool VoteManager::addVerifiedVote(const std::shared_ptr<PbftVote>& vote) {
                    << ", round " << vote->getRound() << ", step " << vote->getStep();
     }
 
-    // Not enough votes - do not set 2t+1 voted block for period,round and step
+    // Not enough votes - do not set 5/8 voted block for period,round and step
     if (total_weight < *five_of_eight) {
       return true;
     }
 
-    // Function to save 2t+1 voted block + its votes
+    // Function to save 5/8 voted block + its votes
     auto saveFiveOfEightVotesInDb = [this, &found_round_it, &found_voted_value_it](
                                         FiveOfEightVotedBlockType five_of_eight_voted_block_type,
                                         const std::shared_ptr<PbftVote> vote) {
       auto found_five_of_eight_voted_block =
           found_round_it->second.five_of_eight_voted_blocks_.find(five_of_eight_voted_block_type);
 
-      // 2t+1 votes block already set
+      // 5/8 votes block already set
       if (found_five_of_eight_voted_block != found_round_it->second.five_of_eight_voted_blocks_.end()) {
         assert(found_five_of_eight_voted_block->second.first == vote->getBlockHash());
 
-        // It is possible to have 2t+1 next votes for the same block in multiple steps
+        // It is possible to have 5/8 next votes for the same block in multiple steps
         if (five_of_eight_voted_block_type != FiveOfEightVotedBlockType::NextVotedBlock &&
             five_of_eight_voted_block_type != FiveOfEightVotedBlockType::NextVotedNullBlock) {
           assert(found_five_of_eight_voted_block->second.second == vote->getStep());
@@ -299,11 +299,11 @@ bool VoteManager::addVerifiedVote(const std::shared_ptr<PbftVote>& vote) {
         return;
       }
 
-      // Insert new 2t+1 voted block
+      // Insert new 5/8 voted block
       found_round_it->second.five_of_eight_voted_blocks_.insert(
           {five_of_eight_voted_block_type, std::make_pair(vote->getBlockHash(), vote->getStep())});
 
-      // Save only current pbft period & round 2t+1 votes bundles into db
+      // Save only current pbft period & round 5/8 votes bundles into db
       // Cert votes are saved once the pbft block is pushed in the chain
       if (vote->getType() != PbftVoteTypes::cert_vote && vote->getPeriod() == current_pbft_period_ &&
           vote->getRound() == current_pbft_round_) {
@@ -550,7 +550,7 @@ std::optional<PbftRound> VoteManager::determineNewRound(PbftPeriod current_pbft_
       return {};
     }
 
-    // Get either 2t+1 voted null or specific block
+    // Get either 5/8 voted null or specific block
     auto found_five_of_eight_voted_block =
         round_rit->second.five_of_eight_voted_blocks_.find(FiveOfEightVotedBlockType::NextVotedBlock);
     if (found_five_of_eight_voted_block == round_rit->second.five_of_eight_voted_blocks_.end()) {
@@ -577,7 +577,7 @@ PbftPeriod VoteManager::getRewardVotesPbftBlockPeriod() {
 
 void VoteManager::resetRewardVotes(PbftPeriod period, PbftRound round, PbftStep step, const blk_hash_t& block_hash,
                                    Batch& batch) {
-  // Save 2t+1 cert votes to database, remove old reward votes
+  // Save 5/8 cert votes to database, remove old reward votes
   {
     std::scoped_lock lock(reward_votes_info_mutex_);
     reward_votes_block_hash_ = block_hash;
@@ -939,7 +939,7 @@ std::optional<uint64_t> VoteManager::getPbftFiveOfEight(PbftPeriod pbft_period, 
   try {
     total_dpos_votes_count = final_chain_->dposEligibleTotalVoteCount(pbft_period);
   } catch (state_api::ErrFutureBlock& e) {
-    LOG(log_er_) << "Unable to calculate 2t + 1 for period: " << pbft_period
+    LOG(log_er_) << "Unable to calculate 5/8 threshold for period: " << pbft_period
                  << ". Period is too far ahead of actual finalized pbft chain size (" << final_chain_->lastBlockNumber()
                  << "). Err msg: " << e.what();
     return {};
@@ -1033,14 +1033,14 @@ std::vector<std::shared_ptr<PbftVote>> VoteManager::getFiveOfEightVotedBlockVote
   }
   const auto [five_of_eight_voted_block_hash, five_of_eight_voted_block_step] = five_of_eight_voted_block_it->second;
 
-  // Find step votes for specified step based on found 2t+1 voted block of type "type"
+  // Find step votes for specified step based on found 5/8 voted block of type "type"
   const auto found_step_votes_it = found_round_it->second.step_votes.find(five_of_eight_voted_block_step);
   if (found_step_votes_it == found_round_it->second.step_votes.end()) {
     assert(false);
     return {};
   }
 
-  // Find verified votes for specified block_hash based on found 2t+1 voted block of type "type"
+  // Find verified votes for specified block_hash based on found 5/8 voted block of type "type"
   const auto found_verified_votes_it = found_step_votes_it->second.votes.find(five_of_eight_voted_block_hash);
   if (found_verified_votes_it == found_step_votes_it->second.votes.end()) {
     assert(false);

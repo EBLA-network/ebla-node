@@ -36,7 +36,7 @@ void GetNextVotesBundlePacketHandler::process(const threadpool::PacketData &pack
                                                                   FiveOfEightVotedBlockType::NextVotedNullBlock);
 
   // In edge case this could theoretically happen due to race condition when we moved to the next period or round
-  // right before calling getAllTwoTPlusOneNextVotes with specific period & round
+  // right before calling getFiveOfEightVotedBlockVotes with specific period & round
   if (next_votes.empty() && next_null_votes.empty()) {
     // Try to get period & round values again
     const auto [tmp_pbft_round, tmp_pbft_period] = pbft_mgr_->getPbftRoundAndPeriod();

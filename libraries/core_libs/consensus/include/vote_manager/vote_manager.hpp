@@ -192,8 +192,8 @@ class VoteManager {
   /**
    * @brief Get 5/8 threshold. Quorum is 5/8 of PBFT sortition threshold (ceiling) for a specific period
    * @param pbft_period pbft period
-   * @param vote_type vote type, for which we get 2t+1
-   * @return PBFT 2T + 1 if successful, otherwise (due to non-existent data for pbft_period) empty optional
+   * @param vote_type vote type, for which we get the 5/8 threshold
+   * @return PBFT 5/8 threshold if successful, otherwise (due to non-existent data for pbft_period) empty optional
    */
   std::optional<uint64_t> getPbftFiveOfEight(PbftPeriod pbft_period, PbftVoteTypes vote_type) const;
 
@@ -211,23 +211,23 @@ class VoteManager {
   bool genAndValidateVrfSortition(PbftPeriod pbft_period, PbftRound pbft_round, const WalletConfig& wallet) const;
 
   /**
-   * @brief Get 2t+1 voted block for specific period, round and type, e.g. soft/cert/next voted block
+   * @brief Get 5/8 voted block for specific period, round and type, e.g. soft/cert/next voted block
    *
    * @param period
    * @param round
    * @param votes_type
-   * @return empty optional if no 2t+1 voted block was found, otherwise initialized optional with block hash
+   * @return empty optional if no 5/8 voted block was found, otherwise initialized optional with block hash
    */
   std::optional<blk_hash_t> getFiveOfEightVotedBlock(PbftPeriod period, PbftRound round,
                                                      FiveOfEightVotedBlockType type) const;
 
   /**
-   * Get 2t+1 voted block votes for specific period, round and type, e.g. soft/cert/next voted block
+   * Get 5/8 voted block votes for specific period, round and type, e.g. soft/cert/next voted block
    *
    * @param period
    * @param round
    * @param type
-   * @return vector of votes if 2t+1 voted block votes found, otherwise empty vector
+   * @return vector of votes if 5/8 voted block votes found, otherwise empty vector
    */
   std::vector<std::shared_ptr<PbftVote>> getFiveOfEightVotedBlockVotes(PbftPeriod period, PbftRound round,
                                                                        FiveOfEightVotedBlockType type) const;
@@ -243,7 +243,7 @@ class VoteManager {
   VerifiedVotes::StepVotes getStepVotes(PbftPeriod period, PbftRound round, PbftStep step) const;
 
   /**
-   * @brief Sets current pbft period & round. It also checks if we dont already have 2t+1 vote bundles(pf any type) for
+   * @brief Sets current pbft period & round. It also checks if we dont already have 5/8 vote bundles(pf any type) for
    *                the provided period & round and if so, it saves these bundles into db
    *
    * @param pbft_period
@@ -258,7 +258,7 @@ class VoteManager {
    *
    * @param period
    * @param round
-   * @return greatest network 2t+1 next voting step
+   * @return greatest network 5/8 next voting step
    */
   PbftStep getNetworkTplusOneNextVotingStep(PbftPeriod period, PbftRound round) const;
 
