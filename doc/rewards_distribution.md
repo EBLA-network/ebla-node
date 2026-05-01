@@ -126,10 +126,11 @@ PBFT proposer gets reward for bonus votes, as described above. We have 5% in con
 ```
 max_pbft_proposer_reward = block_generated_reward * 5% // 5_000
 block_max_votes_weight = 11
-two_t_plus_one = block_max_votes_weight * 2 / 3 + 1 // 8
+// EBLA 5/8 quorum (= 15/24 of committee, rounded up via integer math)
+five_of_eight = (block_max_votes_weight * 5 + 7) / 8     // 8
 block_total_votes_weight = 10
-block_bonus_reward_votes = block_total_votes_weight - two_t_plus_one // 2
-block_total_bonus_reward_votes = block_max_votes_weight - two_t_plus_one // 3
+block_bonus_reward_votes = block_total_votes_weight - five_of_eight     // 2
+block_total_bonus_reward_votes = block_max_votes_weight - five_of_eight  // 3
 proposer_reward = max_proposer_reward * block_bonus_reward_votes / block_total_bonus_reward_votes // 3_333
 burned_amount = max_proposer_reward - proposer_reward // 1667
 ```
