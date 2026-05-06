@@ -83,6 +83,27 @@ class DagManager : public std::enable_shared_from_this<DagManager> {
       const std::shared_ptr<DagBlock> &blk,
       const std::unordered_map<trx_hash_t, std::shared_ptr<Transaction>> &trxs = {});
 
+  // === EBLA ADDITION (Layer 1 - Hardened Anchor Selection) ===
+  /**
+   * @brief Lightweight VRF/VDF-only verification of an existing DAG block, intended for
+   *        anchor pre-validation by the PBFT proposer (proposePbftBlock()).
+   *
+   * Unlike verifyBlock(), this method:
+   *   - Does NOT touch seen_blocks_, non_finalized_blks_, or the database.
+   *   - Does NOT verify tips/pivot count, transactions, gas estimation, or eligibility.
+   *   - Performs ONLY the cryptographic VRF + VDF check that, when failing, would
+   *     poison the anchor and deadlock PBFT consensus.
+   *
+   * Reference: EBLA_PROPOSAL_Hardened_Anchor_Selection_v0011.md - Layer 1.
+   *
+   * @param block_hash Hash of the candidate anchor DAG block (must already be in DAG).
+   * @return Verified                if VRF + VDF pass for this block at its proposal period.
+   *         AheadBlock              if proposal-period for the block's level is unknown yet.
+   *         FailedVdfVerification   on VRF failure, missing VRF key, or any throw from verifyVdf.
+   */
+  VerifyBlockReturnType verifyBlockForAnchor(const blk_hash_t &block_hash);
+  // === END EBLA ADDITION ===
+
   /**
    * @brief Checks if block pivot and tips are in DAG
    * @param blk Block to check

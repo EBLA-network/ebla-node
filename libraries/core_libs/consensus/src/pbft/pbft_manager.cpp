@@ -1354,6 +1354,7 @@ std::optional<PbftManager::ProposedBlockData> PbftManager::proposePbftBlock() {
   }
 
   blk_hash_t dag_block_hash;
+  size_t selected_ghost_index = 0;  // Captured for the EBLA reverse walk below.
   if (ghost.size() <= kGenesisConfig.pbft.dag_blocks_size) {
     // Move back config_.ghost_path_move_back DAG blocks for DAG sycning
     auto ghost_index = (ghost.size() < kGenesisConfig.pbft.ghost_path_move_back + 1)
@@ -1366,9 +1367,68 @@ std::optional<PbftManager::ProposedBlockData> PbftManager::proposePbftBlock() {
       ghost_index += 1;
     }
     dag_block_hash = ghost[ghost_index];
+    selected_ghost_index = ghost_index;
   } else {
     dag_block_hash = ghost[kGenesisConfig.pbft.dag_blocks_size - 1];
+    selected_ghost_index = kGenesisConfig.pbft.dag_blocks_size - 1;
   }
+
+  // === EBLA ADDITION (Layer 1 - Hardened Anchor Selection) ===
+  // Pre-validate the chosen anchor's VRF/VDF. If invalid, walk the GHOST path
+  // BACKWARDS toward the previous anchor, picking the first valid candidate.
+  // If none of the candidates verify, fall back to a NULL anchor for this period
+  // (already a consensus-legal outcome - same as the existing
+  // genesis/last-anchor branches below).
+  //
+  // Reference: EBLA_PROPOSAL_Hardened_Anchor_Selection_v0011.md - Layer 1.
+  // Loop idiom is the underflow-safe variant - DO NOT change to "for (;i<size;i--)"
+  // because size_t is unsigned and i-- below 0 wraps to SIZE_MAX (consensus-fatal).
+  {
+    bool anchor_validated = false;
+    size_t skipped_count = 0;
+    size_t i = selected_ghost_index;
+    while (true) {
+      const auto &candidate = ghost[i];
+
+      // Skip terminal sentinels - never propose these as a fresh anchor.
+      const bool is_sentinel =
+          (candidate == last_period_dag_anchor_block_hash) || (candidate == dag_genesis_block_hash_);
+
+      if (!is_sentinel) {
+        const auto verify_result = dag_mgr_->verifyBlockForAnchor(candidate);
+        if (verify_result == DagManager::VerifyBlockReturnType::Verified) {
+          dag_block_hash = candidate;
+          anchor_validated = true;
+          if (skipped_count > 0) {
+            LOG(log_nf_) << "EBLA: Recovered to valid anchor " << candidate
+                         << " at GHOST index " << i << " after skipping " << skipped_count
+                         << " invalid candidate(s)";
+          }
+          break;
+        }
+        // Rate-limit per-skip warnings to avoid log flooding under attack.
+        if (skipped_count < 3) {
+          LOG(log_wr_) << "EBLA: Skipping invalid anchor candidate " << candidate
+                       << " at GHOST index " << i << " (verify_result="
+                       << static_cast<uint32_t>(verify_result) << "). Trying next.";
+        }
+        ++skipped_count;
+      }
+
+      if (i == 0) break;  // Underflow-safe terminator. DO NOT replace with i--.
+      --i;
+    }
+
+    if (!anchor_validated) {
+      LOG(log_er_) << "EBLA: No valid anchor on GHOST path (size=" << ghost.size()
+                   << ", skipped=" << skipped_count
+                   << "). Proposing NULL BLOCK HASH anchor for period "
+                   << current_pbft_period;
+      return generatePbftBlock(current_pbft_period, last_pbft_block_hash, kNullBlockHash,
+                               kNullBlockHash, extra_data, eligible_wallets);
+    }
+  }
+  // === END EBLA ADDITION ===
 
   if (dag_block_hash == dag_genesis_block_hash_) {
     LOG(log_dg_) << "No new DAG blocks generated. DAG only has genesis " << dag_block_hash

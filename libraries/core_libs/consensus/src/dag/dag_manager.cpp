@@ -707,6 +707,62 @@ std::pair<DagManager::VerifyBlockReturnType, SharedTransactions> DagManager::ver
   return {VerifyBlockReturnType::Verified, std::move(all_block_trxs)};
 }
 
+// === EBLA ADDITION (Layer 1 - Hardened Anchor Selection) ===
+// Mirror of the VRF/VDF-only slice of verifyBlock() above. Side-effect free.
+// MUST stay byte-for-byte equivalent in the cryptographic check it performs,
+// otherwise proposer-side and receiver-side will disagree (consensus split).
+DagManager::VerifyBlockReturnType DagManager::verifyBlockForAnchor(const blk_hash_t &block_hash) {
+  // Read-only; matches getGhostPath()'s lock pattern - never escalates to unique_lock.
+  std::shared_lock lock(mutex_);
+
+  // 1. Look up the candidate. If it isn't in our DAG/cache/DB, treat as failed.
+  auto blk = getDagBlock(block_hash);
+  if (!blk) {
+    LOG(log_wr_) << "EBLA anchor pre-validation: candidate " << block_hash
+                 << " not present locally - treating as FailedVdfVerification";
+    return VerifyBlockReturnType::FailedVdfVerification;
+  }
+
+  // 2. Resolve the proposal period for this block's DAG level.
+  const auto propose_period = db_->getProposalPeriodForDagLevel(blk->getLevel());
+  if (!propose_period.has_value()) {
+    // Block's level maps to a period we have not finalized yet. Caller will skip.
+    return VerifyBlockReturnType::AheadBlock;
+  }
+
+  // 3. Resolve the VRF public key for the sender at that period.
+  const auto pk = key_manager_->getVrfKey(*propose_period, blk->getSender());
+  if (!pk) {
+    LOG(log_wr_) << "EBLA anchor pre-validation: missing VRF key for sender "
+                 << blk->getSender() << " at period " << *propose_period
+                 << " (candidate " << block_hash << ")";
+    return VerifyBlockReturnType::FailedVdfVerification;
+  }
+
+  // 4. Run the same VRF + VDF check verifyBlock() runs - identical inputs.
+  try {
+    const auto proposal_period_hash = db_->getPeriodBlockHash(*propose_period);
+    const uint64_t vote_count =
+        final_chain_->dposEligibleVoteCount(*propose_period, blk->getSender());
+    const uint64_t max_vote_count = kValidatorMaxVote;
+    blk->verifyVdf(sortition_params_manager_.getSortitionParams(*propose_period),
+                   proposal_period_hash, *pk, vote_count, max_vote_count);
+  } catch (vdf_sortition::VdfSortition::InvalidVdfSortition const &e) {
+    LOG(log_wr_) << "EBLA anchor pre-validation: VRF/VDF FAIL for candidate "
+                 << block_hash << " at level " << blk->getLevel()
+                 << ", reason: " << e.what();
+    return VerifyBlockReturnType::FailedVdfVerification;
+  } catch (state_api::ErrFutureBlock const &e) {
+    // Same defensive treatment as verifyBlock(): too far ahead of DPOS.
+    LOG(log_wr_) << "EBLA anchor pre-validation: future block " << block_hash
+                 << " at period " << *propose_period << ": " << e.what();
+    return VerifyBlockReturnType::AheadBlock;
+  }
+
+  return VerifyBlockReturnType::Verified;
+}
+// === END EBLA ADDITION ===
+
 bool DagManager::isDagBlockKnown(const blk_hash_t &hash) const {
   auto known = seen_blocks_.count(hash);
   if (!known) {
