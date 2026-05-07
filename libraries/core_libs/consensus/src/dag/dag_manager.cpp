@@ -733,29 +733,26 @@ DagManager::VerifyBlockReturnType DagManager::verifyBlockForAnchor(const blk_has
   // 3. Resolve the VRF public key for the sender at that period.
   const auto pk = key_manager_->getVrfKey(*propose_period, blk->getSender());
   if (!pk) {
-    LOG(log_wr_) << "EBLA anchor pre-validation: missing VRF key for sender "
-                 << blk->getSender() << " at period " << *propose_period
-                 << " (candidate " << block_hash << ")";
+    LOG(log_wr_) << "EBLA anchor pre-validation: missing VRF key for sender " << blk->getSender() << " at period " 
+                 << *propose_period << " (candidate " << block_hash << ")";
     return VerifyBlockReturnType::FailedVdfVerification;
   }
 
   // 4. Run the same VRF + VDF check verifyBlock() runs - identical inputs.
   try {
     const auto proposal_period_hash = db_->getPeriodBlockHash(*propose_period);
-    const uint64_t vote_count =
-        final_chain_->dposEligibleVoteCount(*propose_period, blk->getSender());
+    const uint64_t vote_count = final_chain_->dposEligibleVoteCount(*propose_period, blk->getSender());
     const uint64_t max_vote_count = kValidatorMaxVote;
-    blk->verifyVdf(sortition_params_manager_.getSortitionParams(*propose_period),
-                   proposal_period_hash, *pk, vote_count, max_vote_count);
+    blk->verifyVdf(sortition_params_manager_.getSortitionParams(*propose_period), proposal_period_hash, *pk, vote_count,
+                   max_vote_count);
   } catch (vdf_sortition::VdfSortition::InvalidVdfSortition const &e) {
-    LOG(log_wr_) << "EBLA anchor pre-validation: VRF/VDF FAIL for candidate "
-                 << block_hash << " at level " << blk->getLevel()
-                 << ", reason: " << e.what();
+    LOG(log_wr_) << "EBLA anchor pre-validation: VRF/VDF FAIL for candidate " << block_hash << " at level "
+                 << blk->getLevel() << ", reason: " << e.what();
     return VerifyBlockReturnType::FailedVdfVerification;
   } catch (state_api::ErrFutureBlock const &e) {
     // Same defensive treatment as verifyBlock(): too far ahead of DPOS.
-    LOG(log_wr_) << "EBLA anchor pre-validation: future block " << block_hash
-                 << " at period " << *propose_period << ": " << e.what();
+    LOG(log_wr_) << "EBLA anchor pre-validation: future block " << block_hash << " at period " << *propose_period
+                 << ": " << e.what();
     return VerifyBlockReturnType::AheadBlock;
   }
 

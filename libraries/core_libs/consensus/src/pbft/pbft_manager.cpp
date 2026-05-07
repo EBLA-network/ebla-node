@@ -1385,16 +1385,19 @@ std::optional<PbftManager::ProposedBlockData> PbftManager::proposePbftBlock() {
   // because size_t is unsigned and i-- below 0 wraps to SIZE_MAX (consensus-fatal).
   {
     bool anchor_validated = false;
-    size_t skipped_count = 0;
+    size_t skipped_count = 0;       // counts ONLY failed verifications, not sentinel skips
+    size_t verify_attempts = 0;     // counts how many candidates we actually tried to verify
     size_t i = selected_ghost_index;
     while (true) {
       const auto &candidate = ghost[i];
 
       // Skip terminal sentinels - never propose these as a fresh anchor.
+      // Sentinels are NOT failures - they are simply "no fresh content here".
       const bool is_sentinel =
           (candidate == last_period_dag_anchor_block_hash) || (candidate == dag_genesis_block_hash_);
 
       if (!is_sentinel) {
+        ++verify_attempts;
         const auto verify_result = dag_mgr_->verifyBlockForAnchor(candidate);
         if (verify_result == DagManager::VerifyBlockReturnType::Verified) {
           dag_block_hash = candidate;
@@ -1419,14 +1422,30 @@ std::optional<PbftManager::ProposedBlockData> PbftManager::proposePbftBlock() {
       --i;
     }
 
-    if (!anchor_validated) {
-      LOG(log_er_) << "EBLA: No valid anchor on GHOST path (size=" << ghost.size()
-                   << ", skipped=" << skipped_count
+    // Three terminal cases:
+    //   (1) anchor_validated == true:
+    //         we found a verifiable candidate. Use it. Skip the early NULL return.
+    //   (2) anchor_validated == false && verify_attempts == 0:
+    //         the GHOST path contained ONLY sentinels (e.g. ghost.size()==1 with
+    //         only the previous anchor). This is the normal "no new DAG blocks
+    //         yet" case. Fall through to the legacy downstream guards which
+    //         handle it via getNonFinalizedBlocks() or NULL anchor at debug level.
+    //   (3) anchor_validated == false && verify_attempts > 0:
+    //         we tried at least one real candidate and ALL of them failed VRF.
+    //         This is the genuine attack-mitigation path. Log at ERROR and
+    //         propose NULL anchor immediately.
+    if (!anchor_validated && verify_attempts > 0) {
+      LOG(log_er_) << "EBLA: All " << verify_attempts << " GHOST candidate(s) failed "
+                   << "anchor pre-validation (skipped=" << skipped_count
+                   << ", ghost size=" << ghost.size()
                    << "). Proposing NULL BLOCK HASH anchor for period "
                    << current_pbft_period;
       return generatePbftBlock(current_pbft_period, last_pbft_block_hash, kNullBlockHash,
                                kNullBlockHash, extra_data, eligible_wallets);
     }
+    // Otherwise: dag_block_hash is either a freshly-validated candidate (case 1)
+    // or unchanged from the legacy ghost-index pick (case 2). Either way, the
+    // existing downstream guards below handle it correctly.
   }
   // === END EBLA ADDITION ===
 
