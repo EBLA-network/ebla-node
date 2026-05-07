@@ -48,3 +48,8 @@ build
 # Doxygen generated folders
 html/
 latex/
+
+# Build artifacts — added after Layer 2 cleanup
+build/
+build.log
+*.log
