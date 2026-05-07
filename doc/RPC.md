@@ -642,6 +642,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"ebla_getConfig","params":[],"id"
       "dag_blocks_size": "0xa",
       "ghost_path_move_back": "0x0",
       "lambda_ms": "0x5dc",
+      "max_stuck_rounds": "0x32",
     },
     "sortition": {
       "changes_count_for_average": "0x5",

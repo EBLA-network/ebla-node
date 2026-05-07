@@ -1113,6 +1113,40 @@ void PbftManager::firstFinish_() {
       starting_value = {kNullBlockHash, nullptr};
     }
 
+    // === EBLA ADDITION (Layer 2 - Stuck Round Recovery) ===
+    // Per EBLA-SEC-001.1 §3.2: if PBFT has been stuck on this period for
+    // `max_stuck_rounds` rounds AND the current starting_value is non-NULL but
+    // no longer validates, force a NULL next-vote so the period can advance.
+    //
+    // Layer-1 (anchor pre-validation) prevents most poisoned-anchor scenarios
+    // at proposal time; Layer-2 covers the orthogonal failures Layer-1 cannot:
+    // offline proposers, partitions, and starting_values that became invalid
+    // after construction.
+    //
+    // Predicate hardening (Step 4 §S6):
+    //   1. starting_value.first != kNullBlockHash  – don't re-NULL a NULL value
+    //   2. !starting_value.second || !validate(.) – null-pointer safe
+    //   3. round >= max_stuck_rounds (uint32 vs uint32) – no underflow
+    //
+    // Steady-state behaviour: predicate is false in every healthy round, so
+    // this block is a no-op when the network is making progress (zero log
+    // lines per period) — satisfies §7.2.5 log-discipline.
+    //
+    // We read max_stuck_rounds through kGenesisConfig (already a constructor-
+    // injected member; see PbftManager ctor's `kGenesisConfig(conf.genesis)`),
+    // matching the proposal pseudocode literally and avoiding a new member.
+    if (round >= kGenesisConfig.pbft.max_stuck_rounds
+        && starting_value.first != kNullBlockHash
+        && (!starting_value.second || !validatePbftBlock(starting_value.second))) {
+      LOG(log_wr_) << "EBLA: stuck-round recovery triggered. round=" << round
+                   << " >= max_stuck_rounds=" << kGenesisConfig.pbft.max_stuck_rounds
+                   << "; current starting_value " << starting_value.first
+                   << " is invalid for period " << period
+                   << ". Voting NULL to force period advancement.";
+      starting_value = {kNullBlockHash, nullptr};
+    }
+    // === END EBLA ADDITION ===
+  
     genAndPlaceVote(PbftVoteTypes::next_vote, period, round, step_, starting_value.first, starting_value.second);
   }
 }
@@ -1385,8 +1419,8 @@ std::optional<PbftManager::ProposedBlockData> PbftManager::proposePbftBlock() {
   // because size_t is unsigned and i-- below 0 wraps to SIZE_MAX (consensus-fatal).
   {
     bool anchor_validated = false;
-    size_t skipped_count = 0;       // counts ONLY failed verifications, not sentinel skips
-    size_t verify_attempts = 0;     // counts how many candidates we actually tried to verify
+    size_t skipped_count = 0;    // counts ONLY failed verifications, not sentinel skips
+    size_t verify_attempts = 0;  // counts how many candidates we actually tried to verify
     size_t i = selected_ghost_index;
     while (true) {
       const auto &candidate = ghost[i];
@@ -1403,17 +1437,15 @@ std::optional<PbftManager::ProposedBlockData> PbftManager::proposePbftBlock() {
           dag_block_hash = candidate;
           anchor_validated = true;
           if (skipped_count > 0) {
-            LOG(log_nf_) << "EBLA: Recovered to valid anchor " << candidate
-                         << " at GHOST index " << i << " after skipping " << skipped_count
-                         << " invalid candidate(s)";
+            LOG(log_nf_) << "EBLA: Recovered to valid anchor " << candidate << " at GHOST index " << i
+                         << " after skipping " << skipped_count << " invalid candidate(s)";
           }
           break;
         }
         // Rate-limit per-skip warnings to avoid log flooding under attack.
         if (skipped_count < 3) {
-          LOG(log_wr_) << "EBLA: Skipping invalid anchor candidate " << candidate
-                       << " at GHOST index " << i << " (verify_result="
-                       << static_cast<uint32_t>(verify_result) << "). Trying next.";
+          LOG(log_wr_) << "EBLA: Skipping invalid anchor candidate " << candidate << " at GHOST index " << i
+                       << " (verify_result=" << static_cast<uint32_t>(verify_result) << "). Trying next.";
         }
         ++skipped_count;
       }
@@ -1436,12 +1468,10 @@ std::optional<PbftManager::ProposedBlockData> PbftManager::proposePbftBlock() {
     //         propose NULL anchor immediately.
     if (!anchor_validated && verify_attempts > 0) {
       LOG(log_er_) << "EBLA: All " << verify_attempts << " GHOST candidate(s) failed "
-                   << "anchor pre-validation (skipped=" << skipped_count
-                   << ", ghost size=" << ghost.size()
-                   << "). Proposing NULL BLOCK HASH anchor for period "
-                   << current_pbft_period;
-      return generatePbftBlock(current_pbft_period, last_pbft_block_hash, kNullBlockHash,
-                               kNullBlockHash, extra_data, eligible_wallets);
+                   << "anchor pre-validation (skipped=" << skipped_count << ", ghost size=" << ghost.size()
+                   << "). Proposing NULL BLOCK HASH anchor for period " << current_pbft_period;
+      return generatePbftBlock(current_pbft_period, last_pbft_block_hash, kNullBlockHash, kNullBlockHash, extra_data,
+                               eligible_wallets);
     }
     // Otherwise: dag_block_hash is either a freshly-validated candidate (case 1)
     // or unchanged from the legacy ghost-index pick (case 2). Either way, the

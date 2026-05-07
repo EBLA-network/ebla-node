@@ -733,7 +733,7 @@ DagManager::VerifyBlockReturnType DagManager::verifyBlockForAnchor(const blk_has
   // 3. Resolve the VRF public key for the sender at that period.
   const auto pk = key_manager_->getVrfKey(*propose_period, blk->getSender());
   if (!pk) {
-    LOG(log_wr_) << "EBLA anchor pre-validation: missing VRF key for sender " << blk->getSender() << " at period " 
+    LOG(log_wr_) << "EBLA anchor pre-validation: missing VRF key for sender " << blk->getSender() << " at period "
                  << *propose_period << " (candidate " << block_hash << ")";
     return VerifyBlockReturnType::FailedVdfVerification;
   }
