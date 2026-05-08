@@ -264,6 +264,15 @@ class DagManager : public std::enable_shared_from_this<DagManager> {
   void recoverDag();
   void addToDag(blk_hash_t const &hash, blk_hash_t const &pivot, std::vector<blk_hash_t> const &tips, uint64_t level,
                 bool finalized = false);
+  // === EBLA ADDITION (Layer 3 - DAG Block Eviction of VRF-Failed Blocks) ===
+  // When verifyBlock() returns FailedVdfVerification,
+  // actively purge the offending hash from non_finalized_blks_, seen_blocks_,
+  // and Columns::dag_blocks so it can never become an anchor candidate.
+  // All three erases are idempotent (safe even when the block was never
+  // inserted, the typical case). Caller must NOT hold mutex_; this method
+  // takes std::unique_lock(mutex_) internally.
+  void evictInvalidDagBlock(const blk_hash_t &block_hash);
+  // === END EBLA ADDITION ===
   bool validateBlockNotExpired(const std::shared_ptr<DagBlock> &dag_block,
                                std::unordered_map<blk_hash_t, std::shared_ptr<DagBlock>> &expired_dag_blocks_to_remove);
   void handleExpiredDagBlocksTransactions(const std::vector<trx_hash_t> &transactions_from_expired_dag_blocks) const;

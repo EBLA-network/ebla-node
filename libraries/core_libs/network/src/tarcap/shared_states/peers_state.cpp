@@ -139,6 +139,53 @@ bool PeersState::is_peer_malicious(const dev::p2p::NodeID& peer_id) {
   return false;
 }
 
+// === EBLA ADDITION (Layer 3 - VRF-failure strike counter) ===
+bool PeersState::record_vrf_failure_strike(const dev::p2p::NodeID& peer_id) {
+  // Honour the same operator escape hatch is_peer_malicious uses.
+  if (kConf.network.disable_peer_blacklist) {
+    return false;
+  }
+
+  const auto now = std::chrono::steady_clock::now();
+  std::unique_lock<std::shared_mutex> lock(strikes_mutex_);
+
+  // Lazy prune (rate-limited): drop entries whose window expired, but only
+  // run the sweep at most once every kStrikesPruneIntervalSeconds. Without
+  // the rate-limit, an attacker rotating NodeIDs would force an O(N) walk
+  // on every call, scaling total work as O(N^2). With the rate-limit, total
+  // work is O(N) per minute regardless of strike rate.
+  //
+  // Note: stale entries may persist up to kStrikesPruneIntervalSeconds past
+  // their nominal expiry (60s slop on a 600s window = 10%). Acceptable —
+  // these entries cost ~32 bytes each and have no functional effect on
+  // correctness; they only prevent a fresh strike from re-using the slot.
+  if (std::chrono::duration_cast<std::chrono::seconds>(now - last_strikes_prune_time_) >=
+      kStrikesPruneIntervalSeconds) {
+    for (auto it = vrf_failure_strikes_.begin(); it != vrf_failure_strikes_.end();) {
+      if (std::chrono::duration_cast<std::chrono::seconds>(now - it->second.first_in_window) >
+          kVrfFailureWindowSeconds) {
+        it = vrf_failure_strikes_.erase(it);
+      } else {
+        ++it;
+      }
+    }
+    last_strikes_prune_time_ = now;
+  }
+
+  // Record this peer's strike.
+  auto existing_it = vrf_failure_strikes_.find(peer_id);
+  if (existing_it == vrf_failure_strikes_.end()) {
+    // First strike (or freshly pruned).
+    vrf_failure_strikes_[peer_id] = VrfStrikeRecord{1u, now};
+    return false;
+  }
+
+  // Within window: increment.
+  existing_it->second.count += 1u;
+  return existing_it->second.count >= kVrfFailureStrikeLimit;
+}
+// === END EBLA ADDITION ===
+
 void PeersState::handleMaliciousSyncPeer(const dev::p2p::NodeID& id) {
   set_peer_malicious(id);
   disconnectPeer(id);

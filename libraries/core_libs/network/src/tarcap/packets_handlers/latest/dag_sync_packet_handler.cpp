@@ -79,6 +79,28 @@ void DagSyncPacketHandler::process(const threadpool::PacketData& packet_data, co
 
     auto verified = dag_mgr_->verifyBlock(block, transactions_map);
     if (verified.first != DagManager::VerifyBlockReturnType::Verified) {
+      // === EBLA ADDITION (Layer 3 - graceful handling of VRF-failed blocks) ===
+      // Spare FailedVdfVerification from the immediate-disconnect path and
+      // route it through the strike counter instead. Other failure types
+      // (NotEligible, BlockTooBig, etc.) remain protocol violations.
+      if (verified.first == DagManager::VerifyBlockReturnType::FailedVdfVerification) {
+        const bool over_threshold = peers_state_->record_vrf_failure_strike(peer->getId());
+        if (over_threshold) {
+          std::ostringstream err_msg;
+          err_msg << "Peer exceeded VRF-failure threshold (>=3 invalid blocks in 10 min) "
+                  << "during DAG sync; last invalid block: " << block->getHash();
+          throw MaliciousPeerException(err_msg.str(), peer->getId());
+        }
+        // Layer 3 v1.1: same distinction as in DagBlockPacketHandler.
+        const char* under_threshold_reason = kConf.network.disable_peer_blacklist
+            ? " in DagSyncPacket (strike counter disabled by operator; misbehavior NOT tracked)"
+            : " in DagSyncPacket (strike recorded; under disconnect threshold)";
+        LOG(log_wr_) << "EBLA: peer " << peer->getId().abridged()
+                     << " sent VRF-invalid block " << block->getHash()
+                     << under_threshold_reason;
+        continue;  // skip this block; process the next one in the sync packet
+      }
+      // === END EBLA ADDITION ===
       std::ostringstream err_msg;
       err_msg << "DagBlock " << block->getHash() << " failed verification with error code "
               << static_cast<uint32_t>(verified.first);

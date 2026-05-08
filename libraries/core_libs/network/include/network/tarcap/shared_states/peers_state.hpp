@@ -1,5 +1,12 @@
 #pragma once
 
+// === EBLA ADDITION (Layer 3) - explicit stdlib includes for the strike counter ===
+#include <chrono>
+#include <cstdint>
+#include <shared_mutex>
+#include <unordered_map>
+// === END EBLA ADDITION ===
+
 #include "common/util.hpp"
 #include "config/config.hpp"
 #include "libp2p/Common.h"
@@ -57,6 +64,26 @@ class PeersState {
    */
   bool is_peer_malicious(const dev::p2p::NodeID& peer_id);
 
+  // === EBLA ADDITION (Layer 3 - per-peer VRF-failure strike counter) ===
+  /**
+   * @brief Record a VRF/VDF verification failure originating from a peer.
+   *
+   * Maintains a sliding window of strikes per peer. Returns true when the
+   * peer has reached kVrfFailureStrikeLimit strikes within
+   * kVrfFailureWindowSeconds; the caller is then expected to throw
+   * MaliciousPeerException so the existing escalation in
+   * PacketHandler::process_ runs (set_peer_malicious + disconnectPeer).
+   *
+   * Honors kConf.network.disable_peer_blacklist - when set, the strike
+   * counter is bypassed and this method returns false unconditionally.
+   *
+   * @param peer_id  the peer whose strike to record
+   * @return true if peer has reached the strike threshold (caller must
+   *         throw MaliciousPeerException); false otherwise
+   */
+  bool record_vrf_failure_strike(const dev::p2p::NodeID& peer_id);
+  // === END EBLA ADDITION ===
+
   /**
    * @brief Handle malicious peer
    * @param id
@@ -87,6 +114,32 @@ class PeersState {
   PeersMap pending_peers_;
 
   ThreadSafeMap<dev::p2p::NodeID, std::chrono::steady_clock::time_point> malicious_peers_;
+  // === EBLA ADDITION (Layer 3 - VRF-failure strike counter) ===
+  // Strike window and threshold are intentionally NOT in genesis JSONs
+  // (this is local anti-spam tuning, not consensus). Per the §7.4 BUG-31
+  // lesson, each additional duplication site is one more drift surface.
+  static constexpr std::chrono::seconds kVrfFailureWindowSeconds{600};
+  static constexpr uint32_t kVrfFailureStrikeLimit = 3;
+
+  struct VrfStrikeRecord {
+    uint32_t count = 0;
+    std::chrono::steady_clock::time_point first_in_window{};
+  };
+
+  // Dedicated shared_mutex (not ThreadSafeMap) because record-strike is a
+  // "read entry, mutate, write back" operation that ThreadSafeMap's
+  // value-returning get() cannot do atomically.
+  mutable std::shared_mutex strikes_mutex_;
+  std::unordered_map<dev::p2p::NodeID, VrfStrikeRecord> vrf_failure_strikes_;
+
+  // Layer 3 v1.1: rate-limit the lazy-prune sweep. Without this, an attacker
+  // rotating NodeIDs at high rate inflates the map; each call walks the
+  // whole map, total work scales as O(N^2) over N unique attacker NodeIDs.
+  // With this, the sweep runs at most once per kStrikesPruneIntervalSeconds,
+  // reducing worst-case to O(N) per minute regardless of strike rate.
+  static constexpr std::chrono::seconds kStrikesPruneIntervalSeconds{60};
+  std::chrono::steady_clock::time_point last_strikes_prune_time_{};
+  // === END EBLA ADDITION ===
   const FullNodeConfig kConf;
 };
 

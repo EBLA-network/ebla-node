@@ -71,9 +71,38 @@ void DagBlockPacketHandler::onNewBlockReceived(
   const auto block_hash = block->getHash();
   auto verified = dag_mgr_->verifyBlock(block, trxs);
   switch (verified.first) {
+    // === EBLA ADDITION (Layer 3 - graceful handling of VRF-failed blocks) ===
+    // Split FailedVdfVerification out of the lumped immediate-disconnect block.
+    // Layer 3's eviction inside verifyBlock has already purged this block from
+    // local DAG state; now we record a strike against the peer and only
+    // escalate to MaliciousPeerException after kVrfFailureStrikeLimit (=3)
+    // strikes within kVrfFailureWindowSeconds (=600s). This protects honest
+    // peers caught in a VRF race (the original risk of halt-trigger) from a
+    // reconnect storm.
+    case DagManager::VerifyBlockReturnType::FailedVdfVerification: {
+      const bool over_threshold = peers_state_->record_vrf_failure_strike(peer->getId());
+      if (over_threshold) {
+        std::ostringstream err_msg;
+        err_msg << "Peer exceeded VRF-failure threshold (>=3 invalid blocks in 10 min); "
+                << "last invalid block: " << block->getHash();
+        throw MaliciousPeerException(err_msg.str(), peer->getId());
+      }
+      // Layer 3 v1.1: distinguish the two reasons over_threshold could be false.
+      // (a) The strike counter is bypassed by operator config — the peer's
+      //     misbehavior is NOT tracked; they will never be auto-disconnected.
+      // (b) The strike was recorded normally and the peer is below threshold.
+      const char* under_threshold_reason = kConf.network.disable_peer_blacklist
+          ? " (strike counter disabled by operator; misbehavior NOT tracked)"
+          : " (strike recorded; under disconnect threshold)";
+      LOG(log_wr_) << "EBLA: peer " << peer->getId().abridged()
+                   << " sent VRF-invalid block " << block->getHash()
+                   << under_threshold_reason;
+      return;  // soft-drop the packet; peer keeps connection
+    }
+    // === END EBLA ADDITION ===
+
     case DagManager::VerifyBlockReturnType::IncorrectTransactionsEstimation:
     case DagManager::VerifyBlockReturnType::BlockTooBig:
-    case DagManager::VerifyBlockReturnType::FailedVdfVerification:
     case DagManager::VerifyBlockReturnType::NotEligible:
     case DagManager::VerifyBlockReturnType::FailedTipsVerification: {
       std::ostringstream err_msg;

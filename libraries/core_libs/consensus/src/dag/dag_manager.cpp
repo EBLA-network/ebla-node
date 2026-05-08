@@ -635,6 +635,11 @@ std::pair<DagManager::VerifyBlockReturnType, SharedTransactions> DagManager::ver
   if (!pk) {
     LOG(log_er_) << "DAG block " << blk->getHash() << " with " << blk->getLevel()
                  << " level is missing VRF key for sender " << blk->getSender();
+    // === EBLA ADDITION (Layer 3 - evict VRF-invalid block) ===
+    evictInvalidDagBlock(block_hash);
+    LOG(log_dg_) << "EBLA: evicted VRF-invalid DAG block " << block_hash
+                 << " from non-finalized DAG (key-missing/verify-throw path)";
+    // === END EBLA ADDITION ===
     return {VerifyBlockReturnType::FailedVdfVerification, {}};
   }
 
@@ -649,6 +654,11 @@ std::pair<DagManager::VerifyBlockReturnType, SharedTransactions> DagManager::ver
     LOG(log_er_) << "DAG block " << block_hash << " with " << blk->getLevel()
                  << " level failed on VDF verification with pivot hash " << blk->getPivot() << " reason " << e.what();
     LOG(log_er_) << "period from map: " << *propose_period << " current: " << pbft_chain_->getPbftChainSize();
+    // === EBLA ADDITION (Layer 3 - evict VRF-invalid block) ===
+    evictInvalidDagBlock(block_hash);
+    LOG(log_dg_) << "EBLA: evicted VRF-invalid DAG block " << block_hash
+                 << " from non-finalized DAG (verifyVdf-rejection path)";
+    // === END EBLA ADDITION ===
     return {VerifyBlockReturnType::FailedVdfVerification, {}};
   }
 
@@ -757,6 +767,64 @@ DagManager::VerifyBlockReturnType DagManager::verifyBlockForAnchor(const blk_has
   }
 
   return VerifyBlockReturnType::Verified;
+}
+// === EBLA ADDITION (Layer 3 - DAG Block Eviction of VRF-Failed Blocks) ===
+// IMPORTANT - what this helper actually does at runtime:
+//
+// In the COMMON case, all three erases below are no-ops. This is by design.
+// The actual mechanism that keeps VRF-invalid blocks out of the DAG is the
+// call ordering in the network handlers:
+//
+//   1. Network handler receives a block via gossip.
+//   2. Handler calls verifyBlock(). On VRF/VDF failure, verifyBlock returns
+//      FailedVdfVerification BEFORE addDagBlock is ever called.
+//   3. Because addDagBlock is the ONLY function that inserts into
+//      non_finalized_blks_, seen_blocks_, or Columns::dag_blocks, the bad
+//      block never enters any of those structures.
+//
+// So when this helper fires from inside verifyBlock's failure path:
+//   (a) non_finalized_blks_ does not contain the hash  -> erase is no-op
+//   (b) seen_blocks_ does not contain the hash         -> erase is no-op
+//   (c) Columns::dag_blocks does not contain the hash  -> RocksDB tolerates
+//       delete-of-absent-key as no-op
+//
+// Why keep the helper if it's almost always a no-op? Defense in depth
+// against three rarer scenarios where the block COULD be present:
+//   1. A future code path that calls addDagBlock and then revalidates
+//      (currently no such path exists, but the codebase evolves).
+//   2. Crash recovery: a previous run wrote the block to disk before
+//      crashing; recoverDag's catch-block currently leaves it there
+//      (see §7.10 Action-1 follow-up to fix this).
+//   3. A race between two threads where one passes verification and
+//      inserts while another fails verification on the same hash. The
+//      current network-handler code structure makes this nearly impossible,
+//      but defense-in-depth costs essentially nothing.
+//
+// The cost of running three no-op erases is microseconds per call. Cheap
+// insurance against scenarios that don't exist today but might tomorrow.
+//
+// Lock discipline: takes std::unique_lock(mutex_) internally. Callers
+// MUST NOT already hold mutex_ (it is std::shared_mutex, non-recursive).
+// All current callers (network packet handlers) hold no DagManager lock.
+//
+// This method does NOT touch peer state or any network code, avoiding
+// the EblaPeer-mutex deadlock documented in addDagBlock's two-mutex comment.
+void DagManager::evictInvalidDagBlock(const blk_hash_t &block_hash) {
+  std::unique_lock<std::shared_mutex> lock(mutex_);
+
+  // (a) In-memory non-finalized DAG: erase from every level's set.
+  for (auto &level_entry : non_finalized_blks_) {
+    level_entry.second.erase(block_hash);
+  }
+
+  // (b) Short-lived seen-cache: prevent re-processing if the same hash
+  //     arrives again before the cache's expiration sweep would have
+  //     dropped it.
+  seen_blocks_.erase(block_hash);
+
+  // (c) Persistent storage: rocksdb tolerates delete-of-absent-key, so
+  //     this is safe even when the block never reached saveDagBlock.
+  db_->removeDagBlock(block_hash);
 }
 // === END EBLA ADDITION ===
 
