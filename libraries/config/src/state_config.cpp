@@ -84,7 +84,6 @@ Json::Value enc_json(const DPOSConfig& obj) {
   json["commission_change_frequency"] = dev::toJS(obj.commission_change_frequency);
   json["max_block_author_reward"] = dev::toJS(obj.max_block_author_reward);
   json["dag_proposers_reward"] = dev::toJS(obj.dag_proposers_reward);
-  json["yield_percentage"] = dev::toJS(obj.yield_percentage);
   json["blocks_per_year"] = dev::toJS(obj.blocks_per_year);
 
   json["initial_validators"] = Json::Value(Json::arrayValue);
@@ -108,7 +107,6 @@ void dec_json(const Json::Value& json, DPOSConfig& obj) {
   obj.commission_change_frequency = dev::getUInt(json["commission_change_frequency"].asString());
   obj.max_block_author_reward = static_cast<uint16_t>(dev::getUInt(json["max_block_author_reward"].asString()));
   obj.dag_proposers_reward = static_cast<uint16_t>(dev::getUInt(json["dag_proposers_reward"].asString()));
-  obj.yield_percentage = static_cast<uint16_t>(dev::getUInt(json["yield_percentage"]));
   obj.blocks_per_year = dev::getUInt(json["blocks_per_year"]);
   obj.trx_min_gas_price =
       json["trx_min_gas_price"].isUInt64() ? dev::getUInt(json["trx_min_gas_price"]) : uint64_t(1000000000);
@@ -128,7 +126,7 @@ RLP_FIELDS_DEFINE(ValidatorInfo, address, owner, vrf_key, commission, endpoint, 
 RLP_FIELDS_DEFINE(DPOSConfig, eligibility_balance_threshold, vote_eligibility_balance_step, validator_maximum_stake,
                   minimum_deposit, max_block_author_reward, dag_proposers_reward, commission_change_delta,
                   commission_change_frequency, delegation_delay, delegation_locking_period, blocks_per_year,
-                  yield_percentage, trx_min_gas_price, trx_max_gas_limit, initial_validators)
+                  trx_min_gas_price, trx_max_gas_limit, initial_validators)
 RLP_FIELDS_DEFINE(Config, evm_chain_config, initial_balances, dpos, hardforks)
 RLP_FIELDS_DEFINE(Opts, expected_max_trx_per_block, max_trie_full_node_levels_to_cache)
 RLP_FIELDS_DEFINE(OptsDB, db_path, disable_most_recent_trie_value_views)

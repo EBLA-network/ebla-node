@@ -235,13 +235,11 @@ TEST_F(RewardsStatsTest, dagBlockRewards) {
 
   std::vector<std::shared_ptr<PbftVote>> empty_votes;
 
-  // Post-Phase 14.3: Aspen is permanent from block 0, so pre_aspen_reward_stats
-  // and post_aspen_reward_stats now behave identically. Both kept to exercise
-  // processStats() with populated HardforksConfig values.
-  rewards::Stats pre_aspen_reward_stats(100, HardforksConfig{{}, SlashingConfig{0}, AspenHardfork{6, 999}}, db,
-                                        [](auto) { return 100; });
-  rewards::Stats post_aspen_reward_stats(100, HardforksConfig{{}, SlashingConfig{0}, AspenHardfork{4, 999}}, db,
-                                         [](auto) { return 100; });
+  // Aspen is permanent from block 0 in EBLA. A single Stats instance covers
+  // what the old pre/post pair used to test (both branches behaved identically
+  // post-Phase-14.3).
+  rewards::Stats reward_stats(100, HardforksConfig{{}, SlashingConfig{0}, AspenHardfork{}}, db,
+                              [](auto) { return 100; });
 
   // Create pbft block with 5 dag blocks
   auto dag_key1 = dev::KeyPair::create();
@@ -298,7 +296,7 @@ TEST_F(RewardsStatsTest, dagBlockRewards) {
 
   // Process rewards before aspen hf, expect dag_blocks_count to match blocks that include unique transactions which is
   // blocks 1, 2 and 5
-  auto stats = pre_aspen_reward_stats.processStats(block, gas_used, batch);
+  auto stats = reward_stats.processStats(block, gas_used, batch);
   ASSERT_EQ(stats.size(), 1);
   auto stats_with_get = reinterpret_cast<TestableBlockStats*>(&stats[0]);
   ASSERT_EQ(stats_with_get->getValidatorStats().size(), 3);
@@ -311,7 +309,7 @@ TEST_F(RewardsStatsTest, dagBlockRewards) {
 
   // Process rewards after aspen hf, expect dag_blocks_count to match blocks with smallest difficulty which is blocks 3
   // and 5 Verify fees rewards to be the same before and after the HF
-  auto post_stats = post_aspen_reward_stats.processStats(block, gas_used, batch);
+  auto post_stats = reward_stats.processStats(block, gas_used, batch);
   ASSERT_EQ(post_stats.size(), 1);
   auto post_stats_with_get = reinterpret_cast<TestableBlockStats*>(&post_stats[0]);
   ASSERT_EQ(post_stats_with_get->getValidatorStats().size(), 4);

@@ -243,7 +243,15 @@ NodesTest::NodesTest() {
     cfg.network.listen_port = 10003 + i;
 
     cfg.genesis.gas_price.minimum_price = 0;
-    cfg.genesis.state.dpos.yield_percentage = 0;
+    // Disable rewards: cap max_supply at sum of initial balances. Order matters —
+    // we cap BEFORE adding the extra de2b1203... balance below, so total_supply
+    // > max_supply on every block and processBlockReward returns 0.
+    {
+      ebla::uint256_t initial_sum = 0;
+      for (const auto& [_, bal] : cfg.genesis.state.initial_balances) initial_sum += bal;
+      cfg.genesis.state.hardforks.aspen_hf.max_supply = initial_sum;
+      cfg.genesis.state.hardforks.aspen_hf.generated_rewards = 0;
+    }
     cfg.genesis.state.initial_balances[addr_t("de2b1203d72d3549ee2f733b00b2789414c7cea5")] =
         u256(7200999050) * 10000000000000000;  // https://ethereum.stackexchange.com/a/74832
 

@@ -91,8 +91,14 @@ Validator E | 1 | 0 |
 Newly generated tokens amount per year is equal to total delegated amount multiplied by yield percentage. So every new block will create a reward is equal to newly generated tokens amount per year divided by estimated blocks count per year. All following calculations would be described with a pseudocode. Let's put some random values to show the calculations:
 ```
 total_delegated_amount = 10_000_000_000
-yield_percentage = 20%
-new_tokens_per_year = total_delegated_amount * yield_percentage // 2_000_000_000
+# EBLA epoch-decay model:
+#   yield(epoch_n) = EblaYieldTable[n]            for n in [0, MaxEpoch]
+#   yield(epoch_n) = MinYieldValue (= 1.0%)       for n > MaxEpoch
+#   block_reward   = (total_delegation × yield) / (1e6 × BlocksPerYear)
+#
+# Initial yield 7%, decay -5% per 10M-block epoch (~14 months), floor 1%.
+# Source: ebla-evm/ebla/state/contracts/dpos/precompiled/yield_curve.go
+# Hard cap: 12B EBLA enforced in processBlockReward (dpos_contract.go).
 blocks_per_year = 20_000
 block_generated_reward = new_tokens_per_year / blocks_per_year // 100_000
 ```

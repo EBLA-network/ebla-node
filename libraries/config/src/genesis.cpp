@@ -96,7 +96,9 @@ GenesisConfig::GenesisConfig() {
   dpos.eligibility_balance_threshold = dev::jsToU256("0x10F0CF064DD59200000");
   dpos.vote_eligibility_balance_step = dev::jsToU256("0x3635C9ADC5DEA00000");
   dpos.validator_maximum_stake = dev::jsToU256("0xD3C21BCECCEDA1000000");
-  dpos.yield_percentage = 7;  // EBLA: 7% initial yield
+  // EBLA: initial 7% yield is hard-coded in EblaYieldTable[0] = 70000
+  // (see ebla-evm/ebla/state/contracts/dpos/precompiled/yield_curve.go).
+  // No genesis-level yield knob remains.
   updateBlocksPerYear();
 }
 

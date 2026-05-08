@@ -52,7 +52,16 @@ struct FinalChainTest : WithDataDir {
   void init() {
     SUT = std::make_shared<final_chain::FinalChain>(db, cfg, addr_t{});
     const auto& effective_balances = effective_initial_balances(cfg.genesis.state);
-    cfg.genesis.state.dpos.yield_percentage = 0;
+    // Disable rewards in test by capping max_supply at the current sum of
+    // initial balances. processBlockReward then sees total_supply >= max_supply
+    // and returns 0 every block. Same observable balance behavior as the old
+    // yield_percentage=0 mechanism (which has been removed).
+    {
+      ebla::uint256_t initial_sum = 0;
+      for (const auto& [_, bal] : cfg.genesis.state.initial_balances) initial_sum += bal;
+      cfg.genesis.state.hardforks.aspen_hf.max_supply = initial_sum;
+      cfg.genesis.state.hardforks.aspen_hf.generated_rewards = 0;
+    }
     for (const auto& [addr, _] : cfg.genesis.state.initial_balances) {
       auto acc_actual = SUT->getAccount(addr);
       ASSERT_TRUE(acc_actual);
@@ -175,7 +184,6 @@ struct FinalChainTest : WithDataDir {
     cfg.genesis.state.dpos.vote_eligibility_balance_step = 1000 * kOneEbla;
     cfg.genesis.state.dpos.validator_maximum_stake = 10000000 * kOneEbla;
     cfg.genesis.state.dpos.minimum_deposit = 100 * kOneEbla;
-    cfg.genesis.state.dpos.yield_percentage = 7;
     cfg.genesis.state.dpos.blocks_per_year = 1000;
   }
 
