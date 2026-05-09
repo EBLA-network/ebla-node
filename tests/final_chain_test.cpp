@@ -54,8 +54,8 @@ struct FinalChainTest : WithDataDir {
     const auto& effective_balances = effective_initial_balances(cfg.genesis.state);
     // Disable rewards in test by capping max_supply at the current sum of
     // initial balances. processBlockReward then sees total_supply >= max_supply
-    // and returns 0 every block. Same observable balance behavior as the old
-    // yield_percentage=0 mechanism (which has been removed).
+    // and returns 0 every block. Same observable balance behavior as the
+    // legacy genesis-yield-knob mechanism this replaced.
     {
       ebla::uint256_t initial_sum = 0;
       for (const auto& [_, bal] : cfg.genesis.state.initial_balances) initial_sum += bal;
