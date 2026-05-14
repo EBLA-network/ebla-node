@@ -6,7 +6,7 @@
 
 namespace ebla::rewards {
 /**
- * @brief class that is managing rewards stats processing and hardforks(intervals changes)
+ * @brief class that is managing rewards stats processing and distribution-interval changes
  * So intermediate blocks stats are stored in the vector in data(to restore on the node restart)
  * and full list of interval stats is returned in the end of interval
  */

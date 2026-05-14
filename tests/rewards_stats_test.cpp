@@ -235,7 +235,7 @@ TEST_F(RewardsStatsTest, dagBlockRewards) {
 
   std::vector<std::shared_ptr<PbftVote>> empty_votes;
 
-  // Aspen is permanent from block 0 in EBLA. A single Stats instance covers
+  // Single Stats instance covers what the legacy pre/post pair used to test
   // what the old pre/post pair used to test (both branches behaved identically
   // post-Phase-14.3).
   rewards::Stats reward_stats(100, ProtocolConfig{{}, SlashingConfig{0}, SupplyConfig{}}, db,

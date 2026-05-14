@@ -32,7 +32,7 @@ class BlockStats {
    * @brief Process PeriodData and save stats in class for future serialization. returns
    *
    * @param block
-   * @param aspen_dag_rewards
+   * @param min_difficulty_dag_rewards
    */
   void processStats(const PeriodData& block, const bool min_difficulty_dag_rewards);
 
