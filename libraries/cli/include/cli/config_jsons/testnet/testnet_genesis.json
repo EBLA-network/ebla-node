@@ -4,7 +4,7 @@
     "level": "0x0",
     "pivot": "0x0000000000000000000000000000000000000000000000000000000000000000",
     "sig": "0xb7e22d46c1ba94d5e8347b01d137b5c428fcbbeaf0a77fb024cbbf1517656ff00d04f7f25be608c321b0d7483c402c294ff46c49b265305d046a52236c0a363701",
-    "timestamp": "0x67853951",
+    "timestamp": "0x6A051080",
     "tips": [],
     "transactions": []
   },
@@ -23,77 +23,31 @@
     "trx_max_gas_limit": "0x1E0A6E0",
     "initial_validators": [
       {
-        "address": "0x18551e353aa65bc0ffbdf9d93b7ad4a8fe29cf95",
-        "owner": "0x18551e353aa65bc0ffbdf9d93b7ad4a8fe29cf95",
+        "address": "0x509088842b5cce7761bf83d48dc6a0e2e37afa72",
+        "owner": "0xfd12d5be9afa154a678b82b2b071bfd81c5d9f6c",
         "commission": 1000,
         "endpoint": "",
         "description": "Ebla testnet validator 1",
         "delegations": {
-          "0x76870407332398322576505f3c5423d0a71af296": "0x69e10de76676d0800000"
+          "0xcbf9331b455ce5da06b030f8fcbc3f0c252ca515": "0x69e10de76676d0800000"
         },
-        "vrf_key": "3cebcfdc7a076352e7b55c5a277a63769ff7baf62d44bd9a8d9add904ab11b7b"
+        "vrf_key": "f17d5993429b7d0a7d875fe749a06b3c4e79f48e7d7ccd8176d71a4364a45fff"
       },
       {
-        "address": "0xc578bb5fc3dac3e96a8c4cb126c71d2dc9082817",
-        "owner": "0xc578bb5fc3dac3e96a8c4cb126c71d2dc9082817",
+        "address": "0x51b8fc80282873242bf65bad208d6fbcce379855",
+        "owner": "0xfd12d5be9afa154a678b82b2b071bfd81c5d9f6c",
         "commission": 1000,
         "endpoint": "",
         "description": "Ebla testnet validator 2",
         "delegations": {
-          "0x76870407332398322576505f3c5423d0a71af296": "0x69e10de76676d0800000"
+          "0xcbf9331b455ce5da06b030f8fcbc3f0c252ca515": "0x69e10de76676d0800000"
         },
-        "vrf_key": "48c633fe14f3c5e13ffb62816fa3111d3a09739bd9be7b6ab05c3f03ed6a879c"
-      },
-      {
-        "address": "0x5c9afb23fba3967ca6102fb60c9949f6a38cd9e8",
-        "owner": "0x5c9afb23fba3967ca6102fb60c9949f6a38cd9e8",
-        "commission": 1000,
-        "endpoint": "",
-        "description": "Ebla testnet validator 3",
-        "delegations": {
-          "0x76870407332398322576505f3c5423d0a71af296": "0x69e10de76676d0800000"
-        },
-        "vrf_key": "f8bbb0c73c74997498796b845458e1cca5a0ef83b3489fca084badd9fba968c6"
-      },
-      {
-        "address": "0x403480c2b2ade0851c62bd1ff7a594c416aff7ce",
-        "owner": "0x403480c2b2ade0851c62bd1ff7a594c416aff7ce",
-        "commission": 1000,
-        "endpoint": "",
-        "description": "Ebla testnet validator 4",
-        "delegations": {
-          "0x76870407332398322576505f3c5423d0a71af296": "0x69e10de76676d0800000"
-        },
-        "vrf_key": "c3912a8c849032ebdc071397c5ae4178a5e67f3399315b30fd6277fca8e1b64f"
-      },
-      {
-        "address": "0x5042fa2711fe547e46c2f64852fdaa5982c80697",
-        "owner": "0x5042fa2711fe547e46c2f64852fdaa5982c80697",
-        "commission": 1000,
-        "endpoint": "",
-        "description": "Ebla testnet validator 5",
-        "delegations": {
-          "0x76870407332398322576505f3c5423d0a71af296": "0x69e10de76676d0800000"
-        },
-        "vrf_key": "7c6dab1852f34ebdf3ad73b60ad70b95b2a6a457d88693823f356c3f8ccc74c6"
-      },
-      {
-        "address": "0x6258d8f51ea17e873f69a2a978fe311fd95743dd",
-        "owner": "0x6258d8f51ea17e873f69a2a978fe311fd95743dd",
-        "commission": 1000,
-        "endpoint": "",
-        "description": "Ebla testnet validator 6",
-        "delegations": {
-          "0x76870407332398322576505f3c5423d0a71af296": "0x69e10de76676d0800000"
-        },
-        "vrf_key": "f5f88dcc7fbfa50a576359ae05ace6ca28352fbc40b4ebbc99605e04c6f42883"
+        "vrf_key": "e03ad4e11766538d1b269de818415e5c11428e6080c91118612b4c0b60afebe1"
       }
     ]
   },
   "initial_balances": {
-    "76870407332398322576505f3c5423d0a71af296": "0x1d14a0219e54822428000000",
-    "f4a52b8f6dc8ab046fec6ad02e77023c044342e4": "0x19d971e4fe8401e74000000",
-    "ee1326fbf7d9322e5ea02c6fe5eb63535fceccd1": "0x19d971e4fe8401e74000000"
+    "cbf9331b455ce5da06b030f8fcbc3f0c252ca515": "0x1d14a0219e54822428000000"
   },
   "gas_price": {
     "blocks": 200,
