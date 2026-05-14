@@ -1135,13 +1135,11 @@ void PbftManager::firstFinish_() {
     // We read max_stuck_rounds through kGenesisConfig (already a constructor-
     // injected member; see PbftManager ctor's `kGenesisConfig(conf.genesis)`),
     // matching the proposal pseudocode literally and avoiding a new member.
-    if (round >= kGenesisConfig.pbft.max_stuck_rounds
-        && starting_value.first != kNullBlockHash
-        && (!starting_value.second || !validatePbftBlock(starting_value.second))) {
+    if (round >= kGenesisConfig.pbft.max_stuck_rounds && starting_value.first != kNullBlockHash &&
+        (!starting_value.second || !validatePbftBlock(starting_value.second))) {
       LOG(log_wr_) << "EBLA: stuck-round recovery triggered. round=" << round
-                   << " >= max_stuck_rounds=" << kGenesisConfig.pbft.max_stuck_rounds
-                   << "; current starting_value " << starting_value.first
-                   << " is invalid for period " << period
+                   << " >= max_stuck_rounds=" << kGenesisConfig.pbft.max_stuck_rounds << "; current starting_value "
+                   << starting_value.first << " is invalid for period " << period
                    << ". Voting NULL to force period advancement.";
       starting_value = {kNullBlockHash, nullptr};
     }

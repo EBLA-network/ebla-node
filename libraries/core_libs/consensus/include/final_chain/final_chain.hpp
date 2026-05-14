@@ -96,7 +96,8 @@ class FinalChain {
   std::optional<h256> finalChainHash(EthBlockNumber n) const;
 
   /**
-   * @brief Needed if we are changing params via a protocol upgrade that affects the Go part of the code. For example DPOS contract
+   * @brief Needed if we are changing params via a protocol upgrade that affects the Go part of the code. For example
+   * DPOS contract
    * @param new_config state_api::Config
    */
   void updateStateConfig(const state_api::Config& new_config);

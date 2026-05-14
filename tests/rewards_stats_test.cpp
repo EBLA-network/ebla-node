@@ -19,8 +19,7 @@ struct RewardsStatsTest : NodesTest {};
 class TestableRewardsStats : public rewards::Stats {
  public:
   TestableRewardsStats(const ProtocolConfig::RewardsDistributionMap& rdm, std::shared_ptr<DbStorage> db)
-      : rewards::Stats(100, ProtocolConfig{rdm, SlashingConfig{0}, SupplyConfig{0, 0}}, db,
-                       [](auto) { return 100; }) {}
+      : rewards::Stats(100, ProtocolConfig{rdm, SlashingConfig{0}, SupplyConfig{0, 0}}, db, [](auto) { return 100; }) {}
   auto getStats() { return blocks_stats_; }
 };
 
@@ -238,8 +237,7 @@ TEST_F(RewardsStatsTest, dagBlockRewards) {
   // Single Stats instance covers what the legacy pre/post pair used to test
   // what the old pre/post pair used to test (both branches behaved identically
   // post-Phase-14.3).
-  rewards::Stats reward_stats(100, ProtocolConfig{{}, SlashingConfig{0}, SupplyConfig{}}, db,
-                              [](auto) { return 100; });
+  rewards::Stats reward_stats(100, ProtocolConfig{{}, SlashingConfig{0}, SupplyConfig{}}, db, [](auto) { return 100; });
 
   // Create pbft block with 5 dag blocks
   auto dag_key1 = dev::KeyPair::create();
