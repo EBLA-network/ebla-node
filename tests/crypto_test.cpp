@@ -174,7 +174,7 @@ TEST_F(CryptoTest, vdf_stake_test) {
     }
   }
 
-  // Post magnolia hardfork stakes
+  // Validator stake fixtures
   for (uint32_t upper_threshold = 0x5ff; upper_threshold < 0xffff; upper_threshold *= 3) {
     std::cout << "Upper threshold: " << upper_threshold << std::endl;
     SortitionParams sortition_params(upper_threshold, 16, 21, 23, 0x64);

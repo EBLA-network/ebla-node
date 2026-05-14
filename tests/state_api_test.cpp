@@ -215,7 +215,7 @@ TEST_F(StateAPITest, slashing) {
   // auto node_cfgs = make_node_cfgs(4, 4, 5);
   for (auto& cfg : node_cfgs) {
     cfg.genesis.state.dpos.delegation_delay = 2;
-    cfg.genesis.state.hardforks.slashing.jail_time = 2;
+    cfg.genesis.state.protocol.slashing.jail_time = 2;
     cfg.report_malicious_behaviour = true;
   }
 

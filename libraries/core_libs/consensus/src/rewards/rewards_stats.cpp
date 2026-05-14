@@ -5,10 +5,10 @@
 #include "storage/storage.hpp"
 
 namespace ebla::rewards {
-Stats::Stats(uint32_t committee_size, const HardforksConfig& hardforks, std::shared_ptr<DbStorage> db,
+Stats::Stats(uint32_t committee_size, const ProtocolConfig& protocol, std::shared_ptr<DbStorage> db,
              std::function<uint64_t(EthBlockNumber)>&& dpos_eligible_total_vote_count, EthBlockNumber last_blk_num)
     : kCommitteeSize(committee_size),
-      kHardforksConfig(hardforks),
+      kProtocolConfig(protocol),
       db_(std::move(db)),
       dpos_eligible_total_vote_count_(dpos_eligible_total_vote_count) {
   recoverFromDb(last_blk_num);
@@ -34,7 +34,7 @@ void Stats::saveBlockStats(uint64_t period, const BlockStats& stats, Batch& writ
 }
 
 uint32_t Stats::getCurrentDistributionFrequency(uint64_t current_block) const {
-  auto distribution_frequencies = kHardforksConfig.rewards_distribution_frequency;
+  auto distribution_frequencies = kProtocolConfig.rewards_distribution_frequency;
   auto itr = distribution_frequencies.upper_bound(current_block);
   if (distribution_frequencies.empty() || itr == distribution_frequencies.begin()) {
     return 1;
@@ -59,7 +59,7 @@ BlockStats Stats::getBlockStats(const PeriodData& blk, const std::vector<gas_t>&
     dpos_vote_count = dpos_eligible_total_vote_count_(blk.previous_block_cert_votes[0]->getPeriod() - 1);
   }
 
-  // Aspen hardfork is permanent from block 0 in EBLA (Phase 14.3).
+  // Supply cap is enforced unconditionally from block 0 in EBLA.
   // Pass `true` unconditionally; the bool parameter remains for BlockStats API
   // stability. Phase 14.9 will drop the parameter entirely.
   return BlockStats{blk, trxs_fees, dpos_vote_count, kCommitteeSize, true};
@@ -99,7 +99,7 @@ std::vector<BlockStats> Stats::processStats(const PeriodData& current_blk, const
   };
 
   std::vector<BlockStats> res;
-  // EBLA (Phase 14.3): Aspen is permanent from block 0 - always sort by period.
+  // EBLA: rewards-stats ordering is unconditional from block 0 — always sort by period.
   std::map<PbftPeriod, BlockStats> ordered_blocks_stats;
   std::transform(std::make_move_iterator(blocks_stats_.begin()), std::make_move_iterator(blocks_stats_.end()),
                  std::inserter(ordered_blocks_stats, ordered_blocks_stats.end()),

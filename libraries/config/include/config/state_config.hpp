@@ -5,7 +5,7 @@
 #include "common/encoding_rlp.hpp"
 #include "common/types.hpp"
 #include "common/vrf_wrapper.hpp"
-#include "config/hardfork.hpp"
+#include "config/protocol_config.hpp"
 
 namespace ebla::state_api {
 
@@ -61,9 +61,9 @@ struct Config {
   EVMChainConfig evm_chain_config;
   BalanceMap initial_balances;
   DPOSConfig dpos;
-  HardforksConfig hardforks;
+  ProtocolConfig protocol;
 
-  void rlp_without_hardforks(util::RLPEncoderRef encoding) const;
+  void rlp_without_protocol(util::RLPEncoderRef encoding) const;
   HAS_RLP_FIELDS
 };
 void append_json(Json::Value& json, const Config& obj);

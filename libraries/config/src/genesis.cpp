@@ -120,7 +120,7 @@ bytes GenesisConfig::rlp() const {
   s << gas_price.rlp();
   s << sortition.rlp();
   s << pbft.rlp();
-  state.rlp_without_hardforks(s);
+  state.rlp_without_protocol(s);
   s << dag.rlp();
 
   return s.out();

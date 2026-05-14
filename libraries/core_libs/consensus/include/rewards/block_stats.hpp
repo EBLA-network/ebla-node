@@ -20,10 +20,10 @@ class BlockStats {
    *
    * @param dpos_vote_count - votes count for previous block
    * @param committee_size
-   * @param aspen_dag_rewards - aspen dag rewards
+   * @param min_difficulty_dag_rewards - credit DAG blocks by min-difficulty rule
    */
   BlockStats(const PeriodData& block, const std::vector<gas_t>& trxs_gas_used, uint64_t dpos_vote_count,
-             uint32_t committee_size, const bool aspen_dag_rewards = false);
+             uint32_t committee_size, const bool min_difficulty_dag_rewards = false);
 
   HAS_RLP_FIELDS
 
@@ -34,7 +34,7 @@ class BlockStats {
    * @param block
    * @param aspen_dag_rewards
    */
-  void processStats(const PeriodData& block, const bool aspen_dag_rewards);
+  void processStats(const PeriodData& block, const bool min_difficulty_dag_rewards);
 
   /**
    * @brief Process Dag blocks and save stats in class for future serialization. returns
@@ -44,11 +44,11 @@ class BlockStats {
   void processDagBlocks(const PeriodData& block);
 
   /**
-   * @brief Process Dag blocks and save stats in class for future serialization with aspen HF changes. returns
+   * @brief Process Dag blocks attributing the unique-transaction credit by min-difficulty rule.
    *
    * @param block
    */
-  void processDagBlocksAspen(const PeriodData& block);
+  void processDagBlocksByMinDifficulty(const PeriodData& block);
 
   /**
    * @brief Prepare fee_by_trx_hash_ map with trx fee by trx hash

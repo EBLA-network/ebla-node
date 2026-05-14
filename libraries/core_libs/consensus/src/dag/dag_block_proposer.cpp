@@ -28,7 +28,7 @@ DagBlockProposer::DagBlockProposer(const FullNodeConfig& config, std::shared_ptr
       kDagProposeGasLimit(std::min(config.propose_dag_gas_limit, config.genesis.getGasLimits().first)),
       kPbftGasLimit(config.genesis.getGasLimits().second),
       kDagGasLimit(config.genesis.getGasLimits().first),
-      kHardforks(config.genesis.state.hardforks),
+      kProtocol(config.genesis.state.protocol),
       kValidatorMaxVote(config.genesis.state.dpos.validator_maximum_stake /
                         config.genesis.state.dpos.vote_eligibility_balance_step) {
   // Use first wallet as default node_addr

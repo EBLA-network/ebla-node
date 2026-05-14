@@ -1,4 +1,5 @@
-#include "config/hardfork.hpp"
+// libraries/config/src/protocol_config.cpp
+#include "config/protocol_config.hpp"
 
 #include "common/config_exception.hpp"
 
@@ -13,22 +14,21 @@ Json::Value enc_json(const SlashingConfig& obj) {
 void dec_json(const Json::Value& json, SlashingConfig& obj) { obj.jail_time = dev::getUInt(json["jail_time"]); }
 RLP_FIELDS_DEFINE(SlashingConfig, jail_time)
 
-Json::Value enc_json(const AspenHardfork& obj) {
+Json::Value enc_json(const SupplyConfig& obj) {
   Json::Value json(Json::objectValue);
   json["max_supply"] = dev::toJS(obj.max_supply);
   json["generated_rewards"] = dev::toJS(obj.generated_rewards);
   return json;
 }
 
-void dec_json(const Json::Value& json, AspenHardfork& obj) {
+void dec_json(const Json::Value& json, SupplyConfig& obj) {
   obj.max_supply = dev::jsToU256(json["max_supply"].asString());
   obj.generated_rewards = dev::jsToU256(json["generated_rewards"].asString());
 }
-RLP_FIELDS_DEFINE(AspenHardfork, max_supply, generated_rewards)
+RLP_FIELDS_DEFINE(SupplyConfig, max_supply, generated_rewards)
 
-Json::Value enc_json(const HardforksConfig& obj) {
+Json::Value enc_json(const ProtocolConfig& obj) {
   Json::Value json(Json::objectValue);
-  json["initial_validators"] = Json::Value(Json::arrayValue);
 
   auto& rewards = json["rewards_distribution_frequency"];
   rewards = Json::objectValue;
@@ -37,13 +37,12 @@ Json::Value enc_json(const HardforksConfig& obj) {
   }
 
   json["slashing"] = enc_json(obj.slashing);
-  json["aspen_hf"] = enc_json(obj.aspen_hf);
-  // json["bamboo_hf"] = enc_json(obj.bamboo_hf);
+  json["supply"] = enc_json(obj.supply);
 
   return json;
 }
 
-void dec_json(const Json::Value& json, HardforksConfig& obj) {
+void dec_json(const Json::Value& json, ProtocolConfig& obj) {
   if (const auto& e = json["rewards_distribution_frequency"]) {
     assert(e.isObject());
 
@@ -53,9 +52,9 @@ void dec_json(const Json::Value& json, HardforksConfig& obj) {
   }
 
   dec_json(json["slashing"], obj.slashing);
-  dec_json(json["aspen_hf"], obj.aspen_hf);
-  // dec_json(json["bamboo_hf"], obj.bamboo_hf);
+  dec_json(json["supply"], obj.supply);
 }
 
-RLP_FIELDS_DEFINE(HardforksConfig, rewards_distribution_frequency, slashing, aspen_hf)
+RLP_FIELDS_DEFINE(ProtocolConfig, rewards_distribution_frequency, slashing, supply)
+
 }  // namespace ebla

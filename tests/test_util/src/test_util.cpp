@@ -249,8 +249,8 @@ NodesTest::NodesTest() {
     {
       ebla::uint256_t initial_sum = 0;
       for (const auto& [_, bal] : cfg.genesis.state.initial_balances) initial_sum += bal;
-      cfg.genesis.state.hardforks.aspen_hf.max_supply = initial_sum;
-      cfg.genesis.state.hardforks.aspen_hf.generated_rewards = 0;
+      cfg.genesis.state.protocol.supply.max_supply = initial_sum;
+      cfg.genesis.state.protocol.supply.generated_rewards = 0;
     }
     cfg.genesis.state.initial_balances[addr_t("de2b1203d72d3549ee2f733b00b2789414c7cea5")] =
         u256(7200999050) * 10000000000000000;  // https://ethereum.stackexchange.com/a/74832
@@ -312,7 +312,7 @@ std::vector<ebla::FullNodeConfig> NodesTest::make_node_cfgs(size_t total_count, 
   ebla::state_api::BalanceMap initial_balances;
   std::vector<ebla::state_api::ValidatorInfo> initial_validators;
 
-  // Calculate initial balance based on AspenHf.MaxSupply so "Yield = (MaxSupply - Genesis Balances Sum) / Genesis
+  // Calculate initial balance based on Supply.MaxSupply so "Yield = (MaxSupply - Genesis Balances Sum) / Genesis
   // Balances Sum = 20%
 
   // Yield [%] = 100 * (max_supply - total_supply) / total_supply
@@ -327,7 +327,7 @@ std::vector<ebla::FullNodeConfig> NodesTest::make_node_cfgs(size_t total_count, 
   const ebla::uint256_t yield{7};  // [%]
   const ebla::uint256_t hundred{100};
   const ebla::uint256_t num_of_nodes{total_count};
-  const ebla::uint256_t max_supply = ret_configs.back().genesis.state.hardforks.aspen_hf.max_supply;
+  const ebla::uint256_t max_supply = ret_configs.back().genesis.state.protocol.supply.max_supply;
 
   const ebla::uint256_t init_balance = (hundred * max_supply) / ((hundred + yield) * num_of_nodes);
 

@@ -7,11 +7,11 @@
 namespace ebla::rewards {
 
 BlockStats::BlockStats(const PeriodData& block, const std::vector<gas_t>& trxs_gas_used, uint64_t dpos_vote_count,
-                       uint32_t committee_size, const bool aspen_dag_reward)
+                       uint32_t committee_size, const bool min_difficulty_dag_reward)
     : block_author_(block.pbft_blk->getBeneficiary()),
       max_votes_weight_(std::min<uint64_t>(committee_size, dpos_vote_count)) {
   initFeeByTrxHash(block.transactions, trxs_gas_used);
-  processStats(block, aspen_dag_reward);
+  processStats(block, min_difficulty_dag_reward);
 }
 
 void BlockStats::initFeeByTrxHash(const SharedTransactions& transactions, const std::vector<gas_t>& trxs_gas_used) {
@@ -67,13 +67,13 @@ std::set<trx_hash_t> toTrxHashesSet(const SharedTransactions& transactions) {
   return block_transactions_hashes_;
 }
 
-void BlockStats::processStats(const PeriodData& block, const bool aspen_dag_rewards) {
+void BlockStats::processStats(const PeriodData& block, const bool min_difficulty_dag_rewards) {
   // total unique transactions count should be always equal to transactions count in block
   assert(fee_by_trx_hash_.size() == block.transactions.size());
 
   validators_stats_.reserve(std::max(block.dag_blocks.size(), block.previous_block_cert_votes.size()));
-  if (aspen_dag_rewards) {
-    processDagBlocksAspen(block);
+  if (min_difficulty_dag_rewards) {
+    processDagBlocksByMinDifficulty(block);
   } else {
     processDagBlocks(block);
   }
@@ -107,7 +107,7 @@ void BlockStats::processDagBlocks(const PeriodData& block) {
   }
 }
 
-void BlockStats::processDagBlocksAspen(const PeriodData& block) {
+void BlockStats::processDagBlocksByMinDifficulty(const PeriodData& block) {
   uint16_t min_difficulty = UINT16_MAX;
   for (const auto& dag_block : block.dag_blocks) {
     if (dag_block->getDifficulty() < min_difficulty) {

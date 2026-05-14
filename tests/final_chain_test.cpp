@@ -59,8 +59,8 @@ struct FinalChainTest : WithDataDir {
     {
       ebla::uint256_t initial_sum = 0;
       for (const auto& [_, bal] : cfg.genesis.state.initial_balances) initial_sum += bal;
-      cfg.genesis.state.hardforks.aspen_hf.max_supply = initial_sum;
-      cfg.genesis.state.hardforks.aspen_hf.generated_rewards = 0;
+      cfg.genesis.state.protocol.supply.max_supply = initial_sum;
+      cfg.genesis.state.protocol.supply.generated_rewards = 0;
     }
     for (const auto& [addr, _] : cfg.genesis.state.initial_balances) {
       auto acc_actual = SUT->getAccount(addr);
@@ -842,7 +842,7 @@ TEST_F(FinalChainTest, remove_jailed_validator_votes_from_total) {
   const std::vector<dev::KeyPair> validator_keys = {dev::KeyPair::create(), dev::KeyPair::create(),
                                                     dev::KeyPair::create()};
   fillConfigForGenesisTests(key.address());
-  cfg.genesis.state.hardforks.slashing.jail_time = 50;
+  cfg.genesis.state.protocol.slashing.jail_time = 50;
 
   for (const auto& vk : validator_keys) {
     const auto vrf_pub_key = ebla::vrf_wrapper::getVrfKeyPair().first;

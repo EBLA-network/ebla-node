@@ -1,6 +1,6 @@
 #pragma once
 
-#include "config/hardfork.hpp"
+#include "config/protocol_config.hpp"
 #include "rewards/block_stats.hpp"
 #include "storage/storage.hpp"
 
@@ -12,7 +12,7 @@ namespace ebla::rewards {
  */
 class Stats {
  public:
-  Stats(uint32_t committee_size, const HardforksConfig& hardforks, std::shared_ptr<DbStorage> db,
+  Stats(uint32_t committee_size, const ProtocolConfig& protocol, std::shared_ptr<DbStorage> db,
         std::function<uint64_t(EthBlockNumber)>&& dpos_eligible_total_vote_count, EthBlockNumber last_blk_num = 0);
 
   /**
@@ -49,7 +49,7 @@ class Stats {
   void saveBlockStats(uint64_t number, const BlockStats& stats, Batch& write_batch);
 
   const uint32_t kCommitteeSize;
-  const HardforksConfig kHardforksConfig;
+  const ProtocolConfig kProtocolConfig;
   std::shared_ptr<DbStorage> db_;
   const std::function<uint64_t(EthBlockNumber)> dpos_eligible_total_vote_count_;
   std::unordered_map<PbftPeriod, BlockStats> blocks_stats_;

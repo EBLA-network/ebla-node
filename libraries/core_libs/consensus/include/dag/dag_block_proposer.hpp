@@ -165,7 +165,7 @@ class DagBlockProposer {
   const uint64_t kPbftGasLimit;
   const uint64_t kDagGasLimit;
 
-  const HardforksConfig kHardforks;
+  const ProtocolConfig kProtocol;
   const uint64_t kValidatorMaxVote;
   const uint64_t kShardProposePeriodInterval = 10;
 

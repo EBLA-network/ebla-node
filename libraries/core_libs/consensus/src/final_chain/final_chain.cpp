@@ -25,7 +25,7 @@ FinalChain::FinalChain(const std::shared_ptr<DbStorage>& db, const ebla::FullNod
                  }),
       kMaxLevelsPerPeriod(config.max_levels_per_period),
       rewards_(
-          config.genesis.pbft.committee_size, config.genesis.state.hardforks, db_,
+          config.genesis.pbft.committee_size, config.genesis.state.protocol, db_,
           [this](EthBlockNumber n) { return dposEligibleTotalVoteCount(n); },
           state_api_.get_last_committed_state_descriptor().blk_num),
       block_headers_cache_(config.final_chain_cache_in_blocks, [this](uint64_t blk) { return getBlockHeader(blk); }),

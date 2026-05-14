@@ -57,7 +57,7 @@ The goal is to make new release candidate even more stable and production (mainn
 
 `HowTo:`
 - We simply continue with already existing `release/vX.Y.Z` branch
-- Create commit in case some testnet specific data must be adjusted, e.g. specifying hardfork block, etc...
+- Create commit in case some testnet specific data must be adjusted, e.g. specifying a protocol upgrade block, etc...
 - Deploy `release/vX.Y.Z` on testnet
 - Only bug fixes are merged into `release/vX.Y.Z`. With each fix, testnet is redeployed.
 - ***Optional:*** At the end of beta testing, merge `release/vX.Y.Z` back into `develop` in case there are some important bug fixes
@@ -71,7 +71,7 @@ After beta testing is successfully finished, we can create final mainnet release
 
 `HowTo:`
 - Again, we continue with already existing `release/vX.Y.Z` branch
-- Create commit in case some mainnet specific data must be adjusted, e.g. specifying hardfork block, etc...
+- Create commit in case some mainnet specific data must be adjusted, e.g. specifying a protocol upgrade block, etc...
 - After all changes were made, merge `release/vX.Y.Z` branch into the `develop` as well as `master` branch
 - Create new release in github with `vX.Y.Z` tag from latest `master`
 - Deploy `vX.Y.Z` tag on mainnet as well as testnet

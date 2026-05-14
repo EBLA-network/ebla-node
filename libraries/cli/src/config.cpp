@@ -136,8 +136,8 @@ void Config::parseCommandLine(int argc, const char* argv[], const std::string& a
     // Check that it is not empty, to not create chain config with just overwritten files
     if (!genesis_json.isNull()) {
       auto default_genesis_json = tools::getGenesis((Config::ChainIdType)genesis_json["chain_id"].asUInt64());
-      // override hardforks data with one from default json
-      genesis_json["hardforks"] = default_genesis_json["hardforks"];
+      // override protocol data with one from default json
+      genesis_json["protocol"] = default_genesis_json["protocol"];
       write_config_and_wallet_files();
     }
 
@@ -185,8 +185,8 @@ void Config::parseCommandLine(int argc, const char* argv[], const std::string& a
     // Check that it is not empty, to not create chain config with just overwritten files
     if (!genesis_json.isNull()) {
       auto default_genesis_json = tools::getGenesis((Config::ChainIdType)genesis_json["chain_id"].asUInt64());
-      // override hardforks data with one from default json
-      genesis_json["hardforks"] = default_genesis_json["hardforks"];
+      // override protocol data with one from default json
+      genesis_json["protocol"] = default_genesis_json["protocol"];
       util::writeJsonToFile(genesis, genesis_json);
     }
 

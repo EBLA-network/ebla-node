@@ -18,8 +18,8 @@ struct RewardsStatsTest : NodesTest {};
 
 class TestableRewardsStats : public rewards::Stats {
  public:
-  TestableRewardsStats(const HardforksConfig::RewardsDistributionMap& rdm, std::shared_ptr<DbStorage> db)
-      : rewards::Stats(100, HardforksConfig{rdm, SlashingConfig{0}, AspenHardfork{0, 0}}, db,
+  TestableRewardsStats(const ProtocolConfig::RewardsDistributionMap& rdm, std::shared_ptr<DbStorage> db)
+      : rewards::Stats(100, ProtocolConfig{rdm, SlashingConfig{0}, SupplyConfig{0, 0}}, db,
                        [](auto) { return 100; }) {}
   auto getStats() { return blocks_stats_; }
 };
@@ -50,7 +50,7 @@ TEST_F(RewardsStatsTest, statsSaving) {
   auto db = std::make_shared<DbStorage>(data_dir / "db");
 
   // distribute every 5 blocks
-  HardforksConfig::RewardsDistributionMap distribution{{0, 5}};
+  ProtocolConfig::RewardsDistributionMap distribution{{0, 5}};
 
   std::vector<std::shared_ptr<PbftVote>> empty_votes;
   std::vector<addr_t> block_authors;
@@ -87,7 +87,7 @@ TEST_F(RewardsStatsTest, statsCleaning) {
   auto batch = db->createWriteBatch();
 
   // distribute every 5 blocks
-  HardforksConfig::RewardsDistributionMap distribution{{0, 5}};
+  ProtocolConfig::RewardsDistributionMap distribution{{0, 5}};
 
   std::vector<std::shared_ptr<PbftVote>> empty_votes;
   std::vector<addr_t> block_authors;
@@ -159,7 +159,7 @@ TEST_F(RewardsStatsTest, distributionChange) {
   auto db = std::make_shared<DbStorage>(data_dir / "db");
   auto batch = db->createWriteBatch();
 
-  HardforksConfig::RewardsDistributionMap distribution{{6, 5}, {11, 2}};
+  ProtocolConfig::RewardsDistributionMap distribution{{6, 5}, {11, 2}};
 
   auto rewards_stats = TestableRewardsStats(distribution, db);
 
@@ -191,7 +191,7 @@ TEST_F(RewardsStatsTest, feeRewards) {
   auto pbft_proposer = dev::KeyPair::create();
   auto dag_proposer = dev::KeyPair::create();
 
-  HardforksConfig::RewardsDistributionMap distribution{};
+  ProtocolConfig::RewardsDistributionMap distribution{};
 
   auto rewards_stats = TestableRewardsStats(distribution, db);
 
@@ -238,7 +238,7 @@ TEST_F(RewardsStatsTest, dagBlockRewards) {
   // Aspen is permanent from block 0 in EBLA. A single Stats instance covers
   // what the old pre/post pair used to test (both branches behaved identically
   // post-Phase-14.3).
-  rewards::Stats reward_stats(100, HardforksConfig{{}, SlashingConfig{0}, AspenHardfork{}}, db,
+  rewards::Stats reward_stats(100, ProtocolConfig{{}, SlashingConfig{0}, SupplyConfig{}}, db,
                               [](auto) { return 100; });
 
   // Create pbft block with 5 dag blocks
@@ -294,8 +294,8 @@ TEST_F(RewardsStatsTest, dagBlockRewards) {
 
   std::vector<gas_t> gas_used{10, 20, 30};
 
-  // Process rewards before aspen hf, expect dag_blocks_count to match blocks that include unique transactions which is
-  // blocks 1, 2 and 5
+  // Legacy behavior reference: pre-Phase-14.3 the count was unique-transactions-per-block.
+  // Removed; only the min-difficulty path remains. Test kept for regression coverage.
   auto stats = reward_stats.processStats(block, gas_used, batch);
   ASSERT_EQ(stats.size(), 1);
   auto stats_with_get = reinterpret_cast<TestableBlockStats*>(&stats[0]);
@@ -307,8 +307,8 @@ TEST_F(RewardsStatsTest, dagBlockRewards) {
   ASSERT_EQ(stats_with_get->getValidatorStats().find(dev::toAddress(dag_key2.pub()))->second.dag_blocks_count_, 1);
   ASSERT_EQ(stats_with_get->getValidatorStats().find(dev::toAddress(dag_key5.pub()))->second.dag_blocks_count_, 1);
 
-  // Process rewards after aspen hf, expect dag_blocks_count to match blocks with smallest difficulty which is blocks 3
-  // and 5 Verify fees rewards to be the same before and after the HF
+  // Verify dag_blocks_count matches blocks with smallest difficulty (blocks 3 and 5).
+  // Verify fees rewards are correctly attributed.
   auto post_stats = reward_stats.processStats(block, gas_used, batch);
   ASSERT_EQ(post_stats.size(), 1);
   auto post_stats_with_get = reinterpret_cast<TestableBlockStats*>(&post_stats[0]);
