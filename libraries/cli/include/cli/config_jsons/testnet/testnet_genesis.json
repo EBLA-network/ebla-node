@@ -10,15 +10,15 @@
   },
   "dpos": {
     "delegation_delay": "0x5",
-    "delegation_locking_period": "0x5",
+    "delegation_locking_period": "0x64",
     "eligibility_balance_threshold": "0x10F0CF064DD59200000",
     "vote_eligibility_balance_step": "0x3635C9ADC5DEA00000",
     "validator_maximum_stake": "0xD3C21BCECCEDA1000000",
     "minimum_deposit": "0x56BC75E2D63100000",
     "max_block_author_reward": "0x5",
     "dag_proposers_reward": "0x32",
-    "commission_change_delta": "0x0",
-    "commission_change_frequency": "0x0",
+    "commission_change_delta": "0x1F4",
+    "commission_change_frequency": "0x64",
     "trx_min_gas_price": "0x3B9ACA00",
     "trx_max_gas_limit": "0x1E0A6E0",
     "initial_validators": [
@@ -124,7 +124,7 @@
     "changing_interval": 200,
     "computation_interval": 50,
     "vrf": {
-      "threshold_upper": "0x4e20"
+      "threshold_upper": "0x2710"
     },
     "vdf": {
       "difficulty_max": 21,
@@ -138,7 +138,7 @@
       "0": 100
     },
     "slashing": {
-      "jail_time": 163459
+      "jail_time": 1000
     },
     "supply": {
     "max_supply": "0x26C62AD77DC602DAE0000000",
