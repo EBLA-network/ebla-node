@@ -27,7 +27,7 @@ set(EBLA_NET_VERSION 6)
 set(EBLA_DB_MAJOR_VERSION 1)
 # Minor version should be modified when changes to the database are made in the tables that can be rebuilt from the
 # basic tables
-set(EBLA_DB_MINOR_VERSION 2)
+set(EBLA_DB_MINOR_VERSION 3)
 
 
 # Defines Ebla library target.
