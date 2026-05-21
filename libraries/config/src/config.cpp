@@ -9,6 +9,63 @@
 
 namespace ebla {
 
+// EBLA DB_ROADMAP_v01 §2.2 / §2.6 / §4.4 — DBConfig parse helpers.
+//
+// validateArchivePath: enforces the security properties from Step 3.10.8 and
+// Step 4.2:
+//   - path is non-empty
+//   - path length <= 1024 chars (defends against malformed JSON blobs)
+//   - path is absolute (rejects "~/foo", "./foo", relative paths)
+//   - path is rooted under one of: /mnt, /srv, /opt, /var/lib  (no /, /etc,
+//     /usr, /boot, /home, etc. — operator can't accidentally point cold tier
+//     at a system directory)
+//   - symlink resolution is NOT performed here; phase 7.5 health-check does it
+//
+// Called from both dec_json(DBConfig&) below AND from the CLI override path
+// in libraries/cli/src/config.cpp (which has its own copy with internal
+// linkage — kept here as `static` for the same reason).
+static void validateArchivePath(const std::filesystem::path &p) {
+  const auto s = p.string();
+  if (s.empty()) {
+    throw ConfigException("db_archive_path is empty but db_tiering_enabled is true");
+  }
+  if (s.size() > 1024) {
+    throw ConfigException("db_archive_path is too long (max 1024 chars)");
+  }
+  if (!p.is_absolute()) {
+    throw ConfigException("db_archive_path must be absolute (got: " + s + ")");
+  }
+  static constexpr std::array<const char *, 4> kAllowedPrefixes = {"/mnt/", "/srv/", "/opt/", "/var/lib/"};
+  bool ok = false;
+  for (const auto *prefix : kAllowedPrefixes) {
+    if (s.rfind(prefix, 0) == 0) {  // starts_with (C++17-compatible)
+      ok = true;
+      break;
+    }
+  }
+  if (!ok) {
+    throw ConfigException(
+        "db_archive_path must be under /mnt, /srv, /opt, or /var/lib (got: " + s + ")");
+  }
+}
+
+// EBLA DB_ROADMAP_v01 §2.6 trap #1 — read uint64 with validate-before-cast,
+// reject negatives explicitly. jsoncpp's asUInt64() on a negative value wraps
+// silently; we want a hard reject with an actionable error message.
+static uint64_t readPositiveUInt64(Json::Value const &json, const std::string &key, uint64_t fallback) {
+  if (!json.isMember(key) || json[key].isNull()) {
+    return fallback;
+  }
+  const auto &v = json[key];
+  if (!v.isIntegral()) {
+    throw ConfigException(key + " must be an integer");
+  }
+  if (v.isInt64() && v.asInt64() < 0) {
+    throw ConfigException(key + " must be non-negative (got: " + std::to_string(v.asInt64()) + ")");
+  }
+  return v.asUInt64();
+}
+
 void dec_json(Json::Value const &json, DBConfig &db_config) {
   db_config.db_snapshot_each_n_pbft_block =
       getConfigDataAsUInt(json, {"db_snapshot_each_n_pbft_block"}, true, db_config.db_snapshot_each_n_pbft_block);
@@ -16,6 +73,58 @@ void dec_json(Json::Value const &json, DBConfig &db_config) {
   db_config.db_max_snapshots = getConfigDataAsUInt(json, {"db_max_snapshots"}, true, db_config.db_max_snapshots);
   db_config.db_max_open_files = getConfigDataAsUInt(json, {"db_max_open_files"}, true, db_config.db_max_open_files);
   db_config.db_compression = getConfigDataAsBoolean(json, {"db_compression"}, true, db_config.db_compression);
+
+  // EBLA DB_ROADMAP_v01 §2.2 — RAM-discipline tunables (Phase 5).
+  // Upper bounds intentionally generous; lower bounds are operationally enforced.
+  db_config.db_block_cache_size_bytes =
+      readPositiveUInt64(json, "db_block_cache_size_bytes", db_config.db_block_cache_size_bytes);
+  if (db_config.db_block_cache_size_bytes < (16ULL << 20)) {  // <16 MiB is useless
+    throw ConfigException("db_block_cache_size_bytes must be at least 16 MiB");
+  }
+  if (db_config.db_block_cache_size_bytes > (1ULL << 40)) {  // >1 TiB is obviously misconfigured
+    throw ConfigException("db_block_cache_size_bytes is unreasonably large (>1 TiB)");
+  }
+
+  db_config.db_write_buffer_size_bytes =
+      readPositiveUInt64(json, "db_write_buffer_size_bytes", db_config.db_write_buffer_size_bytes);
+  if (db_config.db_write_buffer_size_bytes < (256ULL << 20)) {  // mid-PBFT-round flush risk below this
+    throw ConfigException("db_write_buffer_size_bytes must be at least 256 MiB (mid-round flush risk)");
+  }
+  if (db_config.db_write_buffer_size_bytes > (32ULL << 30)) {
+    throw ConfigException("db_write_buffer_size_bytes is unreasonably large (>32 GiB)");
+  }
+
+  // EBLA DB_ROADMAP_v01 §2.2 / §6–§7 — Tiered storage (Phase 6-7).
+  db_config.db_tiering_enabled =
+      getConfigDataAsBoolean(json, {"db_tiering_enabled"}, true, db_config.db_tiering_enabled);
+
+  if (json.isMember("db_archive_path") && !json["db_archive_path"].isNull()) {
+    db_config.db_archive_path = std::filesystem::path(getConfigDataAsString(json, {"db_archive_path"}));
+  }
+
+  db_config.db_hot_size_limit_bytes =
+      readPositiveUInt64(json, "db_hot_size_limit_bytes", db_config.db_hot_size_limit_bytes);
+
+  // §2.6 trap #1 — read into uint32_t, validate range 1..22, THEN narrow to uint8_t.
+  // This forecloses the silent-truncation class (e.g. JSON 277 → uint8_t 21 → passes
+  // the post-cast range check despite being wrong).
+  if (json.isMember("db_cold_compression_level") && !json["db_cold_compression_level"].isNull()) {
+    const uint32_t lvl = getConfigDataAsUInt(json, {"db_cold_compression_level"}, true,
+                                             db_config.db_cold_compression_level);
+    if (lvl < 1 || lvl > 22) {
+      throw ConfigException("db_cold_compression_level must be in range 1..22 (got: " + std::to_string(lvl) + ")");
+    }
+    db_config.db_cold_compression_level = static_cast<uint8_t>(lvl);
+  }
+
+  // Cross-field validation: tiering enabled implies archive path is set and valid,
+  // and the hot-size limit is at least 10 GiB.
+  if (db_config.db_tiering_enabled) {
+    validateArchivePath(db_config.db_archive_path);
+    if (db_config.db_hot_size_limit_bytes < (10ULL << 30)) {
+      throw ConfigException("db_hot_size_limit_bytes must be >= 10 GiB when tiering is enabled");
+    }
+  }
 }
 
 std::vector<logger::Config> FullNodeConfig::loadLoggingConfigs(const Json::Value &logging) {
