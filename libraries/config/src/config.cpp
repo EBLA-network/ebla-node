@@ -44,8 +44,7 @@ static void validateArchivePath(const std::filesystem::path &p) {
     }
   }
   if (!ok) {
-    throw ConfigException(
-        "db_archive_path must be under /mnt, /srv, /opt, or /var/lib (got: " + s + ")");
+    throw ConfigException("db_archive_path must be under /mnt, /srv, /opt, or /var/lib (got: " + s + ")");
   }
 }
 
@@ -109,8 +108,8 @@ void dec_json(Json::Value const &json, DBConfig &db_config) {
   // This forecloses the silent-truncation class (e.g. JSON 277 → uint8_t 21 → passes
   // the post-cast range check despite being wrong).
   if (json.isMember("db_cold_compression_level") && !json["db_cold_compression_level"].isNull()) {
-    const uint32_t lvl = getConfigDataAsUInt(json, {"db_cold_compression_level"}, true,
-                                             db_config.db_cold_compression_level);
+    const uint32_t lvl =
+        getConfigDataAsUInt(json, {"db_cold_compression_level"}, true,db_config.db_cold_compression_level);
     if (lvl < 1 || lvl > 22) {
       throw ConfigException("db_cold_compression_level must be in range 1..22 (got: " + std::to_string(lvl) + ")");
     }

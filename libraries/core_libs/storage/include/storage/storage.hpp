@@ -100,8 +100,7 @@ class DbStorage : public std::enable_shared_from_this<DbStorage> {
 // COLUMN_TIERED / COLUMN_TIERED_W_COMP register a CF whose bottommost SSTs
 // migrate to the cold (HDD) tier when db_tiering_enabled=true. The 4th arg to
 // the Column constructor is the tiered flag - supplied by the macros below.
-#define COLUMN(__name__) \
-  static inline auto const __name__ = all_.emplace_back(#__name__, all_.size(), nullptr, false)
+#define COLUMN(__name__) static inline auto const __name__ = all_.emplace_back(#__name__, all_.size(), nullptr, false)
 #define COLUMN_TIERED(__name__) \
   static inline auto const __name__ = all_.emplace_back(#__name__, all_.size(), nullptr, true)
 #define COLUMN_W_COMP(__name__, ...) \

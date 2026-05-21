@@ -352,16 +352,14 @@ void Config::parseCommandLine(int argc, const char* argv[], const std::string& a
     if (cli_options_.count(DB_BLOCK_CACHE_SIZE)) {
       const auto v = parseByteSize(DB_BLOCK_CACHE_SIZE, cli_options_[DB_BLOCK_CACHE_SIZE].as<std::string>());
       if (v < (16ULL << 20) || v > (1ULL << 40)) {
-        throw bpo::invalid_option_value(
-            std::string(DB_BLOCK_CACHE_SIZE) + ": out of range (16 MiB .. 1 TiB)");
+        throw bpo::invalid_option_value(std::string(DB_BLOCK_CACHE_SIZE) + ": out of range (16 MiB .. 1 TiB)");
       }
       node_config_.db_config.db_block_cache_size_bytes = v;
     }
     if (cli_options_.count(DB_WRITE_BUFFER_SIZE)) {
       const auto v = parseByteSize(DB_WRITE_BUFFER_SIZE, cli_options_[DB_WRITE_BUFFER_SIZE].as<std::string>());
       if (v < (256ULL << 20) || v > (32ULL << 30)) {
-        throw bpo::invalid_option_value(
-            std::string(DB_WRITE_BUFFER_SIZE) + ": out of range (256 MiB .. 32 GiB)");
+        throw bpo::invalid_option_value(std::string(DB_WRITE_BUFFER_SIZE) + ": out of range (256 MiB .. 32 GiB)");
       }
       node_config_.db_config.db_write_buffer_size_bytes = v;
     }
@@ -373,8 +371,7 @@ void Config::parseCommandLine(int argc, const char* argv[], const std::string& a
           parseBool(DB_TIERING_ENABLED, cli_options_[DB_TIERING_ENABLED].as<std::string>());
     }
     if (cli_options_.count(DB_ARCHIVE_PATH)) {
-      node_config_.db_config.db_archive_path =
-          std::filesystem::path(cli_options_[DB_ARCHIVE_PATH].as<std::string>());
+      node_config_.db_config.db_archive_path = std::filesystem::path(cli_options_[DB_ARCHIVE_PATH].as<std::string>());
     }
     if (cli_options_.count(DB_HOT_SIZE_LIMIT)) {
       node_config_.db_config.db_hot_size_limit_bytes =
@@ -383,8 +380,7 @@ void Config::parseCommandLine(int argc, const char* argv[], const std::string& a
     if (cli_options_.count(DB_COLD_COMPRESSION_LEVEL)) {
       const auto lvl = cli_options_[DB_COLD_COMPRESSION_LEVEL].as<uint32_t>();
       if (lvl < 1 || lvl > 22) {
-        throw bpo::invalid_option_value(
-            std::string(DB_COLD_COMPRESSION_LEVEL) + ": out of range (1..22)");
+        throw bpo::invalid_option_value(std::string(DB_COLD_COMPRESSION_LEVEL) + ": out of range (1..22)");
       }
       node_config_.db_config.db_cold_compression_level = static_cast<uint8_t>(lvl);
     }
@@ -392,8 +388,7 @@ void Config::parseCommandLine(int argc, const char* argv[], const std::string& a
     if (node_config_.db_config.db_tiering_enabled) {
       validateArchivePath(node_config_.db_config.db_archive_path);
       if (node_config_.db_config.db_hot_size_limit_bytes < (10ULL << 30)) {
-        throw bpo::invalid_option_value(
-            std::string(DB_HOT_SIZE_LIMIT) + ": must be >= 10 GiB when tiering is enabled");
+        throw bpo::invalid_option_value(std::string(DB_HOT_SIZE_LIMIT) + ": must be >= 10 GiB when tiering is enabled");
       }
     }
 
@@ -522,23 +517,27 @@ bpo::options_description Config::makeNodeOptions(const std::string& available_pl
   // Each flag is optional (no default_value()); if absent at startup, the
   // value parsed from the JSON config file is preserved unchanged. The
   // override block below in parseCommandLine() applies these AFTER JSON load.
-  node_command_options.add_options()(DB_BLOCK_CACHE_SIZE, bpo::value<std::string>(),
+  node_command_options.add_options()(
+      DB_BLOCK_CACHE_SIZE, bpo::value<std::string>(),
       "RocksDB block cache size. Accepts raw bytes or human suffix (e.g., '2GB', '512MiB'). "
       "Overrides db_block_cache_size_bytes in JSON.");
   node_command_options.add_options()(DB_WRITE_BUFFER_SIZE, bpo::value<std::string>(),
-      "RocksDB MemTable budget. Accepts raw bytes or human suffix (e.g., '2GB'). "
-      "Overrides db_write_buffer_size_bytes in JSON.");
+                                     "RocksDB MemTable budget. Accepts raw bytes or human suffix (e.g., '2GB'). "
+                                     "Overrides db_write_buffer_size_bytes in JSON.");
   node_command_options.add_options()(DB_MAX_OPEN_FILES, bpo::value<uint32_t>(),
-      "RocksDB max open SST file descriptors. Overrides db_max_open_files in JSON.");
-  node_command_options.add_options()(DB_TIERING_ENABLED, bpo::value<std::string>(),
+                                     "RocksDB max open SST file descriptors. Overrides db_max_open_files in JSON.");
+  node_command_options.add_options()(
+      DB_TIERING_ENABLED, bpo::value<std::string>(),
       "Enable hot/cold tiered storage: 'true' or 'false'. Overrides db_tiering_enabled in JSON.");
-  node_command_options.add_options()(DB_ARCHIVE_PATH, bpo::value<std::string>(),
+  node_command_options.add_options()(
+      DB_ARCHIVE_PATH, bpo::value<std::string>(),
       "Absolute path to cold-tier (HDD) directory. Must be under /mnt, /srv, /opt, or /var/lib. "
       "Overrides db_archive_path in JSON.");
   node_command_options.add_options()(DB_HOT_SIZE_LIMIT, bpo::value<std::string>(),
-      "Hot-tier size budget. Accepts raw bytes or human suffix (e.g., '800GB'). "
-      "Overrides db_hot_size_limit_bytes in JSON.");
-  node_command_options.add_options()(DB_COLD_COMPRESSION_LEVEL, bpo::value<uint32_t>(),
+                                     "Hot-tier size budget. Accepts raw bytes or human suffix (e.g., '800GB'). "
+                                     "Overrides db_hot_size_limit_bytes in JSON.");
+  node_command_options.add_options()(
+      DB_COLD_COMPRESSION_LEVEL, bpo::value<uint32_t>(),
       "ZSTD compression level for cold-tier SSTs, range 1..22. Overrides db_cold_compression_level in JSON.");
   return node_command_options;
 }

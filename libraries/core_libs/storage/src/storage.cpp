@@ -315,10 +315,10 @@ std::unique_ptr<rocksdb::ColumnFamilyHandle> DbStorage::copyColumn(rocksdb::Colu
       base_name.compare(base_name.size() - copy_suffix.size(), copy_suffix.size(), copy_suffix) == 0) {
     base_name = base_name.substr(0, base_name.size() - copy_suffix.size());
   }
-  const auto it = std::find_if(Columns::all.begin(), Columns::all.end(),
-                               [&base_name](const Column& col) { return col.name() == base_name; });
-  if (it != Columns::all.end()) {
-    applyCfOptionsForColumn(cf_options, *it);
+  const auto col_it = std::find_if(Columns::all.begin(), Columns::all.end(),
+                                   [&base_name](const Column& col) { return col.name() == base_name; });
+  if (col_it != Columns::all.end()) {
+    applyCfOptionsForColumn(cf_options, *col_it);
   } else {
     if (compression_enabled_) {
       cf_options.compression = rocksdb::CompressionType::kLZ4Compression;
