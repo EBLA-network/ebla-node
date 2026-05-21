@@ -42,6 +42,16 @@ static constexpr const char* VRF_SECRET = "vrf-secret";
 static constexpr const char* OVERWRITE_CONFIG = "overwrite-config";
 static constexpr const char* MIGRATE_ONLY = "migrate-only";
 static constexpr const char* MIGRATE_RECEIPTS_BY_PERIOD = "migrate-receipts-by-period";
+// EBLA DB_ROADMAP_v01 §Docker-step — RAM/tiering tunables overridable from
+// CLI (and from docker-entrypoint.sh env vars, which translate to these flags).
+// Each is optional; absent flag preserves the value parsed from JSON.
+static constexpr const char* DB_BLOCK_CACHE_SIZE = "db-block-cache-size";
+static constexpr const char* DB_WRITE_BUFFER_SIZE = "db-write-buffer-size";
+static constexpr const char* DB_MAX_OPEN_FILES = "db-max-open-files";
+static constexpr const char* DB_TIERING_ENABLED = "db-tiering-enabled";
+static constexpr const char* DB_ARCHIVE_PATH = "db-archive-path";
+static constexpr const char* DB_HOT_SIZE_LIMIT = "db-hot-size-limit";
+static constexpr const char* DB_COLD_COMPRESSION_LEVEL = "db-cold-compression-level";
 
 class Config {
  public:
