@@ -15,7 +15,11 @@ struct EthParams {
   uint64_t gas_limit = ((uint64_t)1 << 53) - 1;
   std::shared_ptr<final_chain::FinalChain> final_chain;
   std::function<std::shared_ptr<Transaction>(const h256&)> get_trx;
-  std::function<void(const std::shared_ptr<Transaction>& trx)> send_trx;
+  // Returns (ok, err_msg) directly from TransactionManager::insertTransaction.
+  // On ok==false, the JSON-RPC handler (eth_sendRawTransaction) is responsible
+  // for throwing jsonrpc::JsonRpcException with ERROR_RPC_INVALID_PARAMS so
+  // clients receive -32602 (input rejected) rather than -32603 (server error).
+  std::function<std::pair<bool, std::string>(const std::shared_ptr<Transaction>& trx)> send_trx;
   std::function<u256()> gas_pricer = [] { return u256(0); };
   std::function<uint64_t()> get_earliest_block = [] { return uint64_t(0); };
   std::function<std::optional<SyncStatus>()> syncing_probe = [] { return std::nullopt; };

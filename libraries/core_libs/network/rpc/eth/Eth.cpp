@@ -229,7 +229,16 @@ class EthImpl : public Eth, EthParams {
 
   string eth_sendRawTransaction(const string& _rlp) override {
     auto trx = std::make_shared<Transaction>(jsToBytes(_rlp, OnFailed::Throw), true);
-    send_trx(trx);
+    // The mempool may reject the transaction for any of: chain_id mismatch,
+    // invalid signature, gas_price below trx_min_gas_price (1 Gwei on EBLA),
+    // intrinsic gas too low, duplicate hash, replay of finalized tx, mempool
+    // overflow, or future-nonce-with-full-non-proposable-queue. In every case
+    // the cause is the client's input — surface it as ERROR_RPC_INVALID_PARAMS
+    // (-32602) so wallets and SDKs do not retry the same RLP.
+    if (auto [ok, err_msg] = send_trx(trx); !ok) {
+      throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_RPC_INVALID_PARAMS,
+                                      "Transaction is rejected. Reason: " + err_msg);
+    }
     return toJS(trx->getHash());
   }
 

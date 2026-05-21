@@ -58,14 +58,11 @@ void Rpc::start() {
     eth_rpc_params.gas_pricer = [gas_pricer = app()->getGasPricer()]() { return gas_pricer->bid(); };
     eth_rpc_params.get_earliest_block = [db = app()->getDB()]() { return db->getEarliestBlockNumber(); };
     eth_rpc_params.get_trx = [db = app()->getDB()](auto const &trx_hash) { return db->getTransaction(trx_hash); };
+    // Returns (ok, err_msg) verbatim. The JSON-RPC handler in Eth.cpp throws
+    // jsonrpc::JsonRpcException(ERROR_RPC_INVALID_PARAMS, ...) on !ok so the
+    // client receives the canonical -32602 error code with the rejection reason.
     eth_rpc_params.send_trx = [trx_manager = app()->getTransactionManager()](auto const &trx) {
-      if (auto [ok, err_msg] = trx_manager->insertTransaction(trx); !ok) {
-        BOOST_THROW_EXCEPTION(
-            std::runtime_error(fmt("Transaction is rejected.\n"
-                                   "RLP: %s\n"
-                                   "Reason: %s",
-                                   dev::toJS(trx->rlp()), err_msg)));
-      }
+      return trx_manager->insertTransaction(trx);
     };
     eth_rpc_params.syncing_probe = [network = app()->getNetwork(), pbft_chain = app()->getPbftChain(),
                                     pbft_mgr = app()->getPbftManager()] {
