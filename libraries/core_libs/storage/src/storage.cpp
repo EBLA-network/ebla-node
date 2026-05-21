@@ -161,7 +161,7 @@ void DbStorage::openDb(uint32_t max_open_files, PbftPeriod db_revert_to_period, 
     block_cache_ = rocksdb::NewLRUCache(static_cast<size_t>(block_cache_size_bytes_));
     table_options.block_cache = block_cache_;
     table_options.cache_index_and_filter_blocks = true;
-    table_options.pin_top_level_index_and_filter_in_cache = true;
+    table_options.pin_top_level_index_and_filter = true;
     table_options.filter_policy.reset(rocksdb::NewBloomFilterPolicy(10, false));
     LOG(log_si_) << "DB shared block cache: " << block_cache_size_bytes_ << "B";
   }
