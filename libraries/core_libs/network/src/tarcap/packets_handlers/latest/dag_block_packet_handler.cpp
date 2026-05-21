@@ -91,7 +91,7 @@ void DagBlockPacketHandler::onNewBlockReceived(
       // (a) The strike counter is bypassed by operator config — the peer's
       //     misbehavior is NOT tracked; they will never be auto-disconnected.
       // (b) The strike was recorded normally and the peer is below threshold.
-      const char* under_threshold_reason = kConf.network.disable_peer_blacklist
+      const char *under_threshold_reason = kConf.network.disable_peer_blacklist
                                                ? " (strike counter disabled by operator; misbehavior NOT tracked)"
                                                : " (strike recorded; under disconnect threshold)";
       LOG(log_wr_) << "EBLA: peer " << peer->getId().abridged() << " sent VRF-invalid block " << block->getHash()
