@@ -1,6 +1,9 @@
 #include "storage/storage.hpp"
 
 #include <libdevcore/RLP.h>
+#include <rocksdb/cache.h>
+#include <rocksdb/filter_policy.h>
+#include <rocksdb/table.h>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -10,6 +13,7 @@
 #include <regex>
 
 #include "common/thread_pool.hpp"
+#include "config/config.hpp"
 #include "config/version.hpp"
 #include "dag/dag_block_bundle_rlp.hpp"
 #include "dag/sortition_params_manager.hpp"
@@ -28,6 +32,10 @@ static constexpr uint16_t DAG_BLOCKS_POS_IN_PERIOD_DATA = 2;
 static constexpr uint16_t TRANSACTIONS_POS_IN_PERIOD_DATA = 3;
 static constexpr uint16_t PREV_BLOCK_HASH_POS_IN_PBFT_BLOCK = 0;
 
+// EBLA DB_ROADMAP_v01 §2.4 — Back-compat constructor (8-arg signature).
+// Used by existing call sites (tests, current app.cpp until file 7 lands).
+// Tiering/RAM fields keep their default values; behavior is byte-identical
+// to a pre-roadmap binary.
 DbStorage::DbStorage(const fs::path& path, uint32_t db_snapshot_each_n_pbft_block, uint32_t max_open_files,
                      uint32_t db_max_snapshots, PbftPeriod db_revert_to_period, addr_t node_addr, bool rebuild,
                      bool enable_compression)
@@ -40,8 +48,49 @@ DbStorage::DbStorage(const fs::path& path, uint32_t db_snapshot_each_n_pbft_bloc
   state_db_path_ = (path / kStateDbDir);
   async_write_.sync = false;
   sync_write_.sync = true;
+  // Tiering off, RAM fields at struct defaults (0 → openDb() uses legacy hardcodes).
+  openDb(max_open_files, db_revert_to_period, node_addr, rebuild);
+}
 
+// EBLA DB_ROADMAP_v01 §2.4 — DBConfig-accepting constructor (preferred).
+// Unpacks all RAM/tiering fields from cfg into private members BEFORE openDb()
+// runs. The shared openDb() helper handles the actual DB::Open + tiering wiring.
+DbStorage::DbStorage(const fs::path& path, const DBConfig& cfg, addr_t node_addr, bool rebuild)
+    : path_(path),
+      handles_(Columns::all.size()),
+      compression_enabled_(cfg.db_compression),
+      kDbSnapshotsEachNblock(cfg.db_snapshot_each_n_pbft_block),
+      kDbSnapshotsMaxCount(cfg.db_max_snapshots),
+      tiering_enabled_(cfg.db_tiering_enabled),
+      db_archive_path_(cfg.db_archive_path),
+      db_hot_size_limit_bytes_(cfg.db_hot_size_limit_bytes),
+      cold_compression_level_(cfg.db_cold_compression_level),
+      block_cache_size_bytes_(cfg.db_block_cache_size_bytes),
+      write_buffer_size_bytes_(cfg.db_write_buffer_size_bytes) {
+  db_path_ = (path / kDbDir);
+  state_db_path_ = (path / kStateDbDir);
+  async_write_.sync = false;
+  sync_write_.sync = true;
+  openDb(cfg.db_max_open_files, cfg.db_revert_to_period, node_addr, rebuild);
+}
+
+// EBLA DB_ROADMAP_v01 §2.4 / §4.2 — Shared open path called by both constructors.
+// Performs: rebuild-rename guard, archive-dir setup, options/cache construction,
+// CF descriptor build via applyCfOptionsForColumn, rebuildColumns, recoverToPeriod,
+// DB::Open, version-flag computation. The refuse-when-tiered guards in this
+// function close the Step 4 §4.2 corruption vectors on the rebuild-rename and
+// recoverToPeriod paths.
+void DbStorage::openDb(uint32_t max_open_files, PbftPeriod db_revert_to_period, addr_t node_addr, bool rebuild) {
   if (rebuild) {
+    // EBLA DB_ROADMAP_v01 §4.2.4 — refuse rebuild-rename under tiering.
+    // The fs::rename below moves db_path_ but not db_archive_path_, leaving
+    // the renamed MANIFEST pointing at a cold-tier dir that an operator may
+    // then accidentally share with a fresh DB. Hard refuse.
+    if (tiering_enabled_) {
+      throw DbException(
+          "rebuild-db is not supported when db_tiering_enabled=true. "
+          "Disable tiering, run rebuild, then re-enable. See EBLA DB_ROADMAP_v01 §4.2.");
+    }
     const std::string backup_label = "-rebuild-backup-";
     auto timestamp = std::to_string(std::chrono::system_clock::now().time_since_epoch().count());
     auto backup_db_path = db_path_;
@@ -56,6 +105,28 @@ DbStorage::DbStorage(const fs::path& path, uint32_t db_snapshot_each_n_pbft_bloc
   LOG_OBJECTS_CREATE("DBS");
 
   fs::create_directories(db_path_);
+
+  // EBLA DB_ROADMAP_v01 §2.4 / §7 — Set up cold-tier path and DbPath vector
+  // when tiering is enabled. Directory is created here (after the allow-list
+  // check that already ran at config-parse time in dec_json / cli/config.cpp).
+  // The order of paths matters: index 0 = hot tier, index 1 = cold tier.
+  // RocksDB places L0/L1 SSTs on the first path and bottommost on the last.
+  if (tiering_enabled_) {
+    fs::create_directories(db_archive_path_);
+    tiered_paths_.clear();
+    // Hot tier: bounded by db_hot_size_limit_bytes_. RocksDB uses this as a
+    // soft cap — it places SSTs on this path until the cap is reached, then
+    // spills to the next path.
+    tiered_paths_.emplace_back(db_path_.string(), db_hot_size_limit_bytes_);
+    // Cold tier: target_size = 0 means "unlimited"; archive grows until disk
+    // exhaustion (operator-monitored, see Step 3 §3.10.4).
+    tiered_paths_.emplace_back(db_archive_path_.string(), 0ULL);
+    LOG(log_si_) << "DB tiering ENABLED: hot=" << db_path_ << " (limit=" << db_hot_size_limit_bytes_
+                 << "B) cold=" << db_archive_path_ << " (unlimited)";
+  } else {
+    LOG(log_si_) << "DB tiering disabled (single-tier mode at " << db_path_ << ")";
+  }
+
   removeTempFiles();
 
   rocksdb::Options options;
@@ -65,6 +136,12 @@ DbStorage::DbStorage(const fs::path& path, uint32_t db_snapshot_each_n_pbft_bloc
   // DON'T CHANGE THIS VALUE, IT WILL BREAK THE DB MEMORY USAGE
   options.max_total_wal_size = 10 << 20;                          // 10MB
   options.db_write_buffer_size = size_t(2) * 1024 * 1024 * 1024;  // 2GB
+  // EBLA DB_ROADMAP_v01 §2.2 — override hardcoded write-buffer when the
+  // DBConfig path supplied a non-zero value. Back-compat constructor leaves
+  // write_buffer_size_bytes_ = 0, preserving the 2GB legacy hardcode.
+  if (write_buffer_size_bytes_ > 0) {
+    options.db_write_buffer_size = static_cast<size_t>(write_buffer_size_bytes_);
+  }
   ///////////////////////////////////////////////
   // This option is related to memory consumption
   // https://github.com/facebook/rocksdb/issues/3216#issuecomment-817358217
@@ -72,16 +149,35 @@ DbStorage::DbStorage(const fs::path& path, uint32_t db_snapshot_each_n_pbft_bloc
   options.max_open_files = (max_open_files) ? max_open_files : 256;
   options.max_total_wal_size = 1024 * 1024 * 1024;
 
+  // EBLA DB_ROADMAP_v01 §Phase-5 / RAM-step — Shared block cache across all CFs.
+  // Constructed only when block_cache_size_bytes_ > 0 (i.e., DBConfig path).
+  // Back-compat path leaves block_cache_ = nullptr → each CF gets RocksDB's
+  // default 8 MiB cache. cache_index_and_filter_blocks=true caps the otherwise
+  // unbounded index+filter RAM growth (Step 4 §4.8). pin_top_level_*=true
+  // ensures the top-level filter never evicts (mitigates cold-tier index-block
+  // cache-miss latency, Step 4 §4 of RAM-step Mandatory Security Check item 3).
+  rocksdb::BlockBasedTableOptions table_options;
+  if (block_cache_size_bytes_ > 0) {
+    block_cache_ = rocksdb::NewLRUCache(static_cast<size_t>(block_cache_size_bytes_));
+    table_options.block_cache = block_cache_;
+    table_options.cache_index_and_filter_blocks = true;
+    table_options.pin_top_level_index_and_filter = true;
+    table_options.filter_policy.reset(rocksdb::NewBloomFilterPolicy(10, false));
+    LOG(log_si_) << "DB shared block cache: " << block_cache_size_bytes_ << "B";
+  }
+
   std::vector<rocksdb::ColumnFamilyDescriptor> descriptors;
   descriptors.reserve(Columns::all.size());
-  std::transform(Columns::all.begin(), Columns::all.end(), std::back_inserter(descriptors), [this](const Column& col) {
-    auto options = rocksdb::ColumnFamilyOptions();
-    if (compression_enabled_) {
-      options.compression = rocksdb::CompressionType::kLZ4Compression;
-    }
-    if (col.comparator_) options.comparator = col.comparator_;
-    return rocksdb::ColumnFamilyDescriptor(col.name(), options);
-  });
+  std::transform(Columns::all.begin(), Columns::all.end(), std::back_inserter(descriptors),
+                 [this, &table_options](const Column& col) {
+                   auto cf_options = rocksdb::ColumnFamilyOptions();
+                   applyCfOptionsForColumn(cf_options, col);
+                   // Attach the shared table options (incl. block cache) when one was built.
+                   if (block_cache_) {
+                     cf_options.table_factory.reset(rocksdb::NewBlockBasedTableFactory(table_options));
+                   }
+                   return rocksdb::ColumnFamilyDescriptor(col.name(), cf_options);
+                 });
 
   rebuildColumns(options);
 
@@ -106,6 +202,31 @@ DbStorage::DbStorage(const fs::path& path, uint32_t db_snapshot_each_n_pbft_bloc
     major_version_changed_ = true;
   } else if (minor_version != EBLA_DB_MINOR_VERSION) {
     minor_version_changed_ = true;
+  }
+}
+
+// EBLA DB_ROADMAP_v01 §4.3 — Single source of truth for ColumnFamilyOptions
+// construction. Called from FOUR sites:
+//   1. The descriptor builder lambda in openDb() above
+//   2. The descriptor lambda in rebuildColumns() (see edit 3)
+//   3. deleteColumnData() (see edit 4)
+//   4. copyColumn() (see edit 5)
+// Missing any of these causes silent loss of tiering on rebuild/recreate.
+void DbStorage::applyCfOptionsForColumn(rocksdb::ColumnFamilyOptions& opts, const Column& col) const {
+  if (compression_enabled_) {
+    opts.compression = rocksdb::CompressionType::kLZ4Compression;
+  }
+  if (col.comparator_) {
+    opts.comparator = col.comparator_;
+  }
+  // Tiering: only tiered CFs (col.tiered_ == true) get cf_paths set.
+  // Non-tiered CFs (consensus-hot data) stay single-tier on db_path_.
+  if (tiering_enabled_ && col.tiered_) {
+    opts.cf_paths = tiered_paths_;
+    // ZSTD at the operator-chosen level for bottommost SSTs (cold-tier).
+    opts.bottommost_compression = rocksdb::CompressionType::kZSTD;
+    opts.bottommost_compression_opts.level = static_cast<int>(cold_compression_level_);
+    opts.bottommost_compression_opts.enabled = true;
   }
 }
 
@@ -181,19 +302,37 @@ std::unique_ptr<rocksdb::ColumnFamilyHandle> DbStorage::copyColumn(rocksdb::Colu
   checkStatus(status);
 
   const rocksdb::Comparator* comparator = orig_column->GetComparator();
-  auto options = rocksdb::ColumnFamilyOptions();
-  if (compression_enabled_) {
-    options.compression = rocksdb::CompressionType::kLZ4Compression;
+  auto cf_options = rocksdb::ColumnFamilyOptions();
+  // EBLA DB_ROADMAP_v01 §4.3 — look up the canonical Column by new_col_name
+  // (strip "-copy" suffix if present, since copyColumn is also used by the
+  // migration path to create transient "-copy" CFs). If a Column is found in
+  // Columns::all, use applyCfOptionsForColumn so tiering and comparator are
+  // both set correctly. Otherwise (transient/synthetic CF), fall back to the
+  // legacy behavior (compression + comparator from orig_column).
+  std::string base_name = new_col_name;
+  const std::string copy_suffix = "-copy";
+  if (base_name.size() > copy_suffix.size() &&
+      base_name.compare(base_name.size() - copy_suffix.size(), copy_suffix.size(), copy_suffix) == 0) {
+    base_name = base_name.substr(0, base_name.size() - copy_suffix.size());
   }
-  if (comparator != nullptr) {
-    options.comparator = comparator;
+  const auto col_it = std::find_if(Columns::all.begin(), Columns::all.end(),
+                                   [&base_name](const Column& col) { return col.name() == base_name; });
+  if (col_it != Columns::all.end()) {
+    applyCfOptionsForColumn(cf_options, *col_it);
+  } else {
+    if (compression_enabled_) {
+      cf_options.compression = rocksdb::CompressionType::kLZ4Compression;
+    }
+    if (comparator != nullptr) {
+      cf_options.comparator = comparator;
+    }
   }
 
   rocksdb::ImportColumnFamilyOptions import_options;
   import_options.move_files = move_data;
 
   rocksdb::ColumnFamilyHandle* copied_column_raw = nullptr;
-  status = db_->CreateColumnFamilyWithImport(options, new_col_name, import_options, *metadata, &copied_column_raw);
+  status = db_->CreateColumnFamilyWithImport(cf_options, new_col_name, import_options, *metadata, &copied_column_raw);
   std::unique_ptr<rocksdb::ColumnFamilyHandle> copied_column(copied_column_raw);
   checkStatus(status);
 
@@ -225,14 +364,12 @@ void DbStorage::deleteColumnData(const Column& c) {
   checkStatus(db_->DropColumnFamily(handle(c)));
   db_->DestroyColumnFamilyHandle(handle(c));
 
-  auto options = rocksdb::ColumnFamilyOptions();
-  if (compression_enabled_) {
-    options.compression = rocksdb::CompressionType::kLZ4Compression;
-  }
-  if (c.comparator_) {
-    options.comparator = c.comparator_;
-  }
-  checkStatus(db_->CreateColumnFamily(options, c.name(), &handles_[c.ordinal_]));
+  // EBLA DB_ROADMAP_v01 §4.3 — call the canonical helper so the re-created CF
+  // inherits tiering placement. Without this, dropping then re-creating a
+  // tiered CF (e.g. via clearColumnHistory) silently demotes it to single-tier.
+  auto cf_options = rocksdb::ColumnFamilyOptions();
+  applyCfOptionsForColumn(cf_options, c);
+  checkStatus(db_->CreateColumnFamily(cf_options, c.name(), &handles_[c.ordinal_]));
 }
 
 void DbStorage::rebuildColumns(const rocksdb::Options& options) {
@@ -254,12 +391,17 @@ void DbStorage::rebuildColumns(const rocksdb::Options& options) {
                      // "-copy" is there, so we will removed unsuccessful migrations
                      return col.name() == name || col.name() + "-copy" == name;
                    });
-                   auto options = rocksdb::ColumnFamilyOptions();
-                   if (compression_enabled_) {
-                     options.compression = rocksdb::CompressionType::kLZ4Compression;
+                   auto cf_options = rocksdb::ColumnFamilyOptions();
+                   // EBLA DB_ROADMAP_v01 §4.3 — call the canonical helper if this CF is in
+                   // Columns::all (the normal case). For unregistered CFs found on disk
+                   // (e.g. orphaned -copy from a prior migration), fall back to compression
+                   // only — these are about to be dropped a few lines below anyway.
+                   if (it != Columns::all.end()) {
+                     applyCfOptionsForColumn(cf_options, *it);
+                   } else if (compression_enabled_) {
+                     cf_options.compression = rocksdb::CompressionType::kLZ4Compression;
                    }
-                   if (it != Columns::all.end() && it->comparator_) options.comparator = it->comparator_;
-                   return rocksdb::ColumnFamilyDescriptor(name, options);
+                   return rocksdb::ColumnFamilyDescriptor(name, cf_options);
                  });
   rocksdb::DB* db_ptr = nullptr;
   checkStatus(rocksdb::DB::Open(options, db_path_.string(), descriptors, &handles, &db_ptr));
@@ -273,12 +415,13 @@ void DbStorage::rebuildColumns(const rocksdb::Options& options) {
       if (handles[i]->GetName() == "dag_blocks_index") {
         rocksdb::ColumnFamilyHandle* handle_dag_blocks_level;
 
-        auto options = rocksdb::ColumnFamilyOptions();
-        if (compression_enabled_) {
-          options.compression = rocksdb::CompressionType::kLZ4Compression;
-        }
-        options.comparator = getIntComparator<uint64_t>();
-        checkStatus(db->CreateColumnFamily(options, Columns::dag_blocks_level.name(), &handle_dag_blocks_level));
+        // EBLA DB_ROADMAP_v01 §4.3 — call the canonical helper. dag_blocks_level
+        // is non-tiered (consensus-hot DAG data stays on SSD), so this CF's
+        // cf_paths will be empty even when tiering is enabled. Defensive: pass
+        // the real Column from Columns::all to get the comparator wiring right.
+        auto cf_options = rocksdb::ColumnFamilyOptions();
+        applyCfOptionsForColumn(cf_options, Columns::dag_blocks_level);
+        checkStatus(db->CreateColumnFamily(cf_options, Columns::dag_blocks_level.name(), &handle_dag_blocks_level));
 
         auto it_dag_level = std::unique_ptr<rocksdb::Iterator>(db->NewIterator(read_options_, handles[i]));
         it_dag_level->SeekToFirst();
@@ -332,6 +475,17 @@ bool DbStorage::createSnapshot(PbftPeriod period) {
     return false;
   }
 
+  // EBLA DB_ROADMAP_v01 §4.2.1 — refuse snapshots under tiering.
+  // rocksdb::Checkpoint::CreateCheckpoint() must COPY (not hard-link) cross-
+  // filesystem cold-tier SSTs, which bloats snapshot size to roughly full DB
+  // size and defeats tiering. Operators wanting snapshots should disable
+  // tiering first, snapshot, then re-enable.
+  if (tiering_enabled_) {
+    LOG(log_wr_) << "createSnapshot skipped: tiering is enabled (see EBLA DB_ROADMAP_v01 §4.2.1). "
+                    "Disable tiering to snapshot.";
+    return false;
+  }
+
   LOG(log_nf_) << "Creating DB snapshot on period: " << period;
 
   // Create rocksdb checkpoint/snapshot
@@ -359,6 +513,18 @@ bool DbStorage::createSnapshot(PbftPeriod period) {
 }
 
 void DbStorage::recoverToPeriod(PbftPeriod period) {
+  // EBLA DB_ROADMAP_v01 §4.2.2 — hard refuse recoverToPeriod under tiering.
+  // The fs::rename(period_path, db_path_) below moves the hot-tier snapshot
+  // but not the cold-tier archive. The renamed MANIFEST inside the new
+  // db_path_ would point at a stale cold-tier path, producing a Status::
+  // Corruption "missing SST" failure (Step 4 §4.2.2) or — worse — silent
+  // overlap with a future fresh DB sharing the same archive (§4.2.4).
+  if (tiering_enabled_) {
+    throw DbException(
+        "recoverToPeriod is not supported when db_tiering_enabled=true. "
+        "Disable tiering, recover, then re-enable. See EBLA DB_ROADMAP_v01 §4.2.2.");
+  }
+
   LOG(log_nf_) << "Revet to snapshot from period: " << period;
 
   // Construct the snapshot folder names

@@ -1144,7 +1144,7 @@ void PbftManager::firstFinish_() {
       starting_value = {kNullBlockHash, nullptr};
     }
     // === END EBLA ADDITION ===
-  
+
     genAndPlaceVote(PbftVoteTypes::next_vote, period, round, step_, starting_value.first, starting_value.second);
   }
 }

@@ -22,6 +22,11 @@
 namespace ebla {
 namespace fs = std::filesystem;
 struct SortitionParamsChange;
+// EBLA DB_ROADMAP_v01 §2.4 - fwd decl; full definition in config/config.hpp.
+// Used by the DBConfig-accepting DbStorage constructor below. Forward-declared
+// (rather than #included) to keep storage.hpp from gaining a new dep on the
+// libraries/config/ public surface.
+struct DBConfig;
 
 enum StatusDbField : uint8_t {
   ExecutedBlkCount = 0,
@@ -72,11 +77,14 @@ class DbStorage : public std::enable_shared_from_this<DbStorage> {
    public:
     size_t const ordinal_;
     const rocksdb::Comparator* comparator_;
+    // EBLA DB_ROADMAP_v01 §2.3 - true if this CF should be placed on the cold
+    // (HDD) tier via cf_paths when db_tiering_enabled. Marked at static init
+    // time via the COLUMN_TIERED / COLUMN_TIERED_W_COMP macros below; never
+    // mutated. Consumed by DbStorage::applyCfOptionsForColumn() in storage.cpp.
+    bool const tiered_;
 
-    Column(std::string name, size_t ordinal, const rocksdb::Comparator* comparator)
-        : name_(std::move(name)), ordinal_(ordinal), comparator_(comparator) {}
-
-    Column(std::string name, size_t ordinal) : name_(std::move(name)), ordinal_(ordinal), comparator_(nullptr) {}
+    Column(std::string name, size_t ordinal, const rocksdb::Comparator* comparator, bool tiered)
+        : name_(std::move(name)), ordinal_(ordinal), comparator_(comparator), tiered_(tiered) {}
 
     auto const& name() const { return ordinal_ ? name_ : rocksdb::kDefaultColumnFamilyName; }
   };
@@ -87,21 +95,34 @@ class DbStorage : public std::enable_shared_from_this<DbStorage> {
    public:
     static inline auto const& all = all_;
 
-#define COLUMN(__name__) static inline auto const __name__ = all_.emplace_back(#__name__, all_.size())
+// EBLA DB_ROADMAP_v01 §2.3 - Four macros now (TIERED variants added).
+// COLUMN / COLUMN_W_COMP register a CF that always lives on the hot (SSD) tier.
+// COLUMN_TIERED / COLUMN_TIERED_W_COMP register a CF whose bottommost SSTs
+// migrate to the cold (HDD) tier when db_tiering_enabled=true. The 4th arg to
+// the Column constructor is the tiered flag - supplied by the macros below.
+#define COLUMN(__name__) static inline auto const __name__ = all_.emplace_back(#__name__, all_.size(), nullptr, false)
+#define COLUMN_TIERED(__name__) \
+  static inline auto const __name__ = all_.emplace_back(#__name__, all_.size(), nullptr, true)
 #define COLUMN_W_COMP(__name__, ...) \
-  static inline auto const __name__ = all_.emplace_back(#__name__, all_.size(), __VA_ARGS__)
+  static inline auto const __name__ = all_.emplace_back(#__name__, all_.size(), __VA_ARGS__, false)
+#define COLUMN_TIERED_W_COMP(__name__, ...) \
+  static inline auto const __name__ = all_.emplace_back(#__name__, all_.size(), __VA_ARGS__, true)
 
     // do not change/move
     COLUMN(default_column);
     // migrations
     COLUMN(migrations);
+    // EBLA DB_ROADMAP_v01 §2.3 - TIERED: write-monotonic period data, rarely re-read once finalized.
     // Contains full data for an executed PBFT block including PBFT block, cert votes, dag blocks and transactions
-    COLUMN_W_COMP(period_data, getIntComparator<PbftPeriod>());
+    COLUMN_TIERED_W_COMP(period_data, getIntComparator<PbftPeriod>());
     COLUMN(genesis);
     COLUMN(dag_blocks);
     COLUMN_W_COMP(dag_blocks_level, getIntComparator<uint64_t>());
-    COLUMN(transactions);
-    COLUMN(trx_period);
+    // EBLA DB_ROADMAP_v01 §2.3 - TIERED: transaction bodies, RPC-read-only after finalization.
+    COLUMN_TIERED(transactions);
+    // EBLA DB_ROADMAP_v01 §2.3 - TIERED: trx_hash → period index. Mempool dedup hits this via
+    // KeyMayExist (bloom-cached, no disk seek) so cold tier is safe. See Step 3 §3.1.
+    COLUMN_TIERED(trx_period);
     COLUMN(status);
     COLUMN(pbft_mgr_round_step);
     COLUMN(pbft_mgr_status);
@@ -113,14 +134,21 @@ class DbStorage : public std::enable_shared_from_this<DbStorage> {
     COLUMN(extra_reward_votes);                // extra reward votes on top of 5/8 cert votes bundle from
                                                // latest_round_five_of_eight_votes
     COLUMN(pbft_block_period);
-    COLUMN(dag_block_period);
+    // EBLA DB_ROADMAP_v01 §2.3 - TIERED: dag_block → period index, RPC-read path only.
+    COLUMN_TIERED(dag_block_period);
     COLUMN_W_COMP(proposal_period_levels_map, getIntComparator<uint64_t>());
     COLUMN(final_chain_meta);
-    COLUMN(final_chain_blk_by_number);
-    COLUMN(final_chain_blk_hash_by_number);
-    COLUMN(final_chain_blk_number_by_hash);
-    COLUMN(final_chain_receipt_by_trx_hash);
-    COLUMN(final_chain_log_blooms_index);
+    // EBLA DB_ROADMAP_v01 §2.3 - TIERED: eth_getBlockByNumber payload.
+    COLUMN_TIERED(final_chain_blk_by_number);
+    // EBLA DB_ROADMAP_v01 §2.3 - TIERED: eth_getBlockByHash → number lookup.
+    COLUMN_TIERED(final_chain_blk_hash_by_number);
+    // EBLA DB_ROADMAP_v01 §2.3 - TIERED: number → hash reverse lookup.
+    COLUMN_TIERED(final_chain_blk_number_by_hash);
+    // EBLA DB_ROADMAP_v01 §2.3 - TIERED: eth_getTransactionReceipt path.
+    COLUMN_TIERED(final_chain_receipt_by_trx_hash);
+    // EBLA DB_ROADMAP_v01 §2.3 - TIERED: eth_getLogs bloom index. WARNING: wide-range
+    // eth_getLogs queries on tiered nodes hit the cold tier heavily - see Step 3 §3.2.
+    COLUMN_TIERED(final_chain_log_blooms_index);
     COLUMN_W_COMP(sortition_params_change, getIntComparator<PbftPeriod>());
 
     COLUMN_W_COMP(block_rewards_stats, getIntComparator<uint64_t>());
@@ -129,11 +157,15 @@ class DbStorage : public std::enable_shared_from_this<DbStorage> {
     COLUMN(system_transaction);
     // system transactions hashes by period
     COLUMN(period_system_transactions);
+    // EBLA DB_ROADMAP_v01 §2.3 - TIERED: receipts indexed by period (companion to
+    // final_chain_receipt_by_trx_hash; both must be tiered together).
     // final chain receipts by period
-    COLUMN_W_COMP(final_chain_receipt_by_period, getIntComparator<PbftPeriod>());
+    COLUMN_TIERED_W_COMP(final_chain_receipt_by_period, getIntComparator<PbftPeriod>());
 
 #undef COLUMN
+#undef COLUMN_TIERED
 #undef COLUMN_W_COMP
+#undef COLUMN_TIERED_W_COMP
   };
 
   auto handle(Column const& col) const { return handles_[col.ordinal_]; }
@@ -167,12 +199,55 @@ class DbStorage : public std::enable_shared_from_this<DbStorage> {
   bool major_version_changed_ = false;
   bool minor_version_changed_ = false;
 
+  // EBLA DB_ROADMAP_v01 §2.4 - Tiered storage & RAM-tunable state.
+  // Defaults are "off / use RocksDB defaults" so the 8-arg back-compat
+  // constructor produces behavior identical to a pre-roadmap binary. The
+  // DBConfig-accepting constructor populates these via the member-init list
+  // BEFORE openDb() runs, so the values are live when CFs are first opened.
+  bool tiering_enabled_ = false;
+  fs::path db_archive_path_;
+  uint64_t db_hot_size_limit_bytes_ = 0;
+  uint8_t cold_compression_level_ = 9;
+  uint64_t block_cache_size_bytes_ = 0;
+  uint64_t write_buffer_size_bytes_ = 0;
+  // [hot path (db_path_), cold path (db_archive_path_)] when tiering enabled.
+  // Lifetime attached to *this; each tiered ColumnFamilyOptions takes a copy.
+  std::vector<rocksdb::DbPath> tiered_paths_;
+  // Shared block cache across all CFs. Constructed once at openDb() iff
+  // block_cache_size_bytes_ > 0; held here so the shared_ptr stays alive for
+  // the DB's lifetime. (Forward decl of rocksdb::Cache is sufficient for the
+  // member; storage.cpp will include <rocksdb/cache.h> for construction.)
+  std::shared_ptr<rocksdb::Cache> block_cache_;
+
+  // EBLA DB_ROADMAP_v01 §2.4 - Shared DB-open logic. Called from BOTH
+  // constructors after the member-init list has populated path_, db_path_,
+  // state_db_path_, compression_enabled_, and (in the new constructor) all
+  // tiering/RAM fields.
+  void openDb(uint32_t max_open_files, PbftPeriod db_revert_to_period, addr_t node_addr, bool rebuild);
+
+  // EBLA DB_ROADMAP_v01 §4.3 - Single source of truth for ColumnFamilyOptions
+  // construction. Called from FOUR call sites in storage.cpp:
+  //   1. Main descriptor builder in openDb()
+  //   2. rebuildColumns() per-CF descriptor builder
+  //   3. deleteColumnData() CF re-creation
+  //   4. copyColumn() CF re-creation
+  // Missing one of these sites causes silent loss of tiering on rebuild/recreate.
+  void applyCfOptionsForColumn(rocksdb::ColumnFamilyOptions& opts, const Column& col) const;
+
   LOG_OBJECTS_DEFINE
 
  public:
   explicit DbStorage(fs::path const& base_path, uint32_t db_snapshot_each_n_pbft_block = 0, uint32_t max_open_files = 0,
                      uint32_t db_max_snapshots = 0, PbftPeriod db_revert_to_period = 0, addr_t node_addr = addr_t(),
                      bool rebuild = false, bool enable_compression = true);
+
+  // EBLA DB_ROADMAP_v01 §2.4 — DBConfig-accepting constructor (preferred for
+  // new callers). Unpacks all DBConfig fields including the tiering/RAM ones
+  // and delegates the actual DB open to the same openDb() helper as the 8-arg
+  // back-compat constructor above. Existing callers (tests, current app.cpp
+  // before file 6 lands) keep working with the back-compat constructor.
+  DbStorage(fs::path const& base_path, const DBConfig& cfg, addr_t node_addr = addr_t(), bool rebuild = false);
+
   ~DbStorage();
 
   DbStorage(const DbStorage&) = delete;

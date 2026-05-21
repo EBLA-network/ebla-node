@@ -92,7 +92,7 @@ void DagSyncPacketHandler::process(const threadpool::PacketData& packet_data, co
           throw MaliciousPeerException(err_msg.str(), peer->getId());
         }
         // Layer 3 v1.1: same distinction as in DagBlockPacketHandler.
-        const char* under_threshold_reason = 
+        const char* under_threshold_reason =
             kConf.network.disable_peer_blacklist
                 ? " in DagSyncPacket (strike counter disabled by operator; misbehavior NOT tracked)"
                 : " in DagSyncPacket (strike recorded; under disconnect threshold)";

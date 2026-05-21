@@ -2,7 +2,13 @@
 
 #include <libdevcore/CommonJS.h>
 
+#include <algorithm>
+#include <array>
+#include <cctype>
+#include <filesystem>
 #include <iostream>
+#include <limits>
+#include <string>
 
 #include "cli/config_updater.hpp"
 #include "cli/tools.hpp"
@@ -10,6 +16,112 @@
 #include "config/version.hpp"
 
 namespace ebla::cli {
+
+// EBLA DB_ROADMAP_v01 §Docker-step — Helpers for parsing the new DB tunable
+// CLI flags. All have internal linkage to this translation unit.
+//
+// TODO(post-roadmap): hoist these into libraries/common/config_utils + a shared
+// validation helper so file 3 (config/src/config.cpp) and this file can share
+// one implementation. Deliberately duplicated for now to keep this PR minimal.
+
+// Parse a byte-size string. Accepts:
+//   - Raw integer: "2147483648"
+//   - Integer + suffix (case-insensitive): "2GB", "512MiB", "1KB", "10TiB"
+//   Binary suffixes (KiB, MiB, GiB, TiB) multiply by 1024^n.
+//   Decimal suffixes (KB, MB, GB, TB) multiply by 1000^n.
+//   Bare suffix B == 1.
+// Throws bpo::invalid_option_value on negative, malformed, or overflowing input.
+static uint64_t parseByteSize(const std::string& flag_name, const std::string& s) {
+  if (s.empty()) {
+    throw bpo::invalid_option_value(flag_name + ": empty value");
+  }
+  // Locate the numeric prefix.
+  size_t pos = 0;
+  while (pos < s.size() && (std::isdigit(static_cast<unsigned char>(s[pos])) || s[pos] == '+')) {
+    ++pos;
+  }
+  if (pos == 0) {
+    throw bpo::invalid_option_value(flag_name + ": '" + s + "' (must start with a non-negative integer)");
+  }
+  const std::string num_part = s.substr(0, pos);
+  std::string suffix = s.substr(pos);
+  // Lowercase the suffix in place.
+  std::transform(suffix.begin(), suffix.end(), suffix.begin(),
+                 [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+
+  uint64_t base;
+  try {
+    base = std::stoull(num_part);
+  } catch (const std::exception&) {
+    throw bpo::invalid_option_value(flag_name + ": '" + s + "' (numeric overflow or malformed)");
+  }
+
+  uint64_t multiplier = 1;
+  if (suffix.empty() || suffix == "b") {
+    multiplier = 1;
+  } else if (suffix == "kb") {
+    multiplier = 1000ULL;
+  } else if (suffix == "kib") {
+    multiplier = 1024ULL;
+  } else if (suffix == "mb") {
+    multiplier = 1000ULL * 1000;
+  } else if (suffix == "mib") {
+    multiplier = 1024ULL * 1024;
+  } else if (suffix == "gb") {
+    multiplier = 1000ULL * 1000 * 1000;
+  } else if (suffix == "gib") {
+    multiplier = 1024ULL * 1024 * 1024;
+  } else if (suffix == "tb") {
+    multiplier = 1000ULL * 1000 * 1000 * 1000;
+  } else if (suffix == "tib") {
+    multiplier = 1024ULL * 1024 * 1024 * 1024;
+  } else {
+    throw bpo::invalid_option_value(flag_name + ": '" + s + "' (unknown suffix '" + suffix +
+                                    "'; expected B/KB/KiB/MB/MiB/GB/GiB/TB/TiB)");
+  }
+
+  // Overflow-safe multiply.
+  if (multiplier != 0 && base > (std::numeric_limits<uint64_t>::max() / multiplier)) {
+    throw bpo::invalid_option_value(flag_name + ": '" + s + "' (overflows uint64_t)");
+  }
+  return base * multiplier;
+}
+
+// Parse a boolean string. Strictly accepts "true"/"false" (case-insensitive)
+// to reduce support tickets like "I set EBLA_DB_TIERING_ENABLED=1 but tiering
+// didn't activate" (see DB_ROADMAP_v01 Mandatory Security Check §4 of the
+// Docker-step).
+static bool parseBool(const std::string& flag_name, const std::string& s) {
+  std::string lower(s);
+  std::transform(lower.begin(), lower.end(), lower.begin(),
+                 [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+  if (lower == "true") return true;
+  if (lower == "false") return false;
+  throw bpo::invalid_option_value(flag_name + ": '" + s + "' (must be 'true' or 'false')");
+}
+
+// Same allow-list path-prefix check as libraries/config/src/config.cpp.
+// See TODO note above re: hoisting.
+static void validateArchivePath(const std::filesystem::path& p) {
+  const auto str = p.string();
+  if (str.empty()) {
+    throw bpo::invalid_option_value(std::string(DB_ARCHIVE_PATH) + ": empty");
+  }
+  if (str.size() > 1024) {
+    throw bpo::invalid_option_value(std::string(DB_ARCHIVE_PATH) + ": too long (max 1024 chars)");
+  }
+  if (!p.is_absolute()) {
+    throw bpo::invalid_option_value(std::string(DB_ARCHIVE_PATH) + ": must be absolute (got: " + str + ")");
+  }
+  static constexpr std::array<const char*, 4> kAllowedPrefixes = {"/mnt/", "/srv/", "/opt/", "/var/lib/"};
+  for (const auto* prefix : kAllowedPrefixes) {
+    if (str.rfind(prefix, 0) == 0) {
+      return;
+    }
+  }
+  throw bpo::invalid_option_value(std::string(DB_ARCHIVE_PATH) +
+                                  ": must be under /mnt, /srv, /opt, or /var/lib (got: " + str + ")");
+}
 
 Config::Config() : plugins_options_("PLUGINS") {}
 
@@ -231,6 +343,55 @@ void Config::parseCommandLine(int argc, const char* argv[], const std::string& a
     node_config_.db_config.migrate_only = cli_options_[MIGRATE_ONLY].as<bool>();
     node_config_.db_config.migrate_receipts_by_period = cli_options_[MIGRATE_RECEIPTS_BY_PERIOD].as<bool>();
 
+    // EBLA DB_ROADMAP_v01 §Docker-step — Apply DB tunable overrides AFTER JSON load.
+    // Each flag uses cli_options_.count(NAME) to detect "was this flag provided
+    // on the command line at all?" (boost::program_options sets count > 0 only
+    // for explicitly provided values, since these flags have no default_value).
+    // Re-runs the same validation invariants dec_json(DBConfig&) enforces, so a
+    // CLI override cannot put db_config into a state JSON parsing would reject.
+    if (cli_options_.count(DB_BLOCK_CACHE_SIZE)) {
+      const auto v = parseByteSize(DB_BLOCK_CACHE_SIZE, cli_options_[DB_BLOCK_CACHE_SIZE].as<std::string>());
+      if (v < (16ULL << 20) || v > (1ULL << 40)) {
+        throw bpo::invalid_option_value(std::string(DB_BLOCK_CACHE_SIZE) + ": out of range (16 MiB .. 1 TiB)");
+      }
+      node_config_.db_config.db_block_cache_size_bytes = v;
+    }
+    if (cli_options_.count(DB_WRITE_BUFFER_SIZE)) {
+      const auto v = parseByteSize(DB_WRITE_BUFFER_SIZE, cli_options_[DB_WRITE_BUFFER_SIZE].as<std::string>());
+      if (v < (256ULL << 20) || v > (32ULL << 30)) {
+        throw bpo::invalid_option_value(std::string(DB_WRITE_BUFFER_SIZE) + ": out of range (256 MiB .. 32 GiB)");
+      }
+      node_config_.db_config.db_write_buffer_size_bytes = v;
+    }
+    if (cli_options_.count(DB_MAX_OPEN_FILES)) {
+      node_config_.db_config.db_max_open_files = cli_options_[DB_MAX_OPEN_FILES].as<uint32_t>();
+    }
+    if (cli_options_.count(DB_TIERING_ENABLED)) {
+      node_config_.db_config.db_tiering_enabled =
+          parseBool(DB_TIERING_ENABLED, cli_options_[DB_TIERING_ENABLED].as<std::string>());
+    }
+    if (cli_options_.count(DB_ARCHIVE_PATH)) {
+      node_config_.db_config.db_archive_path = std::filesystem::path(cli_options_[DB_ARCHIVE_PATH].as<std::string>());
+    }
+    if (cli_options_.count(DB_HOT_SIZE_LIMIT)) {
+      node_config_.db_config.db_hot_size_limit_bytes =
+          parseByteSize(DB_HOT_SIZE_LIMIT, cli_options_[DB_HOT_SIZE_LIMIT].as<std::string>());
+    }
+    if (cli_options_.count(DB_COLD_COMPRESSION_LEVEL)) {
+      const auto lvl = cli_options_[DB_COLD_COMPRESSION_LEVEL].as<uint32_t>();
+      if (lvl < 1 || lvl > 22) {
+        throw bpo::invalid_option_value(std::string(DB_COLD_COMPRESSION_LEVEL) + ": out of range (1..22)");
+      }
+      node_config_.db_config.db_cold_compression_level = static_cast<uint8_t>(lvl);
+    }
+    // Cross-field re-validation after all overrides applied (mirrors dec_json).
+    if (node_config_.db_config.db_tiering_enabled) {
+      validateArchivePath(node_config_.db_config.db_archive_path);
+      if (node_config_.db_config.db_hot_size_limit_bytes < (10ULL << 30)) {
+        throw bpo::invalid_option_value(std::string(DB_HOT_SIZE_LIMIT) + ": must be >= 10 GiB when tiering is enabled");
+      }
+    }
+
     if (command[0] == NODE_COMMAND) node_configured_ = true;
   } else if (command[0] == ACCOUNT_COMMAND) {
     if (command.size() == 1)
@@ -351,6 +512,33 @@ bpo::options_description Config::makeNodeOptions(const std::string& available_pl
                                      "Only migrate DB, it will NOT run a node");
   node_command_options.add_options()(MIGRATE_RECEIPTS_BY_PERIOD, bpo::bool_switch()->default_value(false),
                                      "Apply migration to store receipts by period, not by hash");
+
+  // EBLA DB_ROADMAP_v01 §Docker-step — DB tunable overrides.
+  // Each flag is optional (no default_value()); if absent at startup, the
+  // value parsed from the JSON config file is preserved unchanged. The
+  // override block below in parseCommandLine() applies these AFTER JSON load.
+  node_command_options.add_options()(
+      DB_BLOCK_CACHE_SIZE, bpo::value<std::string>(),
+      "RocksDB block cache size. Accepts raw bytes or human suffix (e.g., '2GB', '512MiB'). "
+      "Overrides db_block_cache_size_bytes in JSON.");
+  node_command_options.add_options()(DB_WRITE_BUFFER_SIZE, bpo::value<std::string>(),
+                                     "RocksDB MemTable budget. Accepts raw bytes or human suffix (e.g., '2GB'). "
+                                     "Overrides db_write_buffer_size_bytes in JSON.");
+  node_command_options.add_options()(DB_MAX_OPEN_FILES, bpo::value<uint32_t>(),
+                                     "RocksDB max open SST file descriptors. Overrides db_max_open_files in JSON.");
+  node_command_options.add_options()(
+      DB_TIERING_ENABLED, bpo::value<std::string>(),
+      "Enable hot/cold tiered storage: 'true' or 'false'. Overrides db_tiering_enabled in JSON.");
+  node_command_options.add_options()(
+      DB_ARCHIVE_PATH, bpo::value<std::string>(),
+      "Absolute path to cold-tier (HDD) directory. Must be under /mnt, /srv, /opt, or /var/lib. "
+      "Overrides db_archive_path in JSON.");
+  node_command_options.add_options()(DB_HOT_SIZE_LIMIT, bpo::value<std::string>(),
+                                     "Hot-tier size budget. Accepts raw bytes or human suffix (e.g., '800GB'). "
+                                     "Overrides db_hot_size_limit_bytes in JSON.");
+  node_command_options.add_options()(
+      DB_COLD_COMPRESSION_LEVEL, bpo::value<uint32_t>(),
+      "ZSTD compression level for cold-tier SSTs, range 1..22. Overrides db_cold_compression_level in JSON.");
   return node_command_options;
 }
 

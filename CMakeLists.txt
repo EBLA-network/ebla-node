@@ -10,7 +10,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # Set current version of the project
 set(EBLA_MAJOR_VERSION 2)
-set(EBLA_MINOR_VERSION 0)
+set(EBLA_MINOR_VERSION 1)
 set(EBLA_PATCH_VERSION 0)
 set(EBLA_VERSION ${EBLA_MAJOR_VERSION}.${EBLA_MINOR_VERSION}.${EBLA_PATCH_VERSION})
 message(CMAKE_BINARY_DIR ${CMAKE_BINARY_DIR})
@@ -27,7 +27,7 @@ set(EBLA_NET_VERSION 6)
 set(EBLA_DB_MAJOR_VERSION 1)
 # Minor version should be modified when changes to the database are made in the tables that can be rebuilt from the
 # basic tables
-set(EBLA_DB_MINOR_VERSION 2)
+set(EBLA_DB_MINOR_VERSION 3)
 
 
 # Defines Ebla library target.

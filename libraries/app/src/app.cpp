@@ -83,32 +83,44 @@ void App::init(const cli::Config &cli_conf) {
     assert(false);
   }
   {
+    // EBLA DB_ROADMAP_v01 §2.4 / file 7 - Switch to the DBConfig-accepting
+    // DbStorage constructor. All DB tuning fields (tiering, RAM, compression,
+    // snapshot policy, revert-to-period, max-open-files) flow through cfg
+    // instead of positional args, eliminating the positional-transposition
+    // footgun and enabling the new tiering wiring.
+    //
+    // Two adjustments preserved from the original code:
+    //   (a) When rebuild_db is true, the MAIN db_ instance has its snapshot
+    //       frequency forced to 0 (snapshots disabled during rebuild). The
+    //       OLD_db_ rebuild-source instance keeps its normal snapshot setting
+    //       because it is only ever read from, never extended.
+    //   (b) On major-version change, conf_.db_config.rebuild_db is mutated
+    //       so App::start() will run rebuildDb(). This mutation is required
+    //       and intentional.
+    //
+    // NOTE: openDb() throws DbException when rebuild=true AND db_tiering_enabled
+    // is true (see EBLA DB_ROADMAP_v01 §4.2). Operators must disable tiering
+    // for the duration of any rebuild operation. The daemon exits at startup
+    // with a clear error message if this combination is requested.
     if (conf_.db_config.rebuild_db) {
-      old_db_ = std::make_shared<DbStorage>(conf_.db_path, conf_.db_config.db_snapshot_each_n_pbft_block,
-                                            conf_.db_config.db_max_open_files, conf_.db_config.db_max_snapshots,
-                                            conf_.db_config.db_revert_to_period, node_addr, true,
-                                            conf_.db_config.db_compression);
+      old_db_ = std::make_shared<DbStorage>(conf_.db_path, conf_.db_config, node_addr, /*rebuild=*/true);
     }
-    db_ = std::make_shared<DbStorage>(conf_.db_path,
-                                      // Snapshots should be disabled while rebuilding
-                                      conf_.db_config.rebuild_db ? 0 : conf_.db_config.db_snapshot_each_n_pbft_block,
-                                      conf_.db_config.db_max_open_files, conf_.db_config.db_max_snapshots,
-                                      conf_.db_config.db_revert_to_period, node_addr, false,
-                                      conf_.db_config.db_compression);
+    // Local DBConfig copy with snapshots disabled if we're rebuilding.
+    auto main_db_cfg = conf_.db_config;
+    if (conf_.db_config.rebuild_db) {
+      main_db_cfg.db_snapshot_each_n_pbft_block = 0;
+    }
+    db_ = std::make_shared<DbStorage>(conf_.db_path, main_db_cfg, node_addr, /*rebuild=*/false);
 
     if (db_->hasMajorVersionChanged()) {
       LOG(log_si_) << "Major DB version has changed. Rebuilding Db";
       conf_.db_config.rebuild_db = true;
       db_ = nullptr;
-      old_db_ = std::make_shared<DbStorage>(conf_.db_path, conf_.db_config.db_snapshot_each_n_pbft_block,
-                                            conf_.db_config.db_max_open_files, conf_.db_config.db_max_snapshots,
-                                            conf_.db_config.db_revert_to_period, node_addr, true,
-                                            conf_.db_config.db_compression);
-      db_ = std::make_shared<DbStorage>(conf_.db_path,
-                                        0,  // Snapshots should be disabled while rebuilding
-                                        conf_.db_config.db_max_open_files, conf_.db_config.db_max_snapshots,
-                                        conf_.db_config.db_revert_to_period, node_addr, false,
-                                        conf_.db_config.db_compression);
+      old_db_ = std::make_shared<DbStorage>(conf_.db_path, conf_.db_config, node_addr, /*rebuild=*/true);
+      // Snapshot suppression on the post-major-version-rebuild main db_.
+      auto post_rebuild_cfg = conf_.db_config;
+      post_rebuild_cfg.db_snapshot_each_n_pbft_block = 0;
+      db_ = std::make_shared<DbStorage>(conf_.db_path, post_rebuild_cfg, node_addr, /*rebuild=*/false);
     }
 
     db_->updateDbVersions();

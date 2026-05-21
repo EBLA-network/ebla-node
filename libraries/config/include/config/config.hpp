@@ -17,6 +17,29 @@ struct DBConfig {
   PbftPeriod rebuild_db_period = 0;
   bool migrate_receipts_by_period = false;
   bool db_compression = true;  // Enable LZ4 compression on RocksDB column families
+  // EBLA DB_ROADMAP_v01 §2.2 / §5 — RAM-discipline tunables
+  // RocksDB block cache (shared across all CFs when Phase 5 wiring lands).
+  // Default sized for the 8 GiB validator profile; 16 GiB validators raise to 2 GiB,
+  // 32 GiB premium/RPC nodes raise to 8 GiB. See operator-docs Phase 9.
+  uint64_t db_block_cache_size_bytes = 512ULL << 20;  // 512 MiB
+  // RocksDB MemTable budget (DB-wide cap, NOT per-CF). Below 256 MiB risks
+  // mid-PBFT-round flushes; above 8 GiB on a 16 GiB box risks OOM.
+  uint64_t db_write_buffer_size_bytes = 2ULL << 30;  // 2 GiB
+
+  // EBLA DB_ROADMAP_v01 §2.2 / §6–§7 — Tiered storage (cf_paths)
+  // Off by default per Phase 11.2. Enabling without setting db_archive_path
+  // is rejected at config-parse time.
+  bool db_tiering_enabled = false;
+  // Absolute path to the HDD/cold-tier mount. Validated against an allow-list
+  // of mount prefixes (/mnt, /srv, /opt, /var/lib) in dec_json.
+  fs::path db_archive_path;
+  // Hot-tier (SSD) size budget in bytes. RocksDB places SSTs on the hot path
+  // until this limit is reached, then spills to the cold path. Must be >= 10 GiB
+  // when tiering is enabled.
+  uint64_t db_hot_size_limit_bytes = 800ULL * (1ULL << 30);  // ~859 GB
+  // ZSTD compression level for cold-tier (bottommost) SSTs. Range 1..22.
+  // Stored as uint8_t to forbid ZSTD "fast" negative levels (intentional).
+  uint8_t db_cold_compression_level = 9;
 };
 void dec_json(Json::Value const &json, DBConfig &db_config);
 
