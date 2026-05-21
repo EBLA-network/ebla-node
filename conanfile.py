@@ -20,7 +20,7 @@ class EblaConan(ConanFile):
         self.requires("openssl/3.4.1")
         self.requires("cryptopp/8.9.0")
         self.requires("gtest/1.16.0")
-        self.requires("rocksdb/9.10.0")
+        self.requires("rocksdb/10.10.1#0951c7e2f30bc648c25d0669aae510d4")
         self.requires("prometheus-cpp/1.3.0")
         self.requires("jsoncpp/1.9.6")
         self.requires("mpfr/4.2.2")
@@ -68,6 +68,11 @@ class EblaConan(ConanFile):
         self.options["cppcheck"].have_rules = False
         self.options["rocksdb"].use_rtti = True
         self.options["rocksdb"].with_lz4 = True
+        # EBLA Phase 1 (DB Roadmap v01): cold-tier compression requires ZSTD.
+        # Snappy is defensive — RocksDB Checkpoint and BackupEngine internally
+        # fall back to it in utility paths.
+        self.options["rocksdb"].with_zstd = True
+        self.options["rocksdb"].with_snappy = True
         # mpir is required by cppcheck and it causing gmp confict
         self.options["mpir"].enable_gmpcompat = False
         # Configure OpenSSL
