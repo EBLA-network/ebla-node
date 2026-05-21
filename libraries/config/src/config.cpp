@@ -109,7 +109,7 @@ void dec_json(Json::Value const &json, DBConfig &db_config) {
   // the post-cast range check despite being wrong).
   if (json.isMember("db_cold_compression_level") && !json["db_cold_compression_level"].isNull()) {
     const uint32_t lvl =
-        getConfigDataAsUInt(json, {"db_cold_compression_level"}, true,db_config.db_cold_compression_level);
+        getConfigDataAsUInt(json, {"db_cold_compression_level"}, true, db_config.db_cold_compression_level);
     if (lvl < 1 || lvl > 22) {
       throw ConfigException("db_cold_compression_level must be in range 1..22 (got: " + std::to_string(lvl) + ")");
     }

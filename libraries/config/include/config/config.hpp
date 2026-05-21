@@ -24,7 +24,7 @@ struct DBConfig {
   uint64_t db_block_cache_size_bytes = 512ULL << 20;  // 512 MiB
   // RocksDB MemTable budget (DB-wide cap, NOT per-CF). Below 256 MiB risks
   // mid-PBFT-round flushes; above 8 GiB on a 16 GiB box risks OOM.
-  uint64_t db_write_buffer_size_bytes = 2ULL << 30;   // 2 GiB
+  uint64_t db_write_buffer_size_bytes = 2ULL << 30;  // 2 GiB
 
   // EBLA DB_ROADMAP_v01 §2.2 / §6–§7 — Tiered storage (cf_paths)
   // Off by default per Phase 11.2. Enabling without setting db_archive_path
