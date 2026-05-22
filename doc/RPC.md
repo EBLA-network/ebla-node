@@ -1022,6 +1022,7 @@ Returns all transactions from block at specified period
 * `logs`: `Array` - Array of log objects, which this transaction generated.
 * `logsBloom`: `DATA`, 256 Bytes - Bloom filter for light clients to quickly retrieve related logs.
 * `status`: `QUANTITY` either 1 (success) or 0 (failure)
+* `type`: `QUANTITY` - EIP-2718 transaction type. EBLA currently only supports legacy transactions, so this is always `"0x0"`.
 
 
 #### Example
@@ -1055,6 +1056,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"debug_getPeriodTransactionsWithR
       "to": "0x8dcc94cc57c72eaa6609ee77cb50c84141fa39bd",
       "transactionHash": "0xca4f7b0c2bb4d0fd0ba525aee8c5148dbb10a4f937f5f39270c95e7735b48552",
       "transactionIndex": "0x0",
+      "type": "0x0",
       "v": "0x0",
       "value": "0x1"
     }, ...

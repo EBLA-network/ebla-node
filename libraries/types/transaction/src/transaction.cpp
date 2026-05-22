@@ -171,6 +171,11 @@ Json::Value Transaction::toJSON() const {
   res["r"] = dev::toJS(vrs.r);
   res["s"] = dev::toJS(vrs.s);
   res["v"] = dev::toJS(vrs.v);
+  // EIP-2718 type tag. EBLA only supports legacy (pre-typed) transactions,
+  // so this is hardcoded to "0x0". When typed-tx envelopes (EIP-2930 / EIP-1559)
+  // are added in a future PR, replace with: dev::toJS(uint64_t(getType())).
+  // TODO(EIP-2718-typed-tx): make dynamic when typed envelopes are accepted.
+  res["type"] = "0x0";
   return res;
 }
 

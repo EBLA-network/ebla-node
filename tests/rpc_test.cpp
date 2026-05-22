@@ -276,6 +276,8 @@ TEST_F(RPCTest, transaction_json) {
   EXPECT_EQ(json["r"], dev::toJS(trx->getVRS().r));
   EXPECT_EQ(json["s"], dev::toJS(trx->getVRS().s));
   EXPECT_EQ(json["chainId"], dev::toJS(trx->getChainID()));
+  // EIP-2718: legacy transactions must always report type "0x0".
+  EXPECT_EQ(json["type"], "0x0");
 }
 
 }  // namespace ebla::core_tests

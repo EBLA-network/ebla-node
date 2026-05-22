@@ -84,6 +84,11 @@ Json::Value toJson(const LocalisedTransactionReceipt& ltr) {
   res["cumulativeGasUsed"] = toJS(ltr.r.cumulative_gas_used);
   res["contractAddress"] = toJson(ltr.r.new_contract_address);
   res["logsBloom"] = toJS(ltr.r.bloom());
+  // EIP-2718 type tag. EBLA only supports legacy (pre-typed) transactions,
+  // so this is hardcoded to "0x0". When typed-tx envelopes (EIP-2930 / EIP-1559)
+  // are added in a future PR, replace with: toJS(uint64_t(ltr.r.tx_type)).
+  // TODO(EIP-2718-typed-tx): make dynamic when typed envelopes are accepted.
+  res["type"] = "0x0";
 
   auto& logs_json = res["logs"] = Json::Value(Json::arrayValue);
   uint log_i = 0;
