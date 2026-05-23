@@ -3,29 +3,34 @@ name: Build Docker Image
 on:
   push:
     branches:
+      - ebla-stable
       - master
-      - develop
+      - main
     paths-ignore:
       - 'doc/**'
       - '**.md'
       - 'charts/**'
   pull_request:
     branches:
+      - ebla-stable
       - master
-      - develop
+      - main
     paths-ignore:
       - 'doc/**'
       - '**.md'
+      - 'charts/**'
 
 env:
-  REGISTRY: gcr.io
-  GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
-  IMAGE_NAME: ebla-node
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ebla-network/ebla-node
   DOCKERFILE: Dockerfile
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     outputs:
       image-digest: ${{ steps.build-push.outputs.digest }}
       image-tags: ${{ steps.meta.outputs.tags }}
@@ -40,33 +45,30 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+      - name: Log in to GitHub Container Registry
+        # Only log in for push events. PR builds verify the build compiles
+        # but do NOT push (prevents fork-PRs from poisoning our registry).
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
         with:
-          credentials_json: ${{ secrets.ARTIFACT_REGISTRY_SA_KEY }}
-
-      - name: Set up Google Cloud CLI
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ env.GCP_PROJECT_ID }}
-
-      - name: Configure Docker for GCR
-        run: |
-          gcloud auth configure-docker ${{ env.REGISTRY }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Prepare environment variables
         id: prepare
         run: |
-          COMMIT_SHA=${{ github.sha }}
-          COMMIT_SHA_SHORT=${COMMIT_SHA:0:8}
-          BUILD_NUMBER=${{ github.run_number }}
-          PR_NUMBER=${{ github.event.pull_request.number }}
+          COMMIT_SHA="${{ github.sha }}"
+          COMMIT_SHA_SHORT="${COMMIT_SHA:0:8}"
+          BUILD_NUMBER="${{ github.run_number }}"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
 
-          # For PRs, use head.ref (the actual branch), for push events use ref_name
+          # github.head_ref is the PR's source branch (only set on PR events)
+          # github.ref_name is the branch/tag for push events
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            BRANCH_NAME=${{ github.head.ref }}
+            BRANCH_NAME="${{ github.head_ref }}"
           else
-            BRANCH_NAME=${{ github.ref_name }}
+            BRANCH_NAME="${{ github.ref_name }}"
           fi
 
           echo "commit_sha=${COMMIT_SHA}" >> $GITHUB_OUTPUT
@@ -78,46 +80,52 @@ jobs:
       - name: Generate image tags
         id: meta
         run: |
-          REGISTRY_URL="${{ env.REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }}"
+          REGISTRY_URL="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+          BRANCH="${{ steps.prepare.outputs.branch_name }}"
+          SHORT_SHA="${{ steps.prepare.outputs.commit_sha_short }}"
           TAGS=""
 
           if [ "${{ github.event_name }}" = "push" ]; then
-            if [ "${{ steps.prepare.outputs.branch_name }}" = "develop" ]; then
-              TAGS="${REGISTRY_URL}:develop-${{ steps.prepare.outputs.commit_sha_short }}"
-              TAGS="${TAGS},${{ env.REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }}:develop-${{ steps.prepare.outputs.commit_sha }}"
-              TAGS="${TAGS},${{ env.REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }}:develop-latest"
-            elif [ "${{ steps.prepare.outputs.branch_name }}" = "master" ]; then
-              TAGS="${REGISTRY_URL}:master-${{ steps.prepare.outputs.commit_sha_short }}"
-              TAGS="${TAGS},${{ env.REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }}:master-latest"
-            fi
+            # Push to a branch: tag with branch-name (floating) and branch-sha (immutable forensic anchor)
+            TAGS="${REGISTRY_URL}:${BRANCH}"
+            TAGS="${TAGS},${REGISTRY_URL}:${BRANCH}-${SHORT_SHA}"
           elif [ "${{ github.event_name }}" = "pull_request" ]; then
-            TAGS="${REGISTRY_URL}:pr-${{ steps.prepare.outputs.pr_number }}-${{ steps.prepare.outputs.build_number }}"
+            # PR: build only, NO push — but generate a tag string for the summary
+            PR_NUM="${{ steps.prepare.outputs.pr_number }}"
+            BUILD_NUM="${{ steps.prepare.outputs.build_number }}"
+            TAGS="${REGISTRY_URL}:pr-${PR_NUM}-${BUILD_NUM}"
           fi
 
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
 
-      - name: Build and push Docker image
+      - name: Build Docker image (and push for branches, build-only for PRs)
         id: build-push
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ${{ env.DOCKERFILE }}
-          push: true
+          # Push only on branch events. PRs verify the build but don't push.
+          push: ${{ github.event_name == 'push' }}
+          platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          provenance: true
 
       - name: Image build summary
         run: |
           echo "## Docker Image Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit:** ${{ steps.prepare.outputs.commit_sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Branch:** ${{ steps.prepare.outputs.branch_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ steps.prepare.outputs.commit_sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** \`${{ steps.prepare.outputs.branch_name }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Event:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Registry:** ${{ env.REGISTRY }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Pushed:** ${{ github.event_name == 'push' && '✅ Yes' || '❌ No (PR build only)' }}" >> $GITHUB_STEP_SUMMARY
           echo "**Tags:**" >> $GITHUB_STEP_SUMMARY
-          # Convert comma-separated tags to markdown list
           IFS=',' read -ra TAGS <<< "${{ steps.meta.outputs.tags }}"
           for tag in "${TAGS[@]}"; do
-            echo "- ${tag// /}" >> $GITHUB_STEP_SUMMARY
+            echo "- \`${tag// /}\`" >> $GITHUB_STEP_SUMMARY
           done
-          echo "**Image Digest:** ${{ steps.build-push.outputs.digest }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "**Image Digest:** \`${{ steps.build-push.outputs.digest }}\`" >> $GITHUB_STEP_SUMMARY
+          fi
