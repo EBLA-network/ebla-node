@@ -29,9 +29,6 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to GitHub Container Registry
-        # Only log in for push events. PR builds verify the build compiles
-        # but do NOT push (prevents fork-PRs from poisoning our registry).
-        if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -43,22 +40,13 @@ jobs:
         run: |
           COMMIT_SHA="${{ github.sha }}"
           COMMIT_SHA_SHORT="${COMMIT_SHA:0:8}"
-          BUILD_NUMBER="${{ github.run_number }}"
-          PR_NUMBER="${{ github.event.pull_request.number }}"
 
-          # github.head_ref is the PR's source branch (only set on PR events)
-          # github.ref_name is the branch/tag for push events
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            BRANCH_NAME="${{ github.head_ref }}"
-          else
-            BRANCH_NAME="${{ github.ref_name }}"
-          fi
+          # workflow_dispatch: github.ref_name is the branch chosen in the UI
+          BRANCH_NAME="${{ github.ref_name }}"
 
           echo "commit_sha=${COMMIT_SHA}" >> $GITHUB_OUTPUT
           echo "commit_sha_short=${COMMIT_SHA_SHORT}" >> $GITHUB_OUTPUT
           echo "branch_name=${BRANCH_NAME}" >> $GITHUB_OUTPUT
-          echo "build_number=${BUILD_NUMBER}" >> $GITHUB_OUTPUT
-          echo "pr_number=${PR_NUMBER}" >> $GITHUB_OUTPUT
 
       - name: Generate image tags
         id: meta
@@ -68,27 +56,19 @@ jobs:
           SHORT_SHA="${{ steps.prepare.outputs.commit_sha_short }}"
           TAGS=""
 
-          if [ "${{ github.event_name }}" = "push" ]; then
-            # Push to a branch: tag with branch-name (floating) and branch-sha (immutable forensic anchor)
-            TAGS="${REGISTRY_URL}:${BRANCH}"
-            TAGS="${TAGS},${REGISTRY_URL}:${BRANCH}-${SHORT_SHA}"
-          elif [ "${{ github.event_name }}" = "pull_request" ]; then
-            # PR: build only, NO push — but generate a tag string for the summary
-            PR_NUM="${{ steps.prepare.outputs.pr_number }}"
-            BUILD_NUM="${{ steps.prepare.outputs.build_number }}"
-            TAGS="${REGISTRY_URL}:pr-${PR_NUM}-${BUILD_NUM}"
-          fi
+          # Tag with branch-name (floating) and branch-sha (immutable forensic anchor)
+          TAGS="${REGISTRY_URL}:${BRANCH}"
+          TAGS="${TAGS},${REGISTRY_URL}:${BRANCH}-${SHORT_SHA}"
 
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
 
-      - name: Build Docker image (and push for branches, build-only for PRs)
+      - name: Build Docker image
         id: build-push
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ${{ env.DOCKERFILE }}
-          # Push only on branch events. PRs verify the build but don't push.
-          push: ${{ github.event_name == 'push' }}
+          push: true
           platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=gha
@@ -103,12 +83,10 @@ jobs:
           echo "**Branch:** \`${{ steps.prepare.outputs.branch_name }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Event:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
           echo "**Registry:** ${{ env.REGISTRY }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Pushed:** ${{ github.event_name == 'push' && '✅ Yes' || '❌ No (PR build only)' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Pushed:** ✅ Yes" >> $GITHUB_STEP_SUMMARY
           echo "**Tags:**" >> $GITHUB_STEP_SUMMARY
           IFS=',' read -ra TAGS <<< "${{ steps.meta.outputs.tags }}"
           for tag in "${TAGS[@]}"; do
             echo "- \`${tag// /}\`" >> $GITHUB_STEP_SUMMARY
           done
-          if [ "${{ github.event_name }}" = "push" ]; then
-            echo "**Image Digest:** \`${{ steps.build-push.outputs.digest }}\`" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "**Image Digest:** \`${{ steps.build-push.outputs.digest }}\`" >> $GITHUB_STEP_SUMMARY
