@@ -1,24 +1,7 @@
 name: Build Docker Image
 
 on:
-  push:
-    branches:
-      - ebla-stable
-      - master
-      - main
-    paths-ignore:
-      - 'doc/**'
-      - '**.md'
-      - 'charts/**'
-  pull_request:
-    branches:
-      - ebla-stable
-      - master
-      - main
-    paths-ignore:
-      - 'doc/**'
-      - '**.md'
-      - 'charts/**'
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
