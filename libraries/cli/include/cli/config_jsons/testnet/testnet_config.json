@@ -37,13 +37,13 @@
     "deep_syncing_threshold": 50,
     "boot_nodes": [
       {
-        "id": "0000000000000000000000000000000000000000000000000000",
-        "ip": "boot-node-0.testnet.ebla.io",
+        "id": "c6cf7c14ca2308aa9269b9f3aa8c711bb85481ab",
+        "ip": "boot-node-1.testnet.eblanetwork.com",
         "port": 10002
       },
       {
-        "id": "0000000000000000000000000000000000000000000000000000",
-        "ip": "boot-node-1.testnet.eblanetwork.com",
+        "id": "b3beef2d5696ae67611407dbc54c94a61a16d589",
+        "ip": "boot-node-2.testnet.eblanetwork.com",
         "port": 10002
       }
     ]

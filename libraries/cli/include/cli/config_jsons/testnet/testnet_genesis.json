@@ -23,7 +23,7 @@
     "trx_max_gas_limit": "0x1E0A6E0",
     "initial_validators": [
       {
-        "address": "0x509088842b5cce7761bf83d48dc6a0e2e37afa72",
+        "address": "0xc6cf7c14ca2308aa9269b9f3aa8c711bb85481ab",
         "owner": "0xfd12d5be9afa154a678b82b2b071bfd81c5d9f6c",
         "commission": 1000,
         "endpoint": "",
@@ -31,10 +31,10 @@
         "delegations": {
           "0xcbf9331b455ce5da06b030f8fcbc3f0c252ca515": "0x69e10de76676d0800000"
         },
-        "vrf_key": "f17d5993429b7d0a7d875fe749a06b3c4e79f48e7d7ccd8176d71a4364a45fff"
+        "vrf_key": "c7aefdcfc09b47794d1a0fd3686dd0ce17e151615fe01c2705b48506bae76d2b"
       },
       {
-        "address": "0x51b8fc80282873242bf65bad208d6fbcce379855",
+        "address": "0xb3beef2d5696ae67611407dbc54c94a61a16d589",
         "owner": "0xfd12d5be9afa154a678b82b2b071bfd81c5d9f6c",
         "commission": 1000,
         "endpoint": "",
@@ -42,7 +42,7 @@
         "delegations": {
           "0xcbf9331b455ce5da06b030f8fcbc3f0c252ca515": "0x69e10de76676d0800000"
         },
-        "vrf_key": "e03ad4e11766538d1b269de818415e5c11428e6080c91118612b4c0b60afebe1"
+        "vrf_key": "0ec38585866448ee2d047bbfbc100455eaece9d94ae4a347a081a85b44bae1de"
       }
     ]
   },
