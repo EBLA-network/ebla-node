@@ -37,12 +37,12 @@
     "deep_syncing_threshold": 50,
     "boot_nodes": [
       {
-        "id": "c6cf7c14ca2308aa9269b9f3aa8c711bb85481ab",
+        "id": "0fedf524d4ed4f4e46f3ec146cc49ae653819821cdedf2695c7751a5d3468e2892f272a3c2d5638528e3cf504350b2275480f98d77acb7a5d948fe5f85210493",
         "ip": "boot-node-1.testnet.eblanetwork.com",
         "port": 10002
       },
       {
-        "id": "b3beef2d5696ae67611407dbc54c94a61a16d589",
+        "id": "e8265628dd5b86979a67d4de7dec46c5af2bd1b0ce451ec3329e811adcb44114f4926b37fc5e860f819a30cea1390099d83ce751ff0ec020c8931c2817e79a57",
         "ip": "boot-node-2.testnet.eblanetwork.com",
         "port": 10002
       }
