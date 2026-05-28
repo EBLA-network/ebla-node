@@ -145,7 +145,7 @@ COPY --from=build $WORKDIR/$BUILD_OUTPUT_DIR/bin/ebla-bootnode /usr/local/bin/eb
 COPY --from=build $WORKDIR/$BUILD_OUTPUT_DIR/lib/*.so* /usr/local/lib/
 
 # Copy scripts
-COPY scripts/ebla-sign.py /usr/local/bin/ebla-sign
+COPY --chmod=755 scripts/ebla-sign.py /usr/local/bin/ebla-sign
 
 # Set LD_LIBRARY_PATH so eblad binary finds shared libs
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
