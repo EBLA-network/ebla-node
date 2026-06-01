@@ -4,7 +4,7 @@
 
 #include <map>
 
-#include "network/tarcap/packet_types.hpp"
+#include "network/eblacap/packet_types.hpp"
 #include "network/threadpool/packet_data.hpp"
 
 namespace ebla {

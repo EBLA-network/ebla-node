@@ -11,16 +11,16 @@
 
 #include "common/thread_pool.hpp"
 #include "config/config.hpp"
-#include "network/tarcap/ebla_capability.hpp"
-#include "network/tarcap/tarcap_version.hpp"
+#include "network/eblacap/ebla_capability.hpp"
+#include "network/eblacap/eblacap_version.hpp"
 #include "transaction/transaction.hpp"
 
 namespace ebla {
 
-namespace network::tarcap {
+namespace network::eblacap {
 class TimePeriodPacketsStats;
 class NodeStats;
-}  // namespace network::tarcap
+}  // namespace network::eblacap
 
 class PacketHandler;
 
@@ -59,7 +59,7 @@ class Network {
                   bool rebroadcast = false);
   void gossipVotesBundle(const std::vector<std::shared_ptr<PbftVote>> &votes, bool rebroadcast = false);
   void handleMaliciousSyncPeer(const dev::p2p::NodeID &id);
-  std::shared_ptr<network::tarcap::EblaPeer> getMaxChainPeer() const;
+  std::shared_ptr<network::eblacap::EblaPeer> getMaxChainPeer() const;
 
   /**
    * @brief Get packets queue status
@@ -73,7 +73,7 @@ class Network {
   std::shared_ptr<PacketHandlerType> getSpecificHandler(network::SubprotocolPacketType packet_type) const;
 
   dev::p2p::NodeID getNodeId() const;
-  std::shared_ptr<network::tarcap::EblaPeer> getPeer(dev::p2p::NodeID const &id) const;
+  std::shared_ptr<network::eblacap::EblaPeer> getPeer(dev::p2p::NodeID const &id) const;
   // END METHODS USED IN TESTS ONLY
 
  private:
@@ -96,13 +96,13 @@ class Network {
   const FullNodeConfig &kConf;
 
   // Packets stats per time period
-  std::shared_ptr<network::tarcap::TimePeriodPacketsStats> all_packets_stats_;
+  std::shared_ptr<network::eblacap::TimePeriodPacketsStats> all_packets_stats_;
 
   // Node stats
-  std::shared_ptr<network::tarcap::NodeStats> node_stats_;
+  std::shared_ptr<network::eblacap::NodeStats> node_stats_;
 
   // Syncing state
-  std::shared_ptr<network::tarcap::PbftSyncingState> pbft_syncing_state_;
+  std::shared_ptr<network::eblacap::PbftSyncingState> pbft_syncing_state_;
 
   // Pbft manager
   std::shared_ptr<PbftManager> pbft_mgr_;
@@ -111,9 +111,9 @@ class Network {
   std::shared_ptr<dev::p2p::Host> host_;
 
   // All supported ebla capabilities - in descending order
-  std::map<network::tarcap::TarcapVersion, std::shared_ptr<network::tarcap::EblaCapability>,
-           std::greater<network::tarcap::TarcapVersion>>
-      tarcaps_;
+  std::map<network::eblacap::EblacapVersion, std::shared_ptr<network::eblacap::EblaCapability>,
+           std::greater<network::eblacap::EblacapVersion>>
+      eblacaps_;
 
   // Threadpool for packets
   std::shared_ptr<network::threadpool::PacketsThreadPool> packets_tp_;
@@ -126,7 +126,7 @@ class Network {
 
 template <typename PacketHandlerType>
 std::shared_ptr<PacketHandlerType> Network::getSpecificHandler(network::SubprotocolPacketType packet_type) const {
-  return tarcaps_.begin()->second->getSpecificHandler<PacketHandlerType>(packet_type);
+  return eblacaps_.begin()->second->getSpecificHandler<PacketHandlerType>(packet_type);
 }
 
 }  // namespace ebla

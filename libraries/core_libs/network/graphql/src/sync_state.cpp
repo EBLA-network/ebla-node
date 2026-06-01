@@ -1,7 +1,7 @@
 
 #include "graphql/sync_state.hpp"
 
-#include "network/tarcap/packets_handlers/latest/pbft_sync_packet_handler.hpp"
+#include "network/eblacap/packets_handlers/latest/pbft_sync_packet_handler.hpp"
 
 namespace graphql::ebla {
 

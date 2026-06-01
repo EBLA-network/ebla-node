@@ -33,7 +33,7 @@ PriorityQueue::PriorityQueue(size_t tp_workers_count, const std::shared_ptr<Pbft
                << ", Low priority packets max num of workers = " << low_priority_queue_workers;
 }
 
-void PriorityQueue::pushBack(std::pair<tarcap::TarcapVersion, PacketData>&& packet) {
+void PriorityQueue::pushBack(std::pair<eblacap::EblacapVersion, PacketData>&& packet) {
   const auto priority = packet.second.priority_;
   packets_queues_[priority].pushBack(std::move(packet));
 }
@@ -53,7 +53,7 @@ bool PriorityQueue::canBorrowThread() {
   return act_total_workers_count_ < (MAX_TOTAL_WORKERS_COUNT - reserved_threads_num);
 }
 
-std::optional<std::pair<tarcap::TarcapVersion, PacketData>> PriorityQueue::pop() {
+std::optional<std::pair<eblacap::EblacapVersion, PacketData>> PriorityQueue::pop() {
   if (act_total_workers_count_ >= MAX_TOTAL_WORKERS_COUNT) {
     LOG(log_dg_) << "MAX_TOTAL_WORKERS_COUNT(" << MAX_TOTAL_WORKERS_COUNT << ") reached, unable to pop data.";
     return {};

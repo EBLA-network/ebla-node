@@ -5,7 +5,7 @@
 
 #include <chrono>
 
-#include "network/tarcap/packet_types.hpp"
+#include "network/eblacap/packet_types.hpp"
 
 namespace ebla::network::threadpool {
 

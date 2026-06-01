@@ -1,0 +1,67 @@
+#pragma once
+
+#include <json/value.h>
+
+#include "common/types.hpp"
+#include "config/config.hpp"
+#include "logger/logger.hpp"
+#include "network/eblacap/eblacap_version.hpp"
+
+namespace ebla {
+class PbftChain;
+class PbftManager;
+class VoteManager;
+class DagManager;
+class TransactionManager;
+}  // namespace ebla
+
+namespace ebla::network::threadpool {
+class PacketsThreadPool;
+}
+
+namespace ebla::network::eblacap {
+
+class EblaPeer;
+class PbftSyncingState;
+class TimePeriodPacketsStats;
+
+class NodeStats {
+ public:
+  NodeStats(std::shared_ptr<PbftSyncingState> pbft_syncing_state, std::shared_ptr<PbftChain> pbft_chain,
+            std::shared_ptr<PbftManager> pbft_mgr, std::shared_ptr<DagManager> dag_mgr,
+            std::shared_ptr<VoteManager> vote_mgr, std::shared_ptr<TransactionManager> trx_mgr,
+            std::shared_ptr<TimePeriodPacketsStats> packets_stats,
+            std::shared_ptr<const threadpool::PacketsThreadPool> thread_pool, const FullNodeConfig& config);
+
+  void logNodeStats(const std::vector<std::shared_ptr<network::eblacap::EblaPeer>>& all_peers,
+                    const std::vector<std::string>& nodes);
+  uint64_t syncTimeSeconds() const;
+  Json::Value getStatus(
+      std::map<network::eblacap::EblacapVersion, std::shared_ptr<network::eblacap::EblaPeer>> peers) const;
+
+ private:
+  std::shared_ptr<PbftSyncingState> pbft_syncing_state_;
+  std::shared_ptr<PbftChain> pbft_chain_;
+  std::shared_ptr<PbftManager> pbft_mgr_;
+  std::shared_ptr<DagManager> dag_mgr_;
+  std::shared_ptr<VoteManager> vote_mgr_;
+  std::shared_ptr<TransactionManager> trx_mgr_;
+  std::shared_ptr<TimePeriodPacketsStats> packets_stats_;
+  std::shared_ptr<const threadpool::PacketsThreadPool> thread_pool_;
+
+  level_t local_max_level_in_dag_prev_interval_{0};
+  uint64_t local_pbft_round_prev_interval_{0};
+  uint64_t local_chain_size_prev_interval_{0};
+  uint64_t local_pbft_sync_period_prev_interval_{0};
+  uint64_t intervals_in_sync_since_launch_{0};
+  uint64_t intervals_syncing_since_launch_{0};
+  uint64_t syncing_duration_seconds{0};
+  uint64_t stalled_syncing_duration_seconds{0};
+
+  // List of node addresses running on this node
+  std::string node_addresses_;
+
+  LOG_OBJECTS_DEFINE
+};
+
+}  // namespace ebla::network::eblacap

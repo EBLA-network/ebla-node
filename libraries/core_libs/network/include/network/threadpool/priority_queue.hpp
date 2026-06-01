@@ -6,7 +6,7 @@
 #include <utility>
 
 #include "logger/logger.hpp"
-#include "network/tarcap/tarcap_version.hpp"
+#include "network/eblacap/eblacap_version.hpp"
 #include "network/threadpool/packets_blocking_mask.hpp"
 #include "packets_queue.hpp"
 
@@ -31,12 +31,12 @@ class PriorityQueue {
    * @brief Pushes new packet into the priority queue
    * @param packet
    */
-  void pushBack(std::pair<tarcap::TarcapVersion, PacketData>&& packet);
+  void pushBack(std::pair<eblacap::EblacapVersion, PacketData>&& packet);
 
   /**
    * @return std::optional<PacketData> packet with the highest priority & oldest "receive" time
    */
-  std::optional<std::pair<tarcap::TarcapVersion, PacketData>> pop();
+  std::optional<std::pair<eblacap::EblacapVersion, PacketData>> pop();
 
   /**
    * @return true of all priority packets_queues_ are empty, otheriwse false

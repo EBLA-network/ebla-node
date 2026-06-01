@@ -3,7 +3,7 @@
 #include "common/init.hpp"
 #include "dag/dag_manager.hpp"
 #include "logger/logger.hpp"
-#include "network/tarcap/packets_handlers/latest/vote_packet_handler.hpp"
+#include "network/eblacap/packets_handlers/latest/vote_packet_handler.hpp"
 #include "test_util/node_dag_creation_fixture.hpp"
 
 namespace ebla::core_tests {
@@ -465,7 +465,7 @@ TEST_F(PbftManagerTest, propose_block_and_vote_broadcast) {
   ASSERT_TRUE(block1_from_node1);
   EXPECT_EQ(block1_from_node1->getJsonStr(), proposed_pbft_block->getJsonStr());
 
-  nw1->getSpecificHandler<network::tarcap::IVotePacketHandler>(network::SubprotocolPacketType::kVotePacket)
+  nw1->getSpecificHandler<network::eblacap::IVotePacketHandler>(network::SubprotocolPacketType::kVotePacket)
       ->onNewPbftVote(propose_vote, proposed_pbft_block);
 
   // Check node2 and node3 receive the PBFT block

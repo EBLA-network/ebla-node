@@ -1,0 +1,31 @@
+#pragma once
+
+#include "network/eblacap/packets/latest/dag_sync_packet.hpp"
+#include "network/eblacap/packets_handlers/interface/sync_packet_handler.hpp"
+
+namespace ebla {
+class TransactionManager;
+}  // namespace ebla
+
+namespace ebla::network::eblacap {
+
+class DagSyncPacketHandler : public ISyncPacketHandler {
+ public:
+  DagSyncPacketHandler(const FullNodeConfig& conf, std::shared_ptr<PeersState> peers_state,
+                       std::shared_ptr<TimePeriodPacketsStats> packets_stats,
+                       std::shared_ptr<PbftSyncingState> pbft_syncing_state, std::shared_ptr<PbftChain> pbft_chain,
+                       std::shared_ptr<PbftManager> pbft_mgr, std::shared_ptr<DagManager> dag_mgr,
+                       std::shared_ptr<TransactionManager> trx_mgr, std::shared_ptr<DbStorage> db,
+                       const addr_t& node_addr, const std::string& logs_prefix = "");
+
+  // Packet type that is processed by this handler
+  static constexpr SubprotocolPacketType kPacketType_ = SubprotocolPacketType::kDagSyncPacket;
+
+ private:
+  virtual void process(const threadpool::PacketData& packet_data, const std::shared_ptr<EblaPeer>& peer) override;
+
+ protected:
+  std::shared_ptr<TransactionManager> trx_mgr_{nullptr};
+};
+
+}  // namespace ebla::network::eblacap

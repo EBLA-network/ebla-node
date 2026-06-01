@@ -20,7 +20,7 @@ class PbftVote;
 struct PbftConfig;
 struct FullNodeConfig;
 
-namespace network::tarcap {
+namespace network::eblacap {
 class EblaPeer;
 }
 

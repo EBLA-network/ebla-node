@@ -7,14 +7,14 @@
 #include <boost/tokenizer.hpp>
 
 #include "config/version.hpp"
-#include "network/tarcap/ebla_capability.hpp"
-#include "network/tarcap/packets_handlers/interface/dag_block_packet_handler.hpp"
-#include "network/tarcap/packets_handlers/interface/sync_packet_handler.hpp"
-#include "network/tarcap/packets_handlers/interface/transaction_packet_handler.hpp"
-#include "network/tarcap/packets_handlers/interface/vote_packet_handler.hpp"
-#include "network/tarcap/shared_states/pbft_syncing_state.hpp"
-#include "network/tarcap/stats/node_stats.hpp"
-#include "network/tarcap/stats/time_period_packets_stats.hpp"
+#include "network/eblacap/ebla_capability.hpp"
+#include "network/eblacap/packets_handlers/interface/dag_block_packet_handler.hpp"
+#include "network/eblacap/packets_handlers/interface/sync_packet_handler.hpp"
+#include "network/eblacap/packets_handlers/interface/transaction_packet_handler.hpp"
+#include "network/eblacap/packets_handlers/interface/vote_packet_handler.hpp"
+#include "network/eblacap/shared_states/pbft_syncing_state.hpp"
+#include "network/eblacap/stats/node_stats.hpp"
+#include "network/eblacap/stats/time_period_packets_stats.hpp"
 #include "pbft/pbft_manager.hpp"
 
 namespace ebla {
@@ -28,7 +28,7 @@ Network::Network(const FullNodeConfig &config, const h256 &genesis_hash, const s
     : kConf(config),
       all_packets_stats_(nullptr),
       node_stats_(nullptr),
-      pbft_syncing_state_(std::make_shared<network::tarcap::PbftSyncingState>(config.network.deep_syncing_threshold)),
+      pbft_syncing_state_(std::make_shared<network::eblacap::PbftSyncingState>(config.network.deep_syncing_threshold)),
       pbft_mgr_(pbft_mgr),
       tp_(config.network.num_threads, false),
       packets_tp_(std::make_shared<network::threadpool::PacketsThreadPool>(config.network.packets_processing_threads,
@@ -38,10 +38,10 @@ Network::Network(const FullNodeConfig &config, const h256 &genesis_hash, const s
   LOG_OBJECTS_CREATE("NETWORK");
   LOG(log_nf_) << "Read Network Config: " << std::endl << config.network << std::endl;
 
-  all_packets_stats_ = std::make_shared<network::tarcap::TimePeriodPacketsStats>(
+  all_packets_stats_ = std::make_shared<network::eblacap::TimePeriodPacketsStats>(
       kConf.network.ddos_protection.packets_stats_time_period_ms, node_addr);
 
-  node_stats_ = std::make_shared<network::tarcap::NodeStats>(pbft_syncing_state_, pbft_chain, pbft_mgr, dag_mgr,
+  node_stats_ = std::make_shared<network::eblacap::NodeStats>(pbft_syncing_state_, pbft_chain, pbft_mgr, dag_mgr,
                                                              vote_mgr, trx_mgr, all_packets_stats_, packets_tp_, kConf);
 
   // TODO make all these properties configurable
@@ -72,18 +72,18 @@ Network::Network(const FullNodeConfig &config, const h256 &genesis_hash, const s
     dev::p2p::Host::CapabilityList capabilities;
 
     // Register latest version of ebla capability
-    auto latest_tarcap = std::make_shared<network::tarcap::EblaCapability>(
+    auto latest_eblacap = std::make_shared<network::eblacap::EblaCapability>(
         EBLA_NET_VERSION, config, genesis_hash, host, packets_tp_, all_packets_stats_, pbft_syncing_state_, db,
         pbft_mgr, pbft_chain, vote_mgr, dag_mgr, trx_mgr, slashing_manager, final_chain);
-    capabilities.emplace_back(latest_tarcap);
+    capabilities.emplace_back(latest_eblacap);
 
     // Register previous (v5) version of ebla capability
     assert(EBLA_NET_VERSION - 1 == 5);
-    auto v5_tarcap = std::make_shared<network::tarcap::EblaCapability>(
+    auto v5_eblacap = std::make_shared<network::eblacap::EblaCapability>(
         EBLA_NET_VERSION - 1, config, genesis_hash, host, packets_tp_, all_packets_stats_, pbft_syncing_state_, db,
         pbft_mgr, pbft_chain, vote_mgr, dag_mgr, trx_mgr, slashing_manager, final_chain,
-        network::tarcap::EblaCapability::kInitV5VersionHandlers);
-    capabilities.emplace_back(v5_tarcap);
+        network::eblacap::EblaCapability::kInitV5VersionHandlers);
+    capabilities.emplace_back(v5_eblacap);
 
     return capabilities;
   };
@@ -91,14 +91,14 @@ Network::Network(const FullNodeConfig &config, const h256 &genesis_hash, const s
   host_ = dev::p2p::Host::make(net_version, constructCapabilities, dev::KeyPair(kConf.getFirstWallet().node_secret),
                                net_conf, ebla_net_conf, network_file_path);
   for (const auto &cap : host_->getSupportedCapabilities()) {
-    const auto tarcap_version = cap.second.ref->version();
-    auto tarcap = std::static_pointer_cast<network::tarcap::EblaCapability>(cap.second.ref);
-    tarcaps_[tarcap_version] = std::move(tarcap);
+    const auto eblacap_version = cap.second.ref->version();
+    auto eblacap = std::static_pointer_cast<network::eblacap::EblaCapability>(cap.second.ref);
+    eblacaps_[eblacap_version] = std::move(eblacap);
   }
 
   addBootNodes(true);
 
-  // Register periodic events. Must be called after full init of tarcaps
+  // Register periodic events. Must be called after full init of eblacaps
   registerPeriodicEvents(pbft_mgr, trx_mgr);
 
   for (uint i = 0; i < tp_.capacity(); ++i) {
@@ -138,10 +138,10 @@ size_t Network::getPeerCount() { return host_->peer_count(); }
 unsigned Network::getNodeCount() { return host_->getNodeCount(); }
 
 Json::Value Network::getStatus() {
-  std::map<network::tarcap::TarcapVersion, std::shared_ptr<network::tarcap::EblaPeer>> peers;
-  for (auto &tarcap : tarcaps_) {
-    for (const auto &peer : tarcap.second->getPeersState()->getAllPeers()) {
-      peers.emplace(tarcap.second->version(), std::move(peer.second));
+  std::map<network::eblacap::EblacapVersion, std::shared_ptr<network::eblacap::EblaPeer>> peers;
+  for (auto &eblacap : eblacaps_) {
+    for (const auto &peer : eblacap.second->getPeersState()->getAllPeers()) {
+      peers.emplace(eblacap.second->version(), std::move(peer.second));
     }
   }
 
@@ -160,9 +160,9 @@ void Network::setSyncStatePeriod(PbftPeriod period) { pbft_syncing_state_->setSy
 void Network::registerPeriodicEvents(const std::shared_ptr<PbftManager> &pbft_mgr,
                                      std::shared_ptr<TransactionManager> trx_mgr) {
   auto getAllPeers = [this]() {
-    std::vector<std::shared_ptr<network::tarcap::EblaPeer>> all_peers;
-    for (auto &tarcap : tarcaps_) {
-      for (const auto &peer : tarcap.second->getPeersState()->getAllPeers()) {
+    std::vector<std::shared_ptr<network::eblacap::EblaPeer>> all_peers;
+    for (auto &eblacap : eblacaps_) {
+      for (const auto &peer : eblacap.second->getPeersState()->getAllPeers()) {
         all_peers.push_back(std::move(peer.second));
       }
     }
@@ -174,8 +174,8 @@ void Network::registerPeriodicEvents(const std::shared_ptr<PbftManager> &pbft_mg
 
   // Send new transactions
   auto sendTxs = [this, trx_mgr = trx_mgr]() {
-    for (auto &tarcap : tarcaps_) {
-      auto tx_packet_handler = tarcap.second->getSpecificHandler<network::tarcap::ITransactionPacketHandler>(
+    for (auto &eblacap : eblacaps_) {
+      auto tx_packet_handler = eblacap.second->getSpecificHandler<network::eblacap::ITransactionPacketHandler>(
           network::SubprotocolPacketType::kTransactionPacket);
       tx_packet_handler->periodicSendTransactions(trx_mgr->getAllPoolTrxs());
     }
@@ -184,8 +184,8 @@ void Network::registerPeriodicEvents(const std::shared_ptr<PbftManager> &pbft_mg
 
   // Send status packet
   auto sendStatus = [this]() {
-    for (auto &tarcap : tarcaps_) {
-      auto status_packet_handler = tarcap.second->getSpecificHandler<network::tarcap::ISyncPacketHandler>(
+    for (auto &eblacap : eblacaps_) {
+      auto status_packet_handler = eblacap.second->getSpecificHandler<network::eblacap::ISyncPacketHandler>(
           network::SubprotocolPacketType::kStatusPacket);
       status_packet_handler->sendStatusToPeers();
     }
@@ -288,8 +288,8 @@ void Network::addBootNodes(bool initial) {
 }
 
 void Network::gossipDagBlock(const std::shared_ptr<DagBlock> &block, bool proposed, const SharedTransactions &trxs) {
-  for (const auto &tarcap : tarcaps_) {
-    auto dag_block_packet_handler = tarcap.second->getSpecificHandler<network::tarcap::IDagBlockPacketHandler>(
+  for (const auto &eblacap : eblacaps_) {
+    auto dag_block_packet_handler = eblacap.second->getSpecificHandler<network::eblacap::IDagBlockPacketHandler>(
         network::SubprotocolPacketType::kDagBlockPacket);
     dag_block_packet_handler->onNewBlockVerified(block, proposed, trxs);
   }
@@ -297,24 +297,24 @@ void Network::gossipDagBlock(const std::shared_ptr<DagBlock> &block, bool propos
 
 void Network::gossipVote(const std::shared_ptr<PbftVote> &vote, const std::shared_ptr<PbftBlock> &block,
                          bool rebroadcast) {
-  for (const auto &tarcap : tarcaps_) {
-    auto vote_packet_handler = tarcap.second->getSpecificHandler<network::tarcap::IVotePacketHandler>(
+  for (const auto &eblacap : eblacaps_) {
+    auto vote_packet_handler = eblacap.second->getSpecificHandler<network::eblacap::IVotePacketHandler>(
         network::SubprotocolPacketType::kVotePacket);
     vote_packet_handler->onNewPbftVote(vote, block, rebroadcast);
   }
 }
 
 void Network::gossipVotesBundle(const std::vector<std::shared_ptr<PbftVote>> &votes, bool rebroadcast) {
-  for (const auto &tarcap : tarcaps_) {
-    tarcap.second
-        ->getSpecificHandler<network::tarcap::IVotePacketHandler>(network::SubprotocolPacketType::kVotesBundlePacket)
+  for (const auto &eblacap : eblacaps_) {
+    eblacap.second
+        ->getSpecificHandler<network::eblacap::IVotePacketHandler>(network::SubprotocolPacketType::kVotesBundlePacket)
         ->onNewPbftVotesBundle(votes, rebroadcast);
   }
 }
 
 void Network::handleMaliciousSyncPeer(const dev::p2p::NodeID &node_id) {
-  for (const auto &tarcap : tarcaps_) {
-    auto peers_state = tarcap.second->getPeersState();
+  for (const auto &eblacap : eblacaps_) {
+    auto peers_state = eblacap.second->getPeersState();
     // Peer is present only in one ebla capability depending on his network version
     if (auto peer = peers_state->getPeer(node_id); !peer) {
       continue;
@@ -324,11 +324,11 @@ void Network::handleMaliciousSyncPeer(const dev::p2p::NodeID &node_id) {
   }
 }
 
-std::shared_ptr<network::tarcap::EblaPeer> Network::getMaxChainPeer() const {
-  std::shared_ptr<network::tarcap::EblaPeer> max_chain_peer{nullptr};
+std::shared_ptr<network::eblacap::EblaPeer> Network::getMaxChainPeer() const {
+  std::shared_ptr<network::eblacap::EblaPeer> max_chain_peer{nullptr};
 
-  for (const auto &tarcap : tarcaps_) {
-    const auto peer = tarcap.second->getPeersState()->getMaxChainPeer(pbft_mgr_);
+  for (const auto &eblacap : eblacaps_) {
+    const auto peer = eblacap.second->getPeersState()->getMaxChainPeer(pbft_mgr_);
     if (!peer) {
       continue;
     }
@@ -344,12 +344,12 @@ std::shared_ptr<network::tarcap::EblaPeer> Network::getMaxChainPeer() const {
 }
 
 // METHODS USED IN TESTS ONLY
-// Note: for functions use in tests all data are fetched only from the tarcap with the highest version,
-//       other functions must use all tarcaps
+// Note: for functions use in tests all data are fetched only from the eblacap with the highest version,
+//       other functions must use all eblacaps
 dev::p2p::NodeID Network::getNodeId() const { return host_->id(); }
 
-std::shared_ptr<network::tarcap::EblaPeer> Network::getPeer(dev::p2p::NodeID const &id) const {
-  return tarcaps_.begin()->second->getPeersState()->getPeer(id);
+std::shared_ptr<network::eblacap::EblaPeer> Network::getPeer(dev::p2p::NodeID const &id) const {
+  return eblacaps_.begin()->second->getPeersState()->getPeer(id);
 }
 // METHODS USED IN TESTS ONLY
 

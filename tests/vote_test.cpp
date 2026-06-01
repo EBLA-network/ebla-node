@@ -4,7 +4,7 @@
 #include "common/init.hpp"
 #include "logger/logger.hpp"
 #include "network/network.hpp"
-#include "network/tarcap/packets_handlers/latest/vote_packet_handler.hpp"
+#include "network/eblacap/packets_handlers/latest/vote_packet_handler.hpp"
 #include "pbft/pbft_manager.hpp"
 #include "test_util/test_util.hpp"
 
@@ -126,7 +126,7 @@ TEST_F(VoteTest, transfer_vote) {
   auto vote = node1->getVoteManager()->generateVote(propose_block_hash, type, period, round, step,
                                                     node1->getConfig().getFirstWallet());
 
-  nw1->getSpecificHandler<network::tarcap::IVotePacketHandler>(network::SubprotocolPacketType::kVotePacket)
+  nw1->getSpecificHandler<network::eblacap::IVotePacketHandler>(network::SubprotocolPacketType::kVotePacket)
       ->sendPbftVote(nw1->getPeer(nw2->getNodeId()), vote, nullptr);
 
   auto vote_mgr1 = node1->getVoteManager();
@@ -165,7 +165,7 @@ TEST_F(VoteTest, vote_broadcast) {
                                       node1->getConfig().getFirstWallet());
 
   node1->getNetwork()
-      ->getSpecificHandler<network::tarcap::IVotePacketHandler>(network::SubprotocolPacketType::kVotePacket)
+      ->getSpecificHandler<network::eblacap::IVotePacketHandler>(network::SubprotocolPacketType::kVotePacket)
       ->onNewPbftVote(vote, nullptr);
 
   EXPECT_HAPPENS({60s, 100ms}, [&](auto &ctx) {

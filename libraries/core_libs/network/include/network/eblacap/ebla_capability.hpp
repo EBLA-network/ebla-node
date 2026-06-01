@@ -1,0 +1,180 @@
+#pragma once
+
+#include <libp2p/Capability.h>
+#include <libp2p/Common.h>
+#include <libp2p/Host.h>
+#include <libp2p/Session.h>
+
+#include <memory>
+
+#include "common/thread_pool.hpp"
+#include "config/config.hpp"
+#include "network/eblacap/packets_handler.hpp"
+#include "network/eblacap/shared_states/peers_state.hpp"
+#include "network/eblacap/eblacap_version.hpp"
+#include "network/threadpool/eblacap_thread_pool.hpp"
+#include "pbft/pbft_chain.hpp"
+#include "slashing_manager/slashing_manager.hpp"
+
+namespace ebla {
+class DbStorage;
+class PbftManager;
+class PbftChain;
+class VoteManager;
+class DagManager;
+class TransactionManager;
+class SlashingManager;
+enum class TransactionStatus;
+
+namespace final_chain {
+class FinalChain;
+}
+
+}  // namespace ebla
+
+namespace ebla::network::eblacap {
+
+class ISyncPacketHandler;
+class IVotePacketHandler;
+class ITransactionPacketHandler;
+class IDagBlockPacketHandler;
+
+class PbftSyncingState;
+class EblaPeer;
+
+class EblaCapability final : public dev::p2p::CapabilityFace {
+ public:
+  /**
+   * @brief Function signature for creating ebla capability packets handlers
+   */
+  using InitPacketsHandlers = std::function<std::shared_ptr<PacketsHandler>(
+      const std::string &logs_prefix, const FullNodeConfig &config, const h256 &genesis_hash,
+      const std::shared_ptr<PeersState> &peers_state, const std::shared_ptr<PbftSyncingState> &pbft_syncing_state,
+
+      const std::shared_ptr<eblacap::TimePeriodPacketsStats> &packets_stats, const std::shared_ptr<DbStorage> &db,
+      const std::shared_ptr<PbftManager> &pbft_mgr, const std::shared_ptr<PbftChain> &pbft_chain,
+      const std::shared_ptr<VoteManager> &vote_mgr, const std::shared_ptr<DagManager> &dag_mgr,
+      const std::shared_ptr<TransactionManager> &trx_mgr, const std::shared_ptr<SlashingManager> &slashing_manager,
+      const std::shared_ptr<final_chain::FinalChain> &final_chain, EblacapVersion version, const addr_t &node_addr)>;
+
+  /**
+   * @brief Default InitPacketsHandlers function definition with the latest version of packets handlers
+   */
+  static const InitPacketsHandlers kInitLatestVersionHandlers;
+  static const InitPacketsHandlers kInitV5VersionHandlers;
+
+ public:
+  EblaCapability(EblacapVersion version, const FullNodeConfig &conf, const h256 &genesis_hash,
+                 std::weak_ptr<dev::p2p::Host> host, std::shared_ptr<network::threadpool::PacketsThreadPool> threadpool,
+                 std::shared_ptr<TimePeriodPacketsStats> packets_stats, std::shared_ptr<PbftSyncingState> syncing_state,
+                 std::shared_ptr<DbStorage> db, std::shared_ptr<PbftManager> pbft_mgr,
+                 std::shared_ptr<PbftChain> pbft_chain, std::shared_ptr<VoteManager> vote_mgr,
+                 std::shared_ptr<DagManager> dag_mgr, std::shared_ptr<TransactionManager> trx_mgr,
+                 std::shared_ptr<SlashingManager> slashing_manager,
+                 std::shared_ptr<final_chain::FinalChain> final_chain,
+                 InitPacketsHandlers init_packets_handlers = kInitLatestVersionHandlers);
+
+  virtual ~EblaCapability() = default;
+  EblaCapability(const EblaCapability &ro) = delete;
+  EblaCapability &operator=(const EblaCapability &ro) = delete;
+  EblaCapability(EblaCapability &&ro) = delete;
+  EblaCapability &operator=(EblaCapability &&ro) = delete;
+
+  // CapabilityFace implemented interface
+  std::string name() const override;
+  EblacapVersion version() const override;
+  unsigned messageCount() const override;
+  void onConnect(std::weak_ptr<dev::p2p::Session> session, u256 const &) override;
+  void onDisconnect(dev::p2p::NodeID const &_nodeID) override;
+  void interpretCapabilityPacket(std::weak_ptr<dev::p2p::Session> session, unsigned _id, dev::RLP const &_r) override;
+  std::string packetTypeToString(unsigned _packetType) const override;
+
+  const std::shared_ptr<PeersState> &getPeersState();
+
+  /**
+   * @brief templated getSpecificHandler method for getting specific packet handler based on packet_type
+   *
+   * @tparam PacketHandlerType
+   *
+   * @return std::shared_ptr<PacketHandlerType>
+   */
+  template <typename PacketHandlerType>
+  std::shared_ptr<PacketHandlerType> getSpecificHandler(SubprotocolPacketType packet_type) const;
+
+ private:
+  bool filterSyncIrrelevantPackets(SubprotocolPacketType packet_type) const;
+  void handlePacketQueueOverLimit(std::shared_ptr<dev::p2p::Host> host, dev::p2p::NodeID node_id, size_t tp_queue_size);
+
+ private:
+  // Capability version
+  EblacapVersion version_;
+
+  // Packets stats per time period
+  std::shared_ptr<TimePeriodPacketsStats> all_packets_stats_;
+
+  // Node config
+  const FullNodeConfig &kConf;
+
+  // Peers state
+  std::shared_ptr<PeersState> peers_state_;
+
+  // Syncing state + syncing handler
+  std::shared_ptr<PbftSyncingState> pbft_syncing_state_;
+
+  // Packets handlers
+  std::shared_ptr<PacketsHandler> packets_handlers_;
+
+  // Main Threadpool for processing packets
+  std::shared_ptr<threadpool::PacketsThreadPool> thread_pool_;
+
+  // Last disconnect time and number of peers
+  std::chrono::system_clock::time_point last_ddos_disconnect_time_ = {};
+  std::chrono::system_clock::time_point queue_over_limit_start_time_ = {};
+  bool queue_over_limit_ = false;
+  uint32_t last_disconnect_number_of_peers_ = 0;
+
+  LOG_OBJECTS_DEFINE
+};
+
+template <typename PacketHandlerType>
+std::shared_ptr<PacketHandlerType> EblaCapability::getSpecificHandler(SubprotocolPacketType packet_type) const {
+  // Note: Allow to manually cast only to known base classes types.
+  // We support multiple ebla capabilities, which can contain different versions of packet handlers and casting
+  // directly to final classes types breaks the functionality...
+  switch (packet_type) {
+    case SubprotocolPacketType::kPbftSyncPacket:
+    case SubprotocolPacketType::kStatusPacket:
+      if (!std::is_same<ISyncPacketHandler, PacketHandlerType>::value) {
+        assert(false);
+      }
+      break;
+
+    case SubprotocolPacketType::kTransactionPacket:
+      if (!std::is_same<ITransactionPacketHandler, PacketHandlerType>::value) {
+        assert(false);
+      }
+      break;
+
+    case SubprotocolPacketType::kVotePacket:
+    case SubprotocolPacketType::kVotesBundlePacket:
+      if (!std::is_same<IVotePacketHandler, PacketHandlerType>::value) {
+        assert(false);
+      }
+      break;
+
+    case SubprotocolPacketType::kDagBlockPacket:
+      if (!std::is_same<IDagBlockPacketHandler, PacketHandlerType>::value) {
+        assert(false);
+      }
+      break;
+
+    default:
+      assert(false);
+      return nullptr;
+  }
+
+  auto handler = packets_handlers_->getSpecificHandler(packet_type);
+  return std::dynamic_pointer_cast<PacketHandlerType>(handler);
+}
+
+}  // namespace ebla::network::eblacap

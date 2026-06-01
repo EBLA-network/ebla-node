@@ -9,7 +9,7 @@
 #include "common/init.hpp"
 #include "common/thread_pool.hpp"
 #include "logger/logger.hpp"
-#include "network/tarcap/tarcap_version.hpp"
+#include "network/eblacap/eblacap_version.hpp"
 #include "test_util/samples.hpp"
 #include "test_util/test_util.hpp"
 
@@ -28,10 +28,10 @@ struct P2PTest : NodesTest {};
 
 class TestEblaCapability final : public dev::p2p::CapabilityFace {
  public:
-  TestEblaCapability(ebla::network::tarcap::TarcapVersion version) : version_(version) {}
+  TestEblaCapability(ebla::network::eblacap::EblacapVersion version) : version_(version) {}
 
   std::string name() const override { return ""; }
-  ebla::network::tarcap::TarcapVersion version() const override { return version_; }
+  ebla::network::eblacap::EblacapVersion version() const override { return version_; }
   unsigned messageCount() const override { return 0; }
   void onConnect(std::weak_ptr<dev::p2p::Session>, u256 const &) override {}
   void onDisconnect(dev::p2p::NodeID const &) override {}
@@ -39,22 +39,22 @@ class TestEblaCapability final : public dev::p2p::CapabilityFace {
   std::string packetTypeToString(unsigned) const override { return ""; }
 
  private:
-  ebla::network::tarcap::TarcapVersion version_{1};
+  ebla::network::eblacap::EblacapVersion version_{1};
 };
 
 std::shared_ptr<dev::p2p::Host> makeTestNode(unsigned short listenPort,
-                                             std::vector<ebla::network::tarcap::TarcapVersion> tarcap_versions,
+                                             std::vector<ebla::network::eblacap::EblacapVersion> eblacap_versions,
                                              std::filesystem::path state_file_path) {
-  auto makeTestTarcaps = [tarcap_versions](std::weak_ptr<dev::p2p::Host>) {
-    Host::CapabilityList tarcaps;
-    for (const auto &version : tarcap_versions) {
-      tarcaps.emplace_back(std::make_shared<TestEblaCapability>(version));
+  auto makeTestEblacaps = [eblacap_versions](std::weak_ptr<dev::p2p::Host>) {
+    Host::CapabilityList eblacaps;
+    for (const auto &version : eblacap_versions) {
+      eblacaps.emplace_back(std::make_shared<TestEblaCapability>(version));
     }
 
-    return tarcaps;
+    return eblacaps;
   };
 
-  return Host::make("EblaNode", makeTestTarcaps, dev::KeyPair::create(),
+  return Host::make("EblaNode", makeTestEblacaps, dev::KeyPair::create(),
                     dev::p2p::NetworkConfig("127.0.0.1", listenPort, false, true), EblaNetworkConfig{},
                     state_file_path);
 }
@@ -107,21 +107,22 @@ TEST_F(P2PTest, multiple_capabilities) {
   util::ThreadPool boot_node_tp;
   boot_node_tp.post_loop({}, [=] { boot_node->do_work(); });
 
-  // Create 2 nodes(hosts) with specified tarcap versionS and wait for their connection being established
-  auto test_tarcaps = [boot_node_key](std::vector<ebla::network::tarcap::TarcapVersion> node1_tarcap_versions,
-                                      std::vector<ebla::network::tarcap::TarcapVersion> node2_tarcap_versions,
-                                      bool wait_for_connection = true) -> std::vector<std::shared_ptr<dev::p2p::Host>> {
+  // Create 2 nodes(hosts) with specified eblacap versionS and wait for their connection being established
+  auto test_eblacaps =
+      [boot_node_key](std::vector<ebla::network::eblacap::EblacapVersion> node1_eblacap_versions,
+                      std::vector<ebla::network::eblacap::EblacapVersion> node2_eblacap_versions,
+                      bool wait_for_connection = true) -> std::vector<std::shared_ptr<dev::p2p::Host>> {
     std::filesystem::remove_all("/tmp/nw1");
     std::filesystem::remove_all("/tmp/nw2");
 
     util::ThreadPool tp;
 
-    const auto node1 = makeTestNode(20002, node1_tarcap_versions, "/tmp/nw1");
+    const auto node1 = makeTestNode(20002, node1_eblacap_versions, "/tmp/nw1");
     std::cout << "node1->peer_count(): " << node1->peer_count() << std::endl;
     node1->addNode(Node(boot_node_key, dev::p2p::NodeIPEndpoint(bi::make_address("127.0.0.1"), 20001, 20001)));
     tp.post_loop({}, [=] { node1->do_work(); });
 
-    const auto node2 = makeTestNode(20003, node2_tarcap_versions, "/tmp/nw2");
+    const auto node2 = makeTestNode(20003, node2_eblacap_versions, "/tmp/nw2");
     node2->addNode(Node(boot_node_key, dev::p2p::NodeIPEndpoint(bi::make_address("127.0.0.1"), 20001, 20001)));
     tp.post_loop({}, [=] { node2->do_work(); });
 
@@ -137,13 +138,13 @@ TEST_F(P2PTest, multiple_capabilities) {
     return {node1, node2};
   };
 
-  // At least 1 common tarcap version - connection should be established
-  { test_tarcaps({1}, {1}); }
-  { test_tarcaps({1, 2, 3}, {3, 4, 5}); }
+  // At least 1 common eblacap version - connection should be established
+  { test_eblacaps({1}, {1}); }
+  { test_eblacaps({1, 2, 3}, {3, 4, 5}); }
 
-  // No common tarcap version, connection should not be established
+  // No common eblacap version, connection should not be established
   {
-    auto nodes = test_tarcaps({1, 2, 3}, {4, 5, 6}, false);
+    auto nodes = test_eblacaps({1, 2, 3}, {4, 5, 6}, false);
     // check that connection wasn't established
     std::this_thread::sleep_for(5s);
     EXPECT_EQ(nodes[0]->peer_count(), 0);

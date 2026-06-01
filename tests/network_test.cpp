@@ -13,14 +13,14 @@
 #include "dag/dag.hpp"
 #include "dag/dag_block_proposer.hpp"
 #include "logger/logger.hpp"
-#include "network/tarcap/packets/latest/pbft_sync_packet.hpp"
-#include "network/tarcap/packets_handlers/latest/dag_block_packet_handler.hpp"
-#include "network/tarcap/packets_handlers/latest/get_dag_sync_packet_handler.hpp"
-#include "network/tarcap/packets_handlers/latest/get_next_votes_bundle_packet_handler.hpp"
-#include "network/tarcap/packets_handlers/latest/status_packet_handler.hpp"
-#include "network/tarcap/packets_handlers/latest/transaction_packet_handler.hpp"
-#include "network/tarcap/packets_handlers/latest/vote_packet_handler.hpp"
-#include "network/tarcap/packets_handlers/latest/votes_bundle_packet_handler.hpp"
+#include "network/eblacap/packets/latest/pbft_sync_packet.hpp"
+#include "network/eblacap/packets_handlers/latest/dag_block_packet_handler.hpp"
+#include "network/eblacap/packets_handlers/latest/get_dag_sync_packet_handler.hpp"
+#include "network/eblacap/packets_handlers/latest/get_next_votes_bundle_packet_handler.hpp"
+#include "network/eblacap/packets_handlers/latest/status_packet_handler.hpp"
+#include "network/eblacap/packets_handlers/latest/transaction_packet_handler.hpp"
+#include "network/eblacap/packets_handlers/latest/vote_packet_handler.hpp"
+#include "network/eblacap/packets_handlers/latest/votes_bundle_packet_handler.hpp"
 #include "pbft/pbft_manager.hpp"
 #include "test_util/samples.hpp"
 #include "test_util/test_util.hpp"
@@ -136,7 +136,7 @@ TEST_F(NetworkTest, transfer_lot_of_blocks) {
   const auto node1_period = node1->getPbftChain()->getPbftChainSize();
   const auto node2_period = node2->getPbftChain()->getPbftChainSize();
   std::cout << "node1 period " << node1_period << ", node2 period " << node2_period << std::endl;
-  nw2->getSpecificHandler<network::tarcap::IDagBlockPacketHandler>(network::SubprotocolPacketType::kDagBlockPacket)
+  nw2->getSpecificHandler<network::eblacap::IDagBlockPacketHandler>(network::SubprotocolPacketType::kDagBlockPacket)
       ->requestDagBlocks(nw2->getPeer(nw1->getNodeId()));
 
   std::cout << "Waiting Sync ..." << std::endl;
@@ -225,7 +225,7 @@ TEST_F(NetworkTest, DISABLED_update_peer_chainsize) {
   auto node2_id = nw2->getNodeId();
 
   EXPECT_NE(nw2->getPeer(node1_id)->pbft_chain_size_, expected_chain_size);
-  nw1->getSpecificHandler<network::tarcap::IVotePacketHandler>(network::SubprotocolPacketType::kVotePacket)
+  nw1->getSpecificHandler<network::eblacap::IVotePacketHandler>(network::SubprotocolPacketType::kVotePacket)
       ->sendPbftVote(nw1->getPeer(node2_id), vote, pbft_block);
   EXPECT_HAPPENS({5s, 100ms},
                  [&](auto& ctx) { WAIT_EXPECT_EQ(ctx, nw2->getPeer(node1_id)->pbft_chain_size_, expected_chain_size) });
@@ -236,7 +236,7 @@ TEST_F(NetworkTest, malicious_peers) {
   conf.network.peer_blacklist_timeout = 2;
   std::shared_ptr<dev::p2p::Host> host;
   EXPECT_EQ(conf.network.disable_peer_blacklist, false);
-  network::tarcap::PeersState state1(host, conf);
+  network::eblacap::PeersState state1(host, conf);
   dev::p2p::NodeID id1(1);
   dev::p2p::NodeID id2(2);
   state1.set_peer_malicious(id1);
@@ -244,21 +244,21 @@ TEST_F(NetworkTest, malicious_peers) {
   EXPECT_EQ(state1.is_peer_malicious(id2), false);
 
   conf.network.peer_blacklist_timeout = 0;
-  network::tarcap::PeersState state2(host, conf);
+  network::eblacap::PeersState state2(host, conf);
   state2.set_peer_malicious(id1);
   EXPECT_EQ(state2.is_peer_malicious(id1), true);
   EXPECT_EQ(state2.is_peer_malicious(id2), false);
 
   conf.network.peer_blacklist_timeout = 2;
   conf.network.disable_peer_blacklist = true;
-  network::tarcap::PeersState state3(host, conf);
+  network::eblacap::PeersState state3(host, conf);
   state1.set_peer_malicious(id1);
   EXPECT_EQ(state3.is_peer_malicious(id1), false);
   EXPECT_EQ(state3.is_peer_malicious(id2), false);
 
   conf.network.peer_blacklist_timeout = 0;
   conf.network.disable_peer_blacklist = true;
-  network::tarcap::PeersState state4(host, conf);
+  network::eblacap::PeersState state4(host, conf);
   state1.set_peer_malicious(id1);
   EXPECT_EQ(state4.is_peer_malicious(id1), false);
   EXPECT_EQ(state4.is_peer_malicious(id2), false);
@@ -381,7 +381,7 @@ TEST_F(NetworkTest, transfer_transaction) {
   std::pair<SharedTransactions, std::vector<trx_hash_t>> transactions;
   transactions.first.push_back(g_signed_trx_samples[0]);
 
-  nw2->getSpecificHandler<network::tarcap::ITransactionPacketHandler>(
+  nw2->getSpecificHandler<network::eblacap::ITransactionPacketHandler>(
          network::SubprotocolPacketType::kTransactionPacket)
       ->sendTransactions(peer1, std::move(transactions));
   const auto tx_mgr1 = node1->getTransactionManager();
@@ -1207,12 +1207,12 @@ TEST_F(NetworkTest, node_transaction_sync) {
 }
 
 TEST_F(NetworkTest, transaction_gossip_selection) {
-  class TestTransactionPacketHandler : public network::tarcap::TransactionPacketHandler {
+  class TestTransactionPacketHandler : public network::eblacap::TransactionPacketHandler {
    public:
-    TestTransactionPacketHandler(std::shared_ptr<network::tarcap::PeersState> peers_state)
+    TestTransactionPacketHandler(std::shared_ptr<network::eblacap::PeersState> peers_state)
         : TransactionPacketHandler({}, peers_state, {}, {}, {}) {}
     std::vector<
-        std::pair<std::shared_ptr<network::tarcap::EblaPeer>, std::pair<SharedTransactions, std::vector<trx_hash_t>>>>
+        std::pair<std::shared_ptr<network::eblacap::EblaPeer>, std::pair<SharedTransactions, std::vector<trx_hash_t>>>>
     public_transactionsToSendToPeers(std::vector<SharedTransactions> transactions) {
       auto res = transactionsToSendToPeers(std::move(transactions));
       for (auto account : res) {
@@ -1234,7 +1234,7 @@ TEST_F(NetworkTest, transaction_gossip_selection) {
   addr_t node_addr1(node_key1.address());
   addr_t node_addr2(node_key2.address());
 
-  auto peers_state = std::make_shared<network::tarcap::PeersState>(std::weak_ptr<dev::p2p::Host>(), FullNodeConfig());
+  auto peers_state = std::make_shared<network::eblacap::PeersState>(std::weak_ptr<dev::p2p::Host>(), FullNodeConfig());
   peers_state->addPendingPeer(node_id1, {});
   auto peer1 = peers_state->getPendingPeer(node_id1);
 
@@ -1769,7 +1769,7 @@ TEST_F(NetworkTest, node_full_sync) {
 }
 
 TEST_F(NetworkTest, suspicious_packets) {
-  network::tarcap::EblaPeer peer;
+  network::eblacap::EblaPeer peer;
   // Verify that after 50000 reported suspicious packets true is returned
   for (int i = 0; i < 50000; i++) {
     EXPECT_FALSE(peer.reportSuspiciousPacket());
@@ -1787,7 +1787,7 @@ TEST_F(NetworkTest, suspicious_packets) {
 }
 
 TEST_F(NetworkTest, dag_syncing_limit) {
-  network::tarcap::EblaPeer peer1, peer2;
+  network::eblacap::EblaPeer peer1, peer2;
   const uint64_t dag_sync_limit = 60;
 
   EXPECT_TRUE(peer1.dagSyncingAllowed());
@@ -1860,10 +1860,10 @@ TEST_F(NetworkTest, pbft_sync_packet_rlp_encoding) {
     auto raw_data = nodes[0]->getDB()->getPeriodDataRaw(i);
     ASSERT_NE(raw_data.size(), 0);
 
-    auto raw_packet = std::make_shared<network::tarcap::PbftSyncPacketRaw>(true, raw_data);
+    auto raw_packet = std::make_shared<network::eblacap::PbftSyncPacketRaw>(true, raw_data);
 
     auto encoded = util::rlp_enc(raw_packet);
-    auto decoded = util::rlp_dec<network::tarcap::PbftSyncPacket>(dev::RLP(encoded));
+    auto decoded = util::rlp_dec<network::eblacap::PbftSyncPacket>(dev::RLP(encoded));
 
     auto encoded_orig = util::rlp_enc(decoded);
 

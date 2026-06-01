@@ -73,9 +73,9 @@ add_executable(rewards_stats_test rewards_stats_test.cpp)
 target_link_libraries(rewards_stats_test test_util)
 add_test(rewards_stats_test ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/rewards_stats_test)
 
-add_executable(tarcap_threadpool_test tarcap_threadpool_test.cpp)
-target_link_libraries(tarcap_threadpool_test test_util)
-add_test(tarcap_threadpool_test ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tarcap_threadpool_test)
+add_executable(eblacap_threadpool_test eblacap_threadpool_test.cpp)
+target_link_libraries(eblacap_threadpool_test test_util)
+add_test(eblacap_threadpool_test ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/eblacap_threadpool_test)
 
 add_executable(gas_pricer_test gas_pricer_test.cpp)
 target_link_libraries(gas_pricer_test test_util)
