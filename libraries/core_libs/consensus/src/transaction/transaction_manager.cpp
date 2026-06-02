@@ -125,16 +125,33 @@ std::pair<bool, std::string> TransactionManager::insertTransaction(const std::sh
 
   const auto trx_hash = trx->getHash();
   auto trx_copy = trx;
-  if (insertValidatedTransaction(std::move(trx_copy), false) == TransactionStatus::Inserted) {
+  const auto status = insertValidatedTransaction(std::move(trx_copy), false);
+  if (status == TransactionStatus::Inserted) {
     return {true, ""};
-  } else {
-    const auto location = db_->getTransactionLocation(trx_hash);
-    if (location) {
-      return {false, "Transaction already finalized in period" + std::to_string(location->period)};
-    } else {
-      return {false, "Transaction could not be inserted"};
+  }
+
+  const auto location = db_->getTransactionLocation(trx_hash);
+  if (location) {
+    return {false, "Transaction already finalized in period" + std::to_string(location->period)};
+  }
+  if (status == TransactionStatus::Overflow) {
+    return {false, "txpool is full"};
+  }
+  // status == Known: rejected by nonce/funds gating in insertValidatedTransaction.
+  // Re-derive the specific reason so clients (MetaMask/ethers/viem) get an actionable
+  // message instead of the catch-all. Same check order as insertValidatedTransaction
+  // (nonce, then funds) -> the message always matches the branch that actually rejected.
+  // final_chain_ is guarded for the test-only null path (see verifyTransaction()).
+  if (final_chain_) {
+    const auto account = final_chain_->getAccount(trx->getSender());
+    if (account.has_value() && account->nonce > trx->getNonce()) {
+      return {false, "nonce too low"};
+    }
+    if (!account.has_value() || account->balance < trx->getCost()) {
+      return {false, "insufficient funds for gas * price + value"};
     }
   }
+  return {false, "Transaction could not be inserted"};
 }
 
 TransactionStatus TransactionManager::insertValidatedTransaction(std::shared_ptr<Transaction> &&tx,

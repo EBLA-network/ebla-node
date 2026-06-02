@@ -216,7 +216,11 @@ TEST_F(TransactionTest, transaction_low_nonce) {
       std::make_shared<Transaction>(1, 101, 1000000000, 100000, dev::bytes(), g_secret, addr_t::random());
   auto result = trx_mgr.verifyTransaction(low_nonce_trx);
   EXPECT_EQ(result.first, true);
-  EXPECT_FALSE(trx_mgr.insertTransaction(low_nonce_trx).first);
+  {
+    auto res = trx_mgr.insertTransaction(low_nonce_trx);
+    EXPECT_FALSE(res.first);
+    EXPECT_EQ(res.second, "nonce too low");
+  }
 
   // Verify dag blocks will pass verification if contain low nonce transactions
   DagBlock dag_blk_with_low_nonce_transaction({}, {}, {}, {low_nonce_trx->getHash()}, secret_t::random());
@@ -232,7 +236,11 @@ TEST_F(TransactionTest, transaction_low_nonce) {
                                     100000, dev::bytes(), g_secret, addr_t::random());
   result = trx_mgr.verifyTransaction(trx_insufficient_balance);
   EXPECT_EQ(result.first, true);
-  EXPECT_FALSE(trx_mgr.insertTransaction(trx_insufficient_balance).first);
+  {
+    auto res = trx_mgr.insertTransaction(trx_insufficient_balance);
+    EXPECT_FALSE(res.first);
+    EXPECT_EQ(res.second, "insufficient funds for gas * price + value");
+  }
 
   // Verify dag blocks will pass verification if contain insufficient balance transactions
   DagBlock dag_blk_with_insufficient_balance_transaction({}, {}, {}, {trx_insufficient_balance->getHash()},
