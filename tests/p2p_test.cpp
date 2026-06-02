@@ -108,10 +108,10 @@ TEST_F(P2PTest, multiple_capabilities) {
   boot_node_tp.post_loop({}, [=] { boot_node->do_work(); });
 
   // Create 2 nodes(hosts) with specified eblacap versionS and wait for their connection being established
-  auto test_eblacaps =
-      [boot_node_key](std::vector<ebla::network::eblacap::EblacapVersion> node1_eblacap_versions,
-                      std::vector<ebla::network::eblacap::EblacapVersion> node2_eblacap_versions,
-                      bool wait_for_connection = true) -> std::vector<std::shared_ptr<dev::p2p::Host>> {
+  auto test_eblacaps = [boot_node_key](
+                           std::vector<ebla::network::eblacap::EblacapVersion> node1_eblacap_versions,
+                           std::vector<ebla::network::eblacap::EblacapVersion> node2_eblacap_versions,
+                           bool wait_for_connection = true) -> std::vector<std::shared_ptr<dev::p2p::Host>> {
     std::filesystem::remove_all("/tmp/nw1");
     std::filesystem::remove_all("/tmp/nw2");
 

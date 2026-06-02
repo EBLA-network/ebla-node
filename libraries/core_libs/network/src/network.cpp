@@ -41,8 +41,8 @@ Network::Network(const FullNodeConfig &config, const h256 &genesis_hash, const s
   all_packets_stats_ = std::make_shared<network::eblacap::TimePeriodPacketsStats>(
       kConf.network.ddos_protection.packets_stats_time_period_ms, node_addr);
 
-  node_stats_ = std::make_shared<network::eblacap::NodeStats>(pbft_syncing_state_, pbft_chain, pbft_mgr, dag_mgr,
-                                                             vote_mgr, trx_mgr, all_packets_stats_, packets_tp_, kConf);
+  node_stats_ = std::make_shared<network::eblacap::NodeStats>(
+      pbft_syncing_state_, pbft_chain, pbft_mgr, dag_mgr, vote_mgr, trx_mgr, all_packets_stats_, packets_tp_, kConf);
 
   // TODO make all these properties configurable
   dev::p2p::NetworkConfig net_conf;

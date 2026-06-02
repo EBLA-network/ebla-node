@@ -3,8 +3,8 @@
 
 #include "common/init.hpp"
 #include "logger/logger.hpp"
-#include "network/network.hpp"
 #include "network/eblacap/packets_handlers/latest/vote_packet_handler.hpp"
+#include "network/network.hpp"
 #include "pbft/pbft_manager.hpp"
 #include "test_util/test_util.hpp"
 

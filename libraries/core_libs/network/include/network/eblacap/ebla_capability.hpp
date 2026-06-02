@@ -9,9 +9,9 @@
 
 #include "common/thread_pool.hpp"
 #include "config/config.hpp"
+#include "network/eblacap/eblacap_version.hpp"
 #include "network/eblacap/packets_handler.hpp"
 #include "network/eblacap/shared_states/peers_state.hpp"
-#include "network/eblacap/eblacap_version.hpp"
 #include "network/threadpool/eblacap_thread_pool.hpp"
 #include "pbft/pbft_chain.hpp"
 #include "slashing_manager/slashing_manager.hpp"
