@@ -274,5 +274,15 @@
     ],
     "order": [],
     "returns": {}
+  },
+  {
+    "name": "eth_feeHistory",
+    "params": [
+      "",
+      "",
+      []
+    ],
+    "order": [],
+    "returns": {}
   }
 ]

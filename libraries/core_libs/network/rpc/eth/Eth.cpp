@@ -215,6 +215,87 @@ class EthImpl : public Eth, EthParams {
     return toJS(hi);
   }
 
+  Json::Value eth_feeHistory(const Json::Value& blockCountParam, const Json::Value& newestBlockParam,
+                             const Json::Value& rewardPercentiles) override {
+    constexpr uint64_t kMaxFeeHistoryBlocks = 1024;  // DoS bound on scanned blocks (mirrors geth)
+    constexpr size_t kMaxRewardPercentiles = 128;    // bounds reward[] allocation
+
+    // blockCount: accept hex string ("0x5") or JSON number (5)
+    uint64_t block_count = 0;
+    if (blockCountParam.isString()) {
+      block_count = static_cast<uint64_t>(jsToInt(blockCountParam.asString()));
+    } else if (blockCountParam.isIntegral()) {
+      block_count = blockCountParam.asUInt64();
+    } else {
+      throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_RPC_INVALID_PARAMS, "blockCount must be a quantity");
+    }
+
+    const auto head = final_chain->lastBlockNumber();
+    if (block_count == 0) {  // nothing requested -> well-formed empty result
+      Json::Value empty(Json::objectValue);
+      empty["oldestBlock"] = toJS(head);
+      empty["baseFeePerGas"] = Json::Value(Json::arrayValue);
+      empty["gasUsedRatio"] = Json::Value(Json::arrayValue);
+      return empty;
+    }
+    if (block_count > kMaxFeeHistoryBlocks) {
+      block_count = kMaxFeeHistoryBlocks;
+    }
+
+    // newestBlock: tag/hex string or numeric; default to head when omitted; clamp to head
+    EthBlockNumber newest = head;
+    if (newestBlockParam.isString() && !newestBlockParam.asString().empty()) {
+      newest = parse_blk_num(newestBlockParam.asString());
+    } else if (newestBlockParam.isIntegral()) {
+      newest = newestBlockParam.asUInt64();
+    }
+    if (newest > head) {
+      newest = head;
+    }
+
+    // oldest: unsigned-underflow-safe, floored at earliest available block
+    const uint64_t earliest = get_earliest_block();
+    const uint64_t span = block_count - 1;  // block_count >= 1 here
+    EthBlockNumber oldest = (newest >= earliest + span) ? (newest - span) : earliest;
+
+    // reward (option a): flat current-oracle estimate; percentile values ignored, only count used
+    size_t percentile_count = 0;
+    if (rewardPercentiles.isArray()) {
+      percentile_count =
+          rewardPercentiles.size() > kMaxRewardPercentiles ? kMaxRewardPercentiles : rewardPercentiles.size();
+    }
+    const bool want_reward = percentile_count > 0;
+    const auto reward_value = want_reward ? toJS(gas_pricer()) : std::string{};
+
+    Json::Value res(Json::objectValue);
+    res["oldestBlock"] = toJS(oldest);
+    Json::Value base_fees(Json::arrayValue);
+    Json::Value gas_used_ratio(Json::arrayValue);
+    Json::Value rewards(Json::arrayValue);
+    for (EthBlockNumber n = oldest; n <= newest; ++n) {
+      base_fees.append("0x0");  // legacy chain: no EIP-1559 base fee
+      double ratio = 0.0;
+      if (const auto h = final_chain->blockHeader(n); h && h->gas_limit != 0) {
+        ratio = static_cast<double>(h->gas_used) / static_cast<double>(h->gas_limit);
+      }
+      gas_used_ratio.append(ratio);
+      if (want_reward) {
+        Json::Value row(Json::arrayValue);
+        for (size_t i = 0; i < percentile_count; ++i) {
+          row.append(reward_value);
+        }
+        rewards.append(row);
+      }
+    }
+    base_fees.append("0x0");  // spec: baseFeePerGas has blockCount+1 entries (next-block projection)
+    res["baseFeePerGas"] = base_fees;
+    res["gasUsedRatio"] = gas_used_ratio;
+    if (want_reward) {
+      res["reward"] = rewards;
+    }
+    return res;
+  }
+
   string eth_getTransactionCount(const string& _address, const Json::Value& _json) override {
     const auto block_number = get_block_number_from_json(_json);
     return toJS(transaction_count(block_number, toAddress(_address)));
