@@ -2,7 +2,7 @@
 
 ## Unsupported EIPs
 Following EIPs are not supported by our EVM:
-- [EIP-1559](https://eips.ethereum.org/EIPS/eip-1559)
+- [EIP-1559](https://eips.ethereum.org/EIPS/eip-1559) — *not supported for transactions*: EBLA has no base-fee mechanism and rejects type-2 (dynamic-fee) envelopes at `eth_sendRawTransaction` and the p2p layer. The `eth_feeHistory` RPC method **is** implemented for wallet compatibility, but reports `baseFeePerGas` as `0x0` for every block (legacy semantics); blocks omit `baseFeePerGas`, so wallets stay on legacy type-0 transactions.
 - [EIP-4844](https://eips.ethereum.org/EIPS/eip-4844)
 - [EIP-2718](https://eips.ethereum.org/EIPS/eip-2718) — *partial support*: the JSON-RPC presentation layer is EIP-2718-aware (transaction and receipt responses include a `"type"` field, hardcoded to `"0x0"` for legacy transactions). However, **acceptance of typed-transaction envelopes** (`0x01`-prefixed EIP-2930 access-list transactions, `0x02`-prefixed EIP-1559 dynamic-fee transactions) is **not** supported — EBLA still rejects such envelopes at `eth_sendRawTransaction` and the p2p layer. Submit legacy transactions only.
 

@@ -7,6 +7,7 @@
 - "pending" block identifier means "latest"
 - `eth_syncing` return values are to be better defined
 - added `totalReward` field to a block type returned by `eth_getBlockByHash` and `eth_getBlockByNumber` methods. This field has amount of tokens that was minted as rewards in this block
+- `eth_feeHistory` is implemented for wallet gas estimation, but EBLA is a legacy (non-EIP-1559) chain: every `baseFeePerGas` entry is `0x0`, `gasUsedRatio` is the real per-block fill ratio, and `reward` percentiles report the node's current gas-price oracle value (the chain minimum when there is no recent traffic). Blocks do not expose `baseFeePerGas`, so wallets keep sending legacy (type-0) transactions.
 
 ### Not implemented
 

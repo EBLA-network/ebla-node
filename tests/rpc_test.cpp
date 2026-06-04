@@ -64,6 +64,60 @@ TEST_F(RPCTest, eth_estimateGas) {
   }
 }
 
+TEST_F(RPCTest, eth_feeHistory) {
+  auto node_cfg = make_node_cfgs(1);
+  auto nodes = launch_nodes(node_cfg);
+  net::rpc::eth::EthParams eth_rpc_params;
+  eth_rpc_params.chain_id = node_cfg.front().genesis.chain_id;
+  eth_rpc_params.gas_limit = node_cfg.front().genesis.dag.gas_limit;
+  eth_rpc_params.final_chain = nodes.front()->getFinalChain();
+  auto eth_json_rpc = net::rpc::eth::NewEth(std::move(eth_rpc_params));
+
+  // 4 blocks ending at latest, with 3 reward percentiles.
+  Json::Value percentiles(Json::arrayValue);
+  percentiles.append(25);
+  percentiles.append(50);
+  percentiles.append(75);
+  const auto res = eth_json_rpc->eth_feeHistory("0x4", "latest", percentiles);
+
+  // Shape is well-formed regardless of how many blocks actually exist.
+  ASSERT_TRUE(res.isObject());
+  ASSERT_TRUE(res.isMember("oldestBlock"));
+  ASSERT_TRUE(res["baseFeePerGas"].isArray());
+  ASSERT_TRUE(res["gasUsedRatio"].isArray());
+  ASSERT_TRUE(res["reward"].isArray());
+
+  const auto n_blocks = res["gasUsedRatio"].size();
+  EXPECT_GE(n_blocks, 1u);
+  // baseFeePerGas carries one extra (next-block projection) entry.
+  EXPECT_EQ(res["baseFeePerGas"].size(), n_blocks + 1);
+  // Legacy chain: every base fee is zero.
+  for (const auto& bf : res["baseFeePerGas"]) {
+    EXPECT_EQ(bf.asString(), "0x0");
+  }
+  // reward: one row per block, each row one entry per requested percentile.
+  EXPECT_EQ(res["reward"].size(), n_blocks);
+  for (const auto& row : res["reward"]) {
+    ASSERT_TRUE(row.isArray());
+    EXPECT_EQ(row.size(), percentiles.size());
+  }
+  // gasUsedRatio entries are valid fractions.
+  for (const auto& r : res["gasUsedRatio"]) {
+    EXPECT_GE(r.asDouble(), 0.0);
+    EXPECT_LE(r.asDouble(), 1.0);
+  }
+
+  // No percentiles requested -> no "reward" field.
+  const auto res_no_reward = eth_json_rpc->eth_feeHistory("0x2", "latest", Json::Value(Json::arrayValue));
+  EXPECT_FALSE(res_no_reward.isMember("reward"));
+  EXPECT_TRUE(res_no_reward["baseFeePerGas"].isArray());
+
+  // blockCount == 0 -> well-formed empty result.
+  const auto res_zero = eth_json_rpc->eth_feeHistory("0x0", "latest", Json::Value(Json::arrayValue));
+  EXPECT_EQ(res_zero["gasUsedRatio"].size(), 0u);
+  EXPECT_EQ(res_zero["baseFeePerGas"].size(), 0u);
+}
+
 TEST_F(RPCTest, eth_call) {
   auto node_cfg = make_node_cfgs(1);
   auto nodes = launch_nodes(node_cfg);
