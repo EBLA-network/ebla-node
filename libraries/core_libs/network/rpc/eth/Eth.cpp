@@ -82,6 +82,8 @@ Json::Value toJson(const LocalisedTransactionReceipt& ltr) {
   res["status"] = toJS(ltr.r.status_code);
   res["gasUsed"] = toJS(ltr.r.gas_used);
   res["cumulativeGasUsed"] = toJS(ltr.r.cumulative_gas_used);
+  // Price actually paid by this tx; legacy chain so it equals the tx's gasPrice.
+  res["effectiveGasPrice"] = toJS(ltr.trx_gas_price);
   res["contractAddress"] = toJson(ltr.r.new_contract_address);
   res["logsBloom"] = toJS(ltr.r.bloom());
   // EIP-2718 type tag. EBLA only supports legacy (pre-typed) transactions,
@@ -377,6 +379,7 @@ class EthImpl : public Eth, EthParams {
                 ExtendedTransactionLocation{{{blk_n, index}, *block_hash}, trx->getHash()},
                 trx->getSender(),
                 trx->getReceiver(),
+                trx->getGasPrice(),
             });
           }
           return toJson(LocalisedTransactionReceipt{
@@ -384,6 +387,7 @@ class EthImpl : public Eth, EthParams {
               ExtendedTransactionLocation{{{blk_n, index}, *block_hash}, trx->getHash()},
               trx->getSender(),
               trx->getReceiver(),
+              trx->getGasPrice(),
           });
         });
   }
@@ -518,6 +522,7 @@ class EthImpl : public Eth, EthParams {
         ExtendedTransactionLocation{*loc_trx->trx_loc, trx_h},
         trx->getSender(),
         trx->getReceiver(),
+        trx->getGasPrice(),
     };
   }
 

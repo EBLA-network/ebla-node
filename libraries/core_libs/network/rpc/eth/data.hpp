@@ -28,6 +28,9 @@ struct LocalisedTransactionReceipt {
   ExtendedTransactionLocation trx_loc;
   addr_t trx_from;
   std::optional<addr_t> trx_to;
+  // EBLA is legacy (no EIP-1559), so effectiveGasPrice == the transaction's gas_price.
+  // Carried on the RPC wrapper because TransactionReceipt itself has no gas price.
+  u256 trx_gas_price{};
 };
 
 struct LocalisedLogEntry {

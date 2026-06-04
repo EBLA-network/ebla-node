@@ -1019,6 +1019,7 @@ Returns all transactions from block at specified period
 * `s`: `QUANTITY` - ECDSA signature s
 * `cumulativeGasUsed`: `QUANTITY` - The total amount of gas used when this transaction was executed in the block.
 * `gasUsed`: `QUANTITY` - The amount of gas used by this specific transaction alone.
+* `effectiveGasPrice`: `QUANTITY` - The gas price actually paid by this transaction. EBLA is legacy (no EIP-1559), so this always equals the transaction's `gasPrice`.
 * `contractAddress`: `DATA`, 20 Bytes - The contract address created, if the transaction was a contract creation, otherwise null.
 * `logs`: `Array` - Array of log objects, which this transaction generated.
 * `logsBloom`: `DATA`, 256 Bytes - Bloom filter for light clients to quickly retrieve related logs.
@@ -1042,6 +1043,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"debug_getPeriodTransactionsWithR
       "blockNumber": "0x100",
       "contractAddress": null,
       "cumulativeGasUsed": "0x5208",
+      "effectiveGasPrice": "0x1",
       "from": "0x111f91441efc8c6c0edf6534970cc887e2fabaa8",
       "gas": "0x5208",
       "gasPrice": "0x1",
