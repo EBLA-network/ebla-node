@@ -114,7 +114,7 @@ RUN cd $BUILD_OUTPUT_DIR && make -j$(nproc) all \
     # && find . -maxdepth 1 ! -name "lib" ! -name "bin" -exec rm -rfv {} \;
 
 # Set LD_LIBRARY_PATH so eblad binary finds shared libs
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+ENV LD_LIBRARY_PATH=/usr/local/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 
 ###############################################################################
 ##### Ebla image containing eblad binary + dynamic libraries + config #####
@@ -148,7 +148,7 @@ COPY --from=build $WORKDIR/$BUILD_OUTPUT_DIR/lib/*.so* /usr/local/lib/
 COPY --chmod=755 scripts/ebla-sign.py /usr/local/bin/ebla-sign
 
 # Set LD_LIBRARY_PATH so eblad binary finds shared libs
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+ENV LD_LIBRARY_PATH=/usr/local/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 
 COPY docker-entrypoint.sh /entrypoint.sh
 
