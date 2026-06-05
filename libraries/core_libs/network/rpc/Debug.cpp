@@ -124,9 +124,9 @@ Json::Value Debug::debug_getPeriodTransactionsWithReceipts(const std::string& _p
       auto transaction = rpc::eth::LocalisedTransaction{trx, location};
       rpc::eth::LocalisedTransactionReceipt receipt;
       if (!receipts) {
-        receipt = rpc::eth::LocalisedTransactionReceipt{final_chain->transactionReceipt(period, index, hash).value(),
-                                                        location, trx->getSender(), trx->getReceiver(),
-                                                        trx->getGasPrice()};
+        receipt =
+            rpc::eth::LocalisedTransactionReceipt{final_chain->transactionReceipt(period, index, hash).value(),
+                                                  location, trx->getSender(), trx->getReceiver(), trx->getGasPrice()};
       } else {
         receipt = rpc::eth::LocalisedTransactionReceipt{receipts->at(index), location, trx->getSender(),
                                                         trx->getReceiver(), trx->getGasPrice()};

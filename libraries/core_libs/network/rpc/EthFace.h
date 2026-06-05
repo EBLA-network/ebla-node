@@ -120,10 +120,10 @@ class EthFace : public ServerInterface<EthFace> {
     this->bindAndAddMethod(jsonrpc::Procedure("eth_getBlockReceipts", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_OBJECT,
                                               "param1", JSON_ANY, NULL),
                            &ebla::net::EthFace::eth_getBlockReceiptsI);
-    this->bindAndAddMethod(jsonrpc::Procedure("eth_feeHistory", jsonrpc::PARAMS_BY_POSITION_WITH_OPTIONAL,
-                                              jsonrpc::JSON_OBJECT, "param1", JSON_ANY, "param2", JSON_ANY, "param3",
-                                              JSON_ANY, NULL),
-                           &ebla::net::EthFace::eth_feeHistoryI);
+    this->bindAndAddMethod(
+        jsonrpc::Procedure("eth_feeHistory", jsonrpc::PARAMS_BY_POSITION_WITH_OPTIONAL, jsonrpc::JSON_OBJECT, "param1",
+                           JSON_ANY, "param2", JSON_ANY, "param3", JSON_ANY, NULL),
+        &ebla::net::EthFace::eth_feeHistoryI);
   }
 
   inline virtual void eth_protocolVersionI(const Json::Value &request, Json::Value &response) {
